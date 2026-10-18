@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SahiRank — India's Genuine Review, Ranking & Partner Platform</title>
+  <title>SahiRank V21 Pro — Geo-Targeted Local Leads, Map Directions & SaaS Monetization</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
@@ -12,6 +15,7 @@
     body { background-color: #f8fafc; color: #0f172a; margin: 0; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    .leaflet-container { z-index: 10 !important; font-family: 'Plus Jakarta Sans', sans-serif; }
     .blur-lock { filter: blur(5px); user-select: none; pointer-events: none; }
   </style>
 </head>
@@ -23,61 +27,69 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
+    const { useState, useEffect, useMemo, useRef } = React;
 
-    // ==========================================
-    // SECRET ADMIN CREDENTIALS (SIRF AAPKE LIYE)
-    // ==========================================
     const ADMIN_EMAIL = "admin@sahirank.com";
-    const ADMIN_PHONE = "9999999999";
     const ADMIN_PASS = "SahiBoss@2026";
     const ADMIN_PIN = "2026";
 
     // ==========================================
-    // 1. ALL INDIA CITIES & DISTRICTS DATABASE
+    // 1. ALL INDIA CITIES DATABASE (WITH LAT-LNG)
     // ==========================================
-    const STATE_CITIES = {
-      "Uttar Pradesh": ["Varanasi","Lucknow","Noida","Ghaziabad","Kanpur","Agra","Prayagraj","Ayodhya","Meerut","Gorakhpur","Bareilly","Aligarh","Moradabad","Mathura","Jhansi","Gyanpur","Bhadohi","Suriyawan","Gopiganj","Aurai","Khamaria","Mirzapur","Jaunpur","Azamgarh","Ballia","Deoria","Basti","Sultanpur","Sonbhadra","Chandauli","Ghazipur","Mau","Sitapur","Hardoi","Lakhimpur Kheri","Shahjahanpur","Rampur","Muzaffarnagar","Saharanpur","Bijnor","Bulandshahr","Etawah","Firozabad","Mainpuri","Fatehpur","Pratapgarh","Rae Bareli","Unnao","Banda","Chitrakoot"],
-      "Bihar": ["Patna","Gaya","Muzaffarpur","Bhagalpur","Darbhanga","Purnia","Begusarai","Munger","Chapra (Saran)","Arrah (Bhojpur)","Buxar","Sasaram (Rohtas)","Katihar","Kishanganj","Siwan","Gopalganj","Motihari","Bettiah","Samastipur","Madhubani","Sitamarhi","Hajipur (Vaishali)","Nalanda","Nawada","Aurangabad","Jehanabad","Jamui","Lakhisarai","Khagaria","Saharsa","Supaul","Madhepura","Araria","Banka"],
-      "Maharashtra": ["Mumbai","Pune","Nagpur","Thane","Nashik","Chhatrapati Sambhajinagar","Solapur","Kolhapur","Amravati","Navi Mumbai","Kalyan","Vasai-Virar","Jalgaon","Akola","Latur","Dhule","Ahmednagar","Chandrapur","Parbhani","Jalna","Panvel","Satara","Beed","Yavatmal","Nanded","Wardha","Ratnagiri"],
-      "Delhi NCR": ["New Delhi","South Delhi","Connaught Place","Rohini","Dwarka","Karol Bagh","Laxmi Nagar","Saket","Janakpuri","Gurugram","Faridabad"],
-      "Madhya Pradesh": ["Indore","Bhopal","Jabalpur","Gwalior","Ujjain","Sagar","Rewa","Satna","Ratlam","Dewas","Katni","Singrauli","Chhindwara","Khandwa","Burhanpur","Morena","Bhind","Shivpuri","Vidisha","Chhatarpur","Mandsaur","Neemuch"],
-      "Rajasthan": ["Jaipur","Kota","Jodhpur","Udaipur","Ajmer","Bikaner","Bhilwara","Alwar","Sikar","Bharatpur","Pali","Sri Ganganagar","Hanumangarh","Chittorgarh","Jaisalmer","Barmer","Nagaur","Tonk","Jhunjhunu","Sawai Madhopur"],
-      "Gujarat": ["Ahmedabad","Surat","Vadodara","Rajkot","Bhavnagar","Jamnagar","Gandhinagar","Junagadh","Anand","Navsari","Morbi","Bharuch","Vapi","Mehsana","Bhuj (Kutch)","Patan","Palanpur","Valsad","Godhra"],
-      "Karnataka": ["Bengaluru","Mysuru","Mangaluru","Hubballi-Dharwad","Belagavi","Kalaburagi","Davangere","Ballari","Vijayapura","Shivamogga","Tumakuru","Udupi","Hassan","Bidar","Raichur"],
-      "Tamil Nadu": ["Chennai","Coimbatore","Madurai","Tiruchirappalli","Salem","Tirunelveli","Tiruppur","Vellore","Erode","Thoothukudi","Dindigul","Thanjavur","Hosur","Nagercoil","Kanchipuram"],
-      "West Bengal": ["Kolkata","Howrah","Siliguri","Durgapur","Asansol","Darjeeling","Kharagpur","Haldia","Malda","Bardhaman","Krishnanagar","Baharampur","Jalpaiguri","Cooch Behar"],
-      "Telangana & AP": ["Hyderabad","Secunderabad","Warangal","Nizamabad","Karimnagar","Khammam","Visakhapatnam","Vijayawada","Guntur","Tirupati","Nellore","Kurnool","Rajahmundry","Kakinada","Anantapur"],
-      "Punjab & Haryana": ["Chandigarh","Ludhiana","Amritsar","Jalandhar","Patiala","Bathinda","Mohali","Pathankot","Hoshiarpur","Ambala","Panipat","Karnal","Hisar","Rohtak","Sonipat","Kurukshetra","Yamunanagar","Panchkula"],
-      "Other States & UTs": ["Dehradun","Haridwar","Rishikesh","Nainital","Haldwani","Roorkee","Shimla","Manali","Dharamshala","Solan","Mandi","Ranchi","Jamshedpur","Dhanbad","Bokaro","Deoghar","Hazaribagh","Raipur","Bhilai","Bilaspur","Korba","Durg","Bhubaneswar","Cuttack","Rourkela","Puri","Sambalpur","Guwahati","Silchar","Dibrugarh","Jorhat","Tezpur","Kochi","Thiruvananthapuram","Kozhikode","Thrissur","Kollam","Panaji","Madgaon","Srinagar","Jammu","Shillong","Agartala","Imphal","Aizawl","Kohima","Gangtok","Itanagar","Leh","Puducherry","Port Blair"]
+    const CITY_COORDS = {
+      "Varanasi": { lat: 25.3176, lng: 82.9739, state: "Uttar Pradesh" },
+      "Lucknow": { lat: 26.8467, lng: 80.9462, state: "Uttar Pradesh" },
+      "Gyanpur": { lat: 25.3567, lng: 82.4722, state: "Uttar Pradesh" },
+      "Bhadohi": { lat: 25.3962, lng: 82.5701, state: "Uttar Pradesh" },
+      "Prayagraj": { lat: 25.4358, lng: 81.8463, state: "Uttar Pradesh" },
+      "Ayodhya": { lat: 26.7922, lng: 82.1998, state: "Uttar Pradesh" },
+      "Gorakhpur": { lat: 26.7606, lng: 83.3732, state: "Uttar Pradesh" },
+      "Kanpur": { lat: 26.4499, lng: 80.3319, state: "Uttar Pradesh" },
+      "Agra": { lat: 27.1767, lng: 78.0081, state: "Uttar Pradesh" },
+      "Noida": { lat: 28.5355, lng: 77.3910, state: "Uttar Pradesh" },
+      "Mumbai": { lat: 19.0760, lng: 72.8777, state: "Maharashtra" },
+      "Pune": { lat: 18.5204, lng: 73.8567, state: "Maharashtra" },
+      "Delhi": { lat: 28.6139, lng: 77.2090, state: "Delhi NCR" },
+      "Patna": { lat: 25.5941, lng: 85.1376, state: "Bihar" },
+      "Gaya": { lat: 24.7914, lng: 85.0002, state: "Bihar" },
+      "Kota": { lat: 25.2138, lng: 75.8648, state: "Rajasthan" },
+      "Jaipur": { lat: 26.9124, lng: 75.7873, state: "Rajasthan" },
+      "Indore": { lat: 22.7196, lng: 75.8577, state: "Madhya Pradesh" },
+      "Bhopal": { lat: 23.2599, lng: 77.4126, state: "Madhya Pradesh" },
+      "Bengaluru": { lat: 12.9716, lng: 77.5946, state: "Karnataka" },
+      "Hyderabad": { lat: 17.3850, lng: 78.4867, state: "Telangana" },
+      "Kolkata": { lat: 22.5726, lng: 88.3639, state: "West Bengal" },
+      "Chennai": { lat: 13.0827, lng: 80.2707, state: "Tamil Nadu" }
     };
 
-    const ALL_CITIES = [];
-    Object.entries(STATE_CITIES).forEach(([state, cities]) => {
-      cities.forEach(c => ALL_CITIES.push({ name: c, state, display: `${c}, ${state}` }));
-    });
+    const ALL_CITIES = Object.keys(CITY_COORDS).map(name => ({
+      name,
+      state: CITY_COORDS[name].state,
+      display: `${name}, ${CITY_COORDS[name].state}`,
+      lat: CITY_COORDS[name].lat,
+      lng: CITY_COORDS[name].lng
+    }));
 
-    // ==========================================
-    // 2. CATEGORIES
-    // ==========================================
     const CATEGORIES = [
-      { id: "All", label: "🌐 All Categories" },
+      { id: "All", label: "🌐 Sabhi Categories" },
       { id: "Hospital & Clinic", label: "🏥 Hospital & Diagnostics" },
       { id: "Car & Bike Showroom", label: "🚗 Car & Bike Showroom" },
       { id: "Service Center & Repair", label: "🔧 Bike/Car/AC Service" },
       { id: "Mall & Supermarket", label: "🏬 Shopping Mall & Mart" },
       { id: "Hotel & Restaurant", label: "🏨 Hotel & Restaurant" },
-      { id: "Coaching & School", label: "🎓 Coaching, School & College" },
-      { id: "Tech & Electronics", label: "📱 Mobile, Laptop & Tech" },
-      { id: "Local Shop & Services", label: "🏪 Local Shop, Salon & Gym" }
+      { id: "Coaching & School", label: "🎓 Coaching & School" },
+      { id: "Tech & Electronics", label: "📱 Tech & Electronics" }
     ];
 
     // ==========================================
-    // 3. PRE-SEEDED 7 BUSINESSES PER CITY (SO NO CITY IS EVER EMPTY)
+    // 2. PRE-SEEDED BUSINESSES WITH LAT-LNG
     // ==========================================
-    function getSeededBusinessesForCity(cityObj) {
+    function getSeededBusinesses(cityObj) {
       const c = cityObj.name;
       const s = cityObj.state;
+      const baseLat = cityObj.lat;
+      const baseLng = cityObj.lng;
+
       return [
         {
           id: `biz-${c}-1`,
@@ -85,63 +97,69 @@
           category: "Hospital & Clinic",
           city: c,
           state: s,
+          lat: baseLat + 0.005,
+          lng: baseLng + 0.003,
           claimed: false,
           ownerEmail: null,
           isSponsored: true,
-          businessPro: false,
+          businessPro: true,
+          verifiedBadge: true,
           searchAppearances: 1420,
           profileViews: 890,
           leadClicks: 215,
-          address: `Main Civil Lines Road, ${c}, ${s}`,
+          address: `Main Civil Lines Road, ${c}`,
           phone: "+91 98765 11001",
           offerText: "15% OFF on Full Body Checkup & OPD Consultation",
           reviews: [
-            { id: 1, user: "Rohan Tiwari", userEmail: "rohan@demo.com", userPhone: "+91 98111 22334", stars: 5, sentiment: "positive", text: "Doctors bahut cooperative hain aur ICU facility top class hai. Cleanliness acchi hai.", verifiedBill: true, helpful: 34, date: "2 days ago" },
-            { id: 2, user: "Priya Dubey", userEmail: "priya@demo.com", userPhone: "+91 98222 33445", stars: 4, sentiment: "positive", text: "Pathology reports time par mil gayi, staff behavior accha tha.", verifiedBill: true, helpful: 19, date: "5 days ago" },
-            { id: 3, user: "Sandeep Yadav", userEmail: "sandeep@demo.com", userPhone: "+91 99333 44556", stars: 2, sentiment: "negative", text: "Raat me billing counter par 45 minute wait karwaya aur pharmacy par dawai mehengi mili. Receptionist rude tha.", verifiedBill: true, helpful: 52, date: "1 day ago" },
-            { id: 4, user: "Ankit Verma", userEmail: "ankit@demo.com", userPhone: "+91 97444 55667", stars: 1, sentiment: "negative", text: "Parking charge bahut jyada hai aur emergency doctor 30 min late aaye.", verifiedBill: false, helpful: 28, date: "3 days ago" }
+            { id: 1, user: "Rohan Tiwari", stars: 5, sentiment: "positive", text: "Doctors bahut cooperative hain aur ICU facility top class hai.", verifiedBill: true, date: "2 days ago" },
+            { id: 2, user: "Sandeep Yadav", stars: 2, sentiment: "negative", text: "Raat me billing counter par 45 minute wait karwaya.", verifiedBill: true, date: "1 day ago" }
           ]
         },
         {
           id: `biz-${c}-2`,
-          name: `${c} Royal Motors — Car & Bike Authorized Showroom`,
+          name: `${c} Royal Motors — Car & Bike Showroom`,
           category: "Car & Bike Showroom",
           city: c,
           state: s,
+          lat: baseLat - 0.004,
+          lng: baseLng + 0.006,
           claimed: false,
           ownerEmail: null,
           isSponsored: false,
           businessPro: false,
+          verifiedBadge: false,
           searchAppearances: 1180,
           profileViews: 640,
           leadClicks: 178,
-          address: `NH Highway Bypass, Industrial Area, ${c}`,
+          address: `NH Highway Bypass, ${c}`,
           phone: "+91 98765 22002",
           offerText: "Free Teflon Coating + ₹2,000 Accessories Coupon",
           reviews: [
-            { id: 10, user: "Vikram Singh", userEmail: "vikram@demo.com", userPhone: "+91 91234 56780", stars: 5, sentiment: "positive", text: "Test drive turant mil gayi aur finance process 2 ghante me ho gaya. Best showroom in city!", verifiedBill: true, helpful: 41, date: "3 days ago" },
-            { id: 11, user: "Deepak Maurya", userEmail: "deepak@demo.com", userPhone: "+91 92345 67891", stars: 2, sentiment: "negative", text: "Delivery ke waqt wada kiya hua free seat cover nahi diya aur RC transfer me 1 mahina laga diya.", verifiedBill: true, helpful: 63, date: "Yesterday" }
+            { id: 10, user: "Vikram Singh", stars: 5, sentiment: "positive", text: "Test drive turant mil gayi aur finance process fast tha.", verifiedBill: true, date: "3 days ago" },
+            { id: 11, user: "Deepak Maurya", stars: 1, sentiment: "negative", text: "Delivery ke waqt seat cover nahi diya.", verifiedBill: true, date: "Yesterday" }
           ]
         },
         {
           id: `biz-${c}-3`,
-          name: `SpeedCare Bike & Car Multi-Brand Service Hub (${c})`,
+          name: `SpeedCare Bike & Car Service Hub (${c})`,
           category: "Service Center & Repair",
           city: c,
           state: s,
+          lat: baseLat + 0.002,
+          lng: baseLng - 0.004,
           claimed: false,
           ownerEmail: null,
           isSponsored: false,
           businessPro: false,
+          verifiedBadge: true,
           searchAppearances: 950,
           profileViews: 510,
           leadClicks: 142,
-          address: `Station Road, Near Overbridge, ${c}`,
+          address: `Station Road, ${c}`,
           phone: "+91 98765 33003",
           offerText: "20% OFF on Labor Charges + Free Foam Wash",
           reviews: [
-            { id: 20, user: "Karan Patel", userEmail: "karan@demo.com", userPhone: "+91 93456 78901", stars: 5, sentiment: "positive", text: "Genuine engine oil daala mere samne aur mileage 5kmpl badh gaya.", verifiedBill: true, helpful: 22, date: "4 days ago" },
-            { id: 21, user: "Mohit Sharma", userEmail: "mohit@demo.com", userPhone: "+91 94567 89012", stars: 1, sentiment: "negative", text: "Bina puche extra clutch plate change kar diya aur ₹1800 faltu bill bana diya.", verifiedBill: true, helpful: 47, date: "2 days ago" }
+            { id: 20, user: "Karan Patel", stars: 5, sentiment: "positive", text: "Genuine engine oil daala mere samne.", verifiedBill: true, date: "4 days ago" }
           ]
         },
         {
@@ -150,97 +168,55 @@
           category: "Mall & Supermarket",
           city: c,
           state: s,
+          lat: baseLat - 0.003,
+          lng: baseLng - 0.005,
           claimed: false,
           ownerEmail: null,
           isSponsored: true,
-          businessPro: false,
+          businessPro: true,
+          verifiedBadge: true,
           searchAppearances: 2340,
           profileViews: 1520,
           leadClicks: 390,
-          address: `City Center Square, ${c}, ${s}`,
+          address: `City Center Square, ${c}`,
           phone: "+91 98765 44004",
-          offerText: "Flat 10% Cashback on Grocery & Fashion Billing above ₹1,500",
+          offerText: "Flat 10% Cashback on Grocery Billing above ₹1,500",
           reviews: [
-            { id: 30, user: "Neha Gupta", userEmail: "neha@demo.com", userPhone: "+91 95678 90123", stars: 5, sentiment: "positive", text: "Sabhi top clothing brands, multiplex cinema aur food court ek hi chat ke niche!", verifiedBill: true, helpful: 55, date: "1 week ago" },
-            { id: 31, user: "Abhishek Rai", userEmail: "abhi@demo.com", userPhone: "+91 96789 01234", stars: 2, sentiment: "negative", text: "Weekend par AC dhang se kaam nahi karta aur billing counter par sirf 2 staff rehte hain.", verifiedBill: false, helpful: 31, date: "3 days ago" }
+            { id: 30, user: "Neha Gupta", stars: 5, sentiment: "positive", text: "Sabhi top clothing brands aur food court ek hi jagah hai!", verifiedBill: true, date: "1 week ago" }
           ]
         },
         {
           id: `biz-${c}-5`,
-          name: `Shikhar IIT-JEE, NEET & Civil Services Academy (${c})`,
+          name: `Shikhar IIT-JEE & NEET Academy (${c})`,
           category: "Coaching & School",
           city: c,
           state: s,
+          lat: baseLat + 0.006,
+          lng: baseLng - 0.001,
           claimed: false,
           ownerEmail: null,
           isSponsored: false,
           businessPro: false,
+          verifiedBadge: false,
           searchAppearances: 1680,
           profileViews: 1120,
           leadClicks: 310,
-          address: `Degree College Chauraha, Knowledge Park, ${c}`,
+          address: `Degree College Chauraha, ${c}`,
           phone: "+91 98765 55005",
-          offerText: "Free 5-Day Demo Classes + 25% Scholarship Discount",
+          offerText: "Free 5-Day Demo Classes + 25% Scholarship",
           reviews: [
-            { id: 40, user: "Aarav Mishra", userEmail: "aarav@demo.com", userPhone: "+91 97890 12345", stars: 5, sentiment: "positive", text: "Physics aur Chemistry faculty Kota level ki hai. Doubt counter roz lagta hai.", verifiedBill: true, helpful: 68, date: "2 days ago" },
-            { id: 41, user: "Sneha Singh", userEmail: "sneha@demo.com", userPhone: "+91 98901 23456", stars: 2, sentiment: "negative", text: "Admission ke baad batch me 120 bache bitha diye aur syllabus piche chal raha hai.", verifiedBill: true, helpful: 89, date: "Yesterday" }
-          ]
-        },
-        {
-          id: `biz-${c}-6`,
-          name: `Hotel Royal Heritage & Spice Darbar Restaurant (${c})`,
-          category: "Hotel & Restaurant",
-          city: c,
-          state: s,
-          claimed: false,
-          ownerEmail: null,
-          isSponsored: false,
-          businessPro: false,
-          searchAppearances: 1320,
-          profileViews: 780,
-          leadClicks: 195,
-          address: `VIP Road, Near Railway Station, ${c}`,
-          phone: "+91 98765 66006",
-          offerText: "15% OFF on Family Dinner & Room Booking",
-          reviews: [
-            { id: 50, user: "Manish Jain", userEmail: "manish@demo.com", userPhone: "+91 99012 34567", stars: 5, sentiment: "positive", text: "Paneer Tikka aur Dal Makhani lajawab hai! Family ke liye best ambiance.", verifiedBill: true, helpful: 29, date: "4 days ago" },
-            { id: 51, user: "Gaurav Kashyap", userEmail: "gaurav@demo.com", userPhone: "+91 90123 45678", stars: 2, sentiment: "negative", text: "Room service bahut slow hai aur Wi-Fi bilkul nahi chal raha tha.", verifiedBill: true, helpful: 37, date: "2 days ago" }
-          ]
-        },
-        {
-          id: `biz-${c}-7`,
-          name: `Digital Tech World — iPhone, Laptop & Gadget Hub (${c})`,
-          category: "Tech & Electronics",
-          city: c,
-          state: s,
-          claimed: false,
-          ownerEmail: null,
-          isSponsored: false,
-          businessPro: false,
-          searchAppearances: 890,
-          profileViews: 460,
-          leadClicks: 112,
-          address: `Main Market Chowk, ${c}`,
-          phone: "+91 98765 77007",
-          offerText: "Free Tempered Glass + ₹1,000 Off on Laptop Repair",
-          reviews: [
-            { id: 60, user: "Harshvardhan", userEmail: "harsh@demo.com", userPhone: "+91 91122 33445", stars: 5, sentiment: "positive", text: "Online Flipkart/Amazon se bhi saste price par laptop mila with official warranty.", verifiedBill: true, helpful: 24, date: "6 days ago" },
-            { id: 61, user: "Pooja Sahu", userEmail: "pooja@demo.com", userPhone: "+91 92233 44556", stars: 1, sentiment: "negative", text: "Mobile screen replacement ke 10 din baad touch kaam karna band kar diya aur warranty mana kar rahe.", verifiedBill: true, helpful: 51, date: "Yesterday" }
+            { id: 40, user: "Aarav Mishra", stars: 5, sentiment: "positive", text: "Physics aur Chemistry faculty Kota level ki hai.", verifiedBill: true, date: "2 days ago" }
           ]
         }
       ];
     }
 
-    // ==========================================
-    // 4. SAHIRANK ALGORITHM & CREATOR LEVEL ENGINE
-    // ==========================================
     function calculateSahiRank(biz) {
       const revs = biz.reviews || [];
-      if (revs.length === 0) return { avgRating: 4.5, trustScore: 78, posCount: 0, negCount: 0, rankScore: 50 };
+      if (revs.length === 0) return { avgRating: 4.5, trustScore: 80, rankScore: 50 };
       const totalStars = revs.reduce((acc, r) => acc + r.stars, 0);
       const avgRating = Number((totalStars / revs.length).toFixed(1));
       const posCount = revs.filter(r => r.stars >= 4).length;
-      const negCount = revs.filter(r => r.stars <= 3).length;
       const verifiedCount = revs.filter(r => r.verifiedBill).length;
 
       const posRatio = (posCount / revs.length) * 60;
@@ -251,83 +227,52 @@
       const sponsorBoost = biz.isSponsored ? 1000 : 0;
       const rankScore = sponsorBoost + trustScore * 5 + (biz.searchAppearances || 0) * 0.05;
 
-      return { avgRating, trustScore, posCount, negCount, rankScore };
+      return { avgRating, trustScore, rankScore };
     }
 
-    function getCreatorLevelInfo(points) {
-      const levels = [
-        { level: 1, title: "Level 1: Newbie Reviewer", minPoints: 0 },
-        { level: 2, title: "Level 2: Rising Voice", minPoints: 100 },
-        { level: 3, title: "Level 3: Verified Critic", minPoints: 250 },
-        { level: 4, title: "Level 4: City Influencer", minPoints: 400 },
-        { level: 5, title: "Level 5: SahiRank Partner (20% Revenue Share Eligible)", minPoints: 500 }
-      ];
-      let current = levels[0];
-      for (const l of levels) {
-        if (points >= l.minPoints) current = l;
-      }
-      const isMonetized = points >= 500;
-      const progressPct = Math.min(100, Math.round((points / 500) * 100));
-      return { ...current, isMonetized, progressPct };
-    }
-
-    // ==========================================
-    // 5. MAIN APP COMPONENT
-    // ==========================================
     function App() {
-      const [selectedCity, setSelectedCity] = useState(ALL_CITIES[0]);
+      // Geo-Targeted City State
+      const [selectedCity, setSelectedCity] = useState(ALL_CITIES[0]); // Default Varanasi
       const [citySearch, setCitySearch] = useState("");
       const [cityDropdown, setCityDropdown] = useState(false);
       const [category, setCategory] = useState("All");
       const [searchQuery, setSearchQuery] = useState("");
 
-      // Active View Mode: 'marketplace' | 'creator_studio' | 'business_dashboard' | 'secret_admin'
-      const [activeTab, setActiveTab] = useState("marketplace");
-
-      // Secret Footer Click Counter for Founder
-      const [secretClicks, setSecretClicks] = useState(0);
-      const [pinModal, setPinModal] = useState(false);
-      const [pinInput, setPinInput] = useState("");
-
-      // Current Logged-In User (Null if logged out, or 'individual' / 'business' / 'admin')
+      const [activeTab, setActiveTab] = useState("marketplace"); // 'marketplace' | 'business_dashboard' | 'secret_admin'
       const [currentUser, setCurrentUser] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v20_user")) || null; } catch { return null; }
+        try { return JSON.parse(localStorage.getItem("sahirank_v21_user")) || null; } catch { return null; }
       });
 
-      // Secret Founder Revenue Ledger (Hidden from public, only visible when role === 'admin')
       const [platformLedger, setPlatformLedger] = useState(() => {
         try {
-          return JSON.parse(localStorage.getItem("sahirank_v20_ledger")) || {
-            totalGrossRevenue: 14850,
-            creatorPayoutPool20Pct: 2970,
-            adminNetProfit80Pct: 11880,
+          return JSON.parse(localStorage.getItem("sahirank_v21_ledger")) || {
+            totalGrossRevenue: 18400,
+            adminNetProfit80Pct: 14720,
             transactions: [
-              { id: 1, type: "Business Pro Subscription", from: "Grand Central Mall", amount: 999, creatorShare: 199.8, adminShare: 799.2, time: "2 hours ago" },
-              { id: 2, type: "Sponsored #1 Rank Boost", from: "Apex Super-Specialty Hospital", amount: 1499, creatorShare: 299.8, adminShare: 1199.2, time: "Yesterday" },
-              { id: 3, type: "User Negative Review Unlock Pass", from: "24 Individual Users (₹49x24)", amount: 1176, creatorShare: 235.2, adminShare: 940.8, time: "This Week" },
-              { id: 4, type: "Customer Lead Phone Unlocks", from: "Royal Motors Showroom", amount: 499, creatorShare: 99.8, adminShare: 399.2, time: "3 days ago" }
+              { id: 1, type: "Business Pro Subscription (₹999)", from: "Apex Hospital", amount: 999, time: "2 hours ago" },
+              { id: 2, type: "Verified Badge (₹1,499)", from: "Grand Mall", amount: 1499, time: "Yesterday" }
             ]
           };
         } catch { return null; }
       });
 
       const [customBizMap, setCustomBizMap] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v20_bizmap")) || {}; } catch { return {}; }
+        try { return JSON.parse(localStorage.getItem("sahirank_v21_bizmap")) || {}; } catch { return {}; }
       });
 
       // Modals
       const [authModal, setAuthModal] = useState(false);
-      const [authMode, setAuthMode] = useState("login"); // 'login' | 'signup'
-      const [authForm, setAuthForm] = useState({ name: "", emailOrPhone: "", password: "", role: "individual", gstOrLicense: "" });
+      const [authForm, setAuthForm] = useState({ name: "", emailOrPhone: "", password: "", role: "individual" });
       const [reviewModalBiz, setReviewModalBiz] = useState(null);
       const [reviewForm, setReviewForm] = useState({ stars: 5, text: "", verifiedBill: true });
       const [suggestModal, setSuggestModal] = useState(false);
-      const [suggestForm, setSuggestForm] = useState({ name: "", category: "Hospital & Clinic", address: "", phone: "" });
-      const [claimModalBiz, setClaimModalBiz] = useState(null);
-      const [claimDoc, setClaimDoc] = useState("");
+      const [suggestForm, setSuggestForm] = useState({ name: "", category: "Hospital & Clinic", address: "", phone: "", lat: selectedCity.lat, lng: selectedCity.lng });
       const [paymentModal, setPaymentModal] = useState(null);
       const [toast, setToast] = useState(null);
-      const [unlockedLeads, setUnlockedLeads] = useState({});
+
+      // Map Ref
+      const mapRef = useRef(null);
+      const markersRef = useRef([]);
 
       const showToast = (msg) => setToast(msg);
       useEffect(() => {
@@ -337,21 +282,18 @@
       }, [toast]);
 
       useEffect(() => {
-        if (currentUser) localStorage.setItem("sahirank_v20_user", JSON.stringify(currentUser));
-        else localStorage.removeItem("sahirank_v20_user");
+        if (currentUser) localStorage.setItem("sahirank_v21_user", JSON.stringify(currentUser));
+        else localStorage.removeItem("sahirank_v21_user");
       }, [currentUser]);
 
       useEffect(() => {
-        if (platformLedger) localStorage.setItem("sahirank_v20_ledger", JSON.stringify(platformLedger));
-      }, [platformLedger]);
-
-      useEffect(() => {
-        localStorage.setItem("sahirank_v20_bizmap", JSON.stringify(customBizMap));
+        localStorage.setItem("sahirank_v21_bizmap", JSON.stringify(customBizMap));
       }, [customBizMap]);
 
+      // Filtered Businesses STRICTLY FOR SELECTED CITY (Geo-Targeted Leads)
       const cityBusinesses = useMemo(() => {
-        const key = selectedCity.display;
-        const base = customBizMap[key] || getSeededBusinessesForCity(selectedCity);
+        const key = selectedCity.name;
+        const base = customBizMap[key] || getSeededBusinesses(selectedCity);
         let list = base.map(b => ({ ...b, metrics: calculateSahiRank(b) }));
 
         if (category !== "All") list = list.filter(b => b.category === category);
@@ -362,243 +304,83 @@
         return list.sort((a, b) => b.metrics.rankScore - a.metrics.rankScore);
       }, [selectedCity, customBizMap, category, searchQuery]);
 
+      // Initialize & Update Map with Pinpoints
+      useEffect(() => {
+        if (!window.L) return;
+        const el = document.getElementById("mainMap");
+        if (!el) return;
+
+        if (!mapRef.current) {
+          mapRef.current = window.L.map("mainMap").setView([selectedCity.lat, selectedCity.lng], 13);
+          window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap contributors",
+            maxZoom: 19
+          }).addTo(mapRef.current);
+        } else {
+          mapRef.current.setView([selectedCity.lat, selectedCity.lng], 13);
+        }
+
+        markersRef.current.forEach(m => { try { m.remove(); } catch {} });
+        markersRef.current = [];
+
+        cityBusinesses.forEach(biz => {
+          const marker = window.L.marker([biz.lat, biz.lng])
+            .addTo(mapRef.current)
+            .bindPopup(`
+              <div style="min-width:180px">
+                <b style="color:#ff6b02;font-size:13px">${biz.name}</b><br/>
+                <span style="font-size:11px">${biz.category}</span><br/>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${biz.lat},${biz.lng}" target="_blank" style="display:inline-block;margin-top:4px;background:#ff6b02;color:#white;padding:3px 8px;border-radius:4px;font-size:10px;text-decoration:none;font-weight:bold;">🧭 Get Directions</a>
+              </div>
+            `);
+          markersRef.current.push(marker);
+        });
+      }, [selectedCity, cityBusinesses]);
+
       const updateCityBusiness = (bizId, updater) => {
-        const key = selectedCity.display;
-        const currentList = customBizMap[key] || getSeededBusinessesForCity(selectedCity);
+        const key = selectedCity.name;
+        const currentList = customBizMap[key] || getSeededBusinesses(selectedCity);
         const updatedList = currentList.map(b => b.id === bizId ? updater(b) : b);
         setCustomBizMap(prev => ({ ...prev, [key]: updatedList }));
       };
 
-      const processRevenueTransaction = (title, amount, fromName) => {
-        const creatorCut = Number((amount * 0.20).toFixed(1));
-        const adminCut = Number((amount * 0.80).toFixed(1));
-
+      const processRevenue = (title, amount) => {
+        const adminCut = Number((amount * 0.8).toFixed(1));
         setPlatformLedger(prev => ({
           totalGrossRevenue: prev.totalGrossRevenue + amount,
-          creatorPayoutPool20Pct: Number((prev.creatorPayoutPool20Pct + creatorCut).toFixed(1)),
-          adminNetProfit80Pct: Number((prev.adminNetProfit80Pct + adminCut).toFixed(1)),
-          transactions: [
-            { id: Date.now(), type: title, from: fromName, amount, creatorShare: creatorCut, adminShare: adminCut, time: "Just now" },
-            ...prev.transactions
-          ]
+          adminNetProfit80Pct: prev.adminNetProfit80Pct + adminCut,
+          transactions: [{ id: Date.now(), type: title, amount, time: "Just now" }, ...prev.transactions]
         }));
-
-        if (currentUser && currentUser.role === "individual" && currentUser.points >= 500) {
-          setCurrentUser(prev => ({
-            ...prev,
-            walletEarnings: Number(((prev.walletEarnings || 0) + creatorCut * 0.25).toFixed(1))
-          }));
-        }
       };
 
-      // Handle Login / Sign Up (With Secret Founder Detection)
       const handleAuthSubmit = (e) => {
         e.preventDefault();
         const inputId = authForm.emailOrPhone.trim().toLowerCase();
         const pass = authForm.password.trim();
 
-        // SECRET ADMIN CHECK: Only triggers if Founder enters secret credentials!
-        if ((inputId === ADMIN_EMAIL || inputId === ADMIN_PHONE) && pass === ADMIN_PASS) {
-          const founderUser = {
-            id: "founder-admin",
-            name: "Founder & Super Admin",
-            email: ADMIN_EMAIL,
-            phone: ADMIN_PHONE,
-            role: "admin",
-            unlockedNegativePass: true
-          };
-          setCurrentUser(founderUser);
+        if ((inputId === ADMIN_EMAIL || inputId === "9999999999") && pass === ADMIN_PASS) {
+          setCurrentUser({ id: "admin", name: "Super Admin", role: "admin" });
           setAuthModal(false);
           setActiveTab("secret_admin");
-          showToast("👑 Welcome Boss! Secret Founder Revenue HQ Unlocked.");
+          showToast("👑 Welcome Boss! Admin HQ Unlocked.");
           return;
         }
 
-        // Standard User or Business Owner Login
         const newUser = {
           id: Date.now(),
-          name: authForm.name.trim() || (authForm.role === "business" ? "Verified Business Partner" : "Verified Reviewer"),
-          email: inputId,
-          phone: inputId,
+          name: authForm.name.trim() || (authForm.role === "business" ? "Business Owner" : "Local User"),
           role: authForm.role,
-          points: authForm.role === "individual" ? 450 : 0,
-          reviewsPostedToday: 0,
-          lastReviewDate: new Date().toLocaleDateString(),
-          walletEarnings: authForm.role === "individual" ? 340 : 0,
-          unlockedNegativePass: false,
-          couponsReceived: [
-            { id: "c1", bizName: "Apex Super-Specialty Hospital", code: "CARE15", discount: "15% OFF on OPD & Lab Tests", date: "Today" }
-          ]
+          city: selectedCity.name
         };
         setCurrentUser(newUser);
         setAuthModal(false);
         setActiveTab(authForm.role === "business" ? "business_dashboard" : "marketplace");
-        showToast(`✅ Welcome ${newUser.name}!`);
+        showToast(`✅ Logged in successfully as ${newUser.name}!`);
       };
-
-      // Handle Secret Footer 5-Click Unlock
-      const handleSecretLogoClick = () => {
-        const next = secretClicks + 1;
-        setSecretClicks(next);
-        if (next >= 5) {
-          setSecretClicks(0);
-          setPinModal(true);
-        }
-      };
-
-      const handlePinVerify = (e) => {
-        e.preventDefault();
-        if (pinInput.trim() === ADMIN_PIN) {
-          const founderUser = {
-            id: "founder-admin",
-            name: "Founder & Super Admin",
-            email: ADMIN_EMAIL,
-            role: "admin",
-            unlockedNegativePass: true
-          };
-          setCurrentUser(founderUser);
-          setPinModal(false);
-          setPinInput("");
-          setActiveTab("secret_admin");
-          showToast("👑 Secret Founder Dashboard Unlocked!");
-        } else {
-          showToast("❌ Invalid PIN!");
-        }
-      };
-
-      // Handle Genuine Review Submit
-      const handleReviewSubmit = (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-          setReviewModalBiz(null);
-          setAuthModal(true);
-          showToast("🔐 Review likhne aur Points kamane ke liye pehle Login karein!");
-          return;
-        }
-        if (currentUser.role === "business") {
-          showToast("⚠️ Business Owner account se dusre business par review nahi de sakte!");
-          return;
-        }
-
-        const today = new Date().toLocaleDateString();
-        const countToday = currentUser.lastReviewDate === today ? (currentUser.reviewsPostedToday || 0) : 0;
-
-        if (countToday >= 3) {
-          showToast("🛑 Daily Limit Reached! Spam rokne ke liye 1 user din me maximum 3 genuine reviews hi de sakta hai.");
-          return;
-        }
-
-        if (reviewForm.text.trim().length < 15) {
-          showToast("⚠️ Genuine review me kam se kam 15 letters ka apna asli anubhav likhein!");
-          return;
-        }
-
-        const earnedPts = reviewForm.verifiedBill ? 50 : 25;
-        const newRev = {
-          id: Date.now(),
-          user: currentUser.name,
-          userEmail: currentUser.email,
-          userPhone: currentUser.phone || "+91 98765 43210",
-          stars: Number(reviewForm.stars),
-          sentiment: Number(reviewForm.stars) >= 4 ? "positive" : "negative",
-          text: reviewForm.text.trim(),
-          verifiedBill: reviewForm.verifiedBill,
-          helpful: 1,
-          date: "Just now"
-        };
-
-        updateCityBusiness(reviewModalBiz.id, (b) => ({
-          ...b,
-          searchAppearances: b.searchAppearances + 5,
-          profileViews: b.profileViews + 3,
-          reviews: [newRev, ...(b.reviews || [])]
-        }));
-
-        const nextPoints = (currentUser.points || 0) + earnedPts;
-        setCurrentUser(prev => ({
-          ...prev,
-          points: nextPoints,
-          reviewsPostedToday: countToday + 1,
-          lastReviewDate: today
-        }));
-
-        setReviewModalBiz(null);
-        setReviewForm({ stars: 5, text: "", verifiedBill: true });
-
-        if (nextPoints >= 500 && (currentUser.points || 0) < 500) {
-          showToast("🎉 CONGRATULATIONS! Aapke 500 Points pure ho gaye! Ab aap Level 5 Monetized Partner ban gaye (20% Revenue Share Active)!");
-        } else {
-          showToast(`✅ Review Posted! Aapko +${earnedPts} Trust Points mile (${3 - (countToday + 1)} reviews left today).`);
-        }
-      };
-
-      // Handle Suggest / Add Listing
-      const handleSuggestSubmit = (e) => {
-        e.preventDefault();
-        if (!suggestForm.name.trim()) return;
-        const isOwner = currentUser?.role === "business";
-        const newBiz = {
-          id: `biz-custom-${Date.now()}`,
-          name: suggestForm.name.trim(),
-          category: suggestForm.category,
-          city: selectedCity.name,
-          state: selectedCity.state,
-          claimed: isOwner,
-          ownerEmail: isOwner ? currentUser.email : null,
-          isSponsored: false,
-          businessPro: false,
-          searchAppearances: 45,
-          profileViews: 18,
-          leadClicks: 4,
-          address: suggestForm.address || `Main Market, ${selectedCity.name}`,
-          phone: suggestForm.phone || "+91 98765 XXXXX",
-          offerText: "10% OFF for SahiRank Verified Reviewers",
-          reviews: []
-        };
-
-        const key = selectedCity.display;
-        const currentList = customBizMap[key] || getSeededBusinessesForCity(selectedCity);
-        setCustomBizMap(prev => ({ ...prev, [key]: [newBiz, ...currentList] }));
-        setSuggestModal(false);
-        setSuggestForm({ name: "", category: "Hospital & Clinic", address: "", phone: "" });
-        showToast(isOwner ? `🏪 Aapka Business '${newBiz.name}' list ho gaya!` : `📍 '${newBiz.name}' Unclaimed add ho gaya!`);
-      };
-
-      // Handle Claim Ownership
-      const handleClaimBusiness = (e) => {
-        e.preventDefault();
-        if (!claimDoc.trim()) {
-          showToast("⚠️ GST Number, Shop License ya Official Phone OTP darj karein!");
-          return;
-        }
-        const ownerUser = {
-          id: "owner-" + Date.now(),
-          name: `${claimModalBiz.name.split(" ")[0]} (Verified Owner)`,
-          email: currentUser?.email || "owner@business.com",
-          phone: claimModalBiz.phone,
-          role: "business"
-        };
-        setCurrentUser(ownerUser);
-        updateCityBusiness(claimModalBiz.id, (b) => ({ ...b, claimed: true, ownerEmail: ownerUser.email }));
-        setClaimModalBiz(null);
-        setClaimDoc("");
-        setActiveTab("business_dashboard");
-        showToast("✅ Ownership Verified! Welcome to your Business Traffic & Leads Portal.");
-      };
-
-      const filteredCities = useMemo(() => {
-        const q = citySearch.trim().toLowerCase();
-        if (!q) return ALL_CITIES.slice(0, 25);
-        return ALL_CITIES.filter(c => c.display.toLowerCase().includes(q)).slice(0, 25);
-      }, [citySearch]);
-
-      const creatorInfo = getCreatorLevelInfo(currentUser?.points || 0);
 
       return (
         <div className="min-h-screen flex flex-col">
-          {/* ==========================================
-              CLEAN PUBLIC HEADER (NO PUBLIC ADMIN BUTTON!)
-          ========================================== */}
+          {/* HEADER */}
           <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
             <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
               {/* Brand */}
@@ -609,25 +391,25 @@
                   </div>
                   <div>
                     <div className="font-display font-bold text-lg leading-none text-slate-900">
-                      SahiRank <span className="text-orange-600">India</span>
+                      SahiRank <span className="text-orange-600">V21 Pro</span>
                     </div>
                     <div className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-0.5">
-                      Genuine Reviews • Verified Rankings
+                      Geo-Targeted Leads • Map Directions
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* City Selector + Search Bar */}
+              {/* Geo-Targeted City Selector + Search */}
               <div className="flex-1 flex flex-col sm:flex-row gap-2">
                 <div className="relative sm:w-72 shrink-0">
                   <div
                     onClick={() => setCityDropdown(!cityDropdown)}
-                    className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl border-2 border-slate-200 hover:border-orange-500 bg-white cursor-pointer"
+                    className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl border-2 border-slate-200 hover:border-orange-500 bg-white cursor-pointer shadow-sm"
                   >
                     <div className="flex items-center gap-2 truncate">
                       <span className="text-orange-500">📍</span>
-                      <span className="text-sm font-bold text-slate-800 truncate">{selectedCity.display}</span>
+                      <span className="text-sm font-bold text-slate-900 truncate"><b>{selectedCity.name}</b> ({selectedCity.state})</span>
                     </div>
                     <span className="text-xs text-slate-400">▼</span>
                   </div>
@@ -638,38 +420,25 @@
                         type="text"
                         value={citySearch}
                         onChange={(e) => setCitySearch(e.target.value)}
-                        placeholder="Search any city (Varanasi, Kota, Patna, Gyanpur...)"
+                        placeholder="Search city (Varanasi, Lucknow, Gyanpur...)"
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-none focus:border-orange-500 mb-2"
                         autoFocus
                       />
-                      {filteredCities.map((c, i) => (
+                      {ALL_CITIES.filter(c => c.display.toLowerCase().includes(citySearch.toLowerCase())).map((c, i) => (
                         <button
                           key={i}
                           onClick={() => {
                             setSelectedCity(c);
                             setCityDropdown(false);
                             setCitySearch("");
-                            showToast(`📍 ${c.name} ke top Hospitals, Showrooms, Malls & Services load ho gaye!`);
+                            showToast(`📍 Location switched to ${c.name}! Showing local ${c.name} leads.`);
                           }}
                           className="w-full text-left px-3 py-2 rounded-xl hover:bg-orange-50 text-xs font-semibold text-slate-700 flex items-center justify-between"
                         >
                           <span>📍 {c.display}</span>
-                          <span className="text-[10px] text-emerald-600 font-bold">Verified City</span>
+                          <span className="text-[10px] text-emerald-600 font-bold">Geo-Targeted</span>
                         </button>
                       ))}
-                      {citySearch.trim().length > 2 && filteredCities.length === 0 && (
-                        <button
-                          onClick={() => {
-                            const custom = { name: citySearch.trim(), state: "India", display: `${citySearch.trim()}, India` };
-                            setSelectedCity(custom);
-                            setCityDropdown(false);
-                            setCitySearch("");
-                          }}
-                          className="w-full text-left px-3 py-2 rounded-xl bg-orange-50 text-orange-700 text-xs font-bold"
-                        >
-                          ➕ Open '{citySearch.trim()}' Directory
-                        </button>
-                      )}
                     </div>
                   )}
                 </div>
@@ -679,7 +448,7 @@
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={`Search Hospital, Car Showroom, Bike Service, Mall, Coaching in ${selectedCity.name}...`}
+                    placeholder={`Search hospitals, showrooms, services in ${selectedCity.name}...`}
                     className="flex-1 bg-transparent outline-none text-sm text-slate-900"
                   />
                   {searchQuery && (
@@ -688,100 +457,48 @@
                 </div>
               </div>
 
-              {/* ROLE-BASED DYNAMIC NAVIGATION */}
+              {/* Navigation & Auth */}
               <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                {/* Individual User sees Creator Rewards */}
-                {(!currentUser || currentUser.role === "individual") && (
-                  <button
-                    onClick={() => {
-                      if (!currentUser) {
-                        setAuthForm({ ...authForm, role: "individual" });
-                        setAuthModal(true);
-                        showToast("🏆 Creator Rewards & 20% Revenue Share dekhne ke liye Login karein!");
-                      } else {
-                        setActiveTab(activeTab === "creator_studio" ? "marketplace" : "creator_studio");
-                      }
-                    }}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${
-                      activeTab === "creator_studio"
-                        ? "bg-amber-500 text-slate-950 border-amber-500"
-                        : "bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100"
-                    }`}
-                  >
-                    <span>🏆</span>
-                    <span>{currentUser ? `${currentUser.points} Pts • ₹${currentUser.walletEarnings}` : "Earn from Reviews"}</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => setActiveTab("business_dashboard")}
+                  className={`px-3.5 py-2.5 rounded-xl text-xs font-bold border transition ${
+                    activeTab === "business_dashboard" ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-800 border-blue-200"
+                  }`}
+                >
+                  🏪 Owner Leads & Traffic
+                </button>
 
-                {/* Business Owner sees Business Traffic Portal */}
-                {(!currentUser || currentUser.role === "business") && (
-                  <button
-                    onClick={() => {
-                      if (!currentUser) {
-                        setAuthForm({ ...authForm, role: "business" });
-                        setAuthModal(true);
-                        showToast("🏪 Apni Dukan/Hospital ka Traffic aur Leads dekhne ke liye Business Login karein!");
-                      } else {
-                        setActiveTab(activeTab === "business_dashboard" ? "marketplace" : "business_dashboard");
-                      }
-                    }}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition ${
-                      activeTab === "business_dashboard"
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
-                    }`}
-                  >
-                    📊 {currentUser?.role === "business" ? "My Business Traffic & Leads" : "For Business Owners"}
-                  </button>
-                )}
-
-                {/* SECRET ADMIN BUTTON: ONLY VISIBLE WHEN LOGGED IN AS FOUNDER ADMIN */}
                 {currentUser?.role === "admin" && (
                   <button
-                    onClick={() => setActiveTab(activeTab === "secret_admin" ? "marketplace" : "secret_admin")}
-                    className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold shadow-lg animate-pulse"
+                    onClick={() => setActiveTab("secret_admin")}
+                    className="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold shadow animate-pulse"
                   >
-                    👑 Secret Founder HQ (₹{platformLedger.adminNetProfit80Pct})
+                    👑 Admin HQ (₹{platformLedger.adminNetProfit80Pct})
                   </button>
                 )}
 
-                {/* Login / Logout Button */}
                 {currentUser ? (
-                  <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                    <span className="text-xs font-bold text-slate-800">{currentUser.name.split(" ")[0]}</span>
-                    <button
-                      onClick={() => {
-                        setCurrentUser(null);
-                        setActiveTab("marketplace");
-                        showToast("👋 Logged out successfully.");
-                      }}
-                      className="text-[11px] text-red-600 font-bold hover:underline ml-1"
-                    >
-                      Logout
-                    </button>
+                  <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-xl border">
+                    <span className="text-xs font-bold text-slate-800">{currentUser.name}</span>
+                    <button onClick={() => { setCurrentUser(null); setActiveTab("marketplace"); showToast("Logged out!"); }} className="text-[11px] text-red-600 font-bold ml-1">Logout</button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setAuthModal(true)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow"
-                  >
-                    🔐 Login / Sign Up
+                  <button onClick={() => setAuthModal(true)} className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow">
+                    🔐 Login
                   </button>
                 )}
               </div>
             </div>
 
             {/* Category Bar */}
-            <div className="border-t border-slate-100 bg-slate-50/80">
+            <div className="border-t border-slate-100 bg-slate-50">
               <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto">
                 {CATEGORIES.map(cat => (
                   <button
                     key={cat.id}
                     onClick={() => { setCategory(cat.id); setActiveTab("marketplace"); }}
-                    className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
-                      category === cat.id && activeTab === "marketplace"
-                        ? "bg-orange-600 text-white border-orange-600 shadow-sm"
-                        : "bg-white text-slate-700 border-slate-200 hover:border-orange-400"
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition ${
+                      category === cat.id && activeTab === "marketplace" ? "bg-orange-600 text-white border-orange-600" : "bg-white text-slate-700 border-slate-200"
                     }`}
                   >
                     {cat.label}
@@ -791,788 +508,202 @@
             </div>
           </header>
 
-          {/* ==========================================
-              VIEW 1: PUBLIC MARKETPLACE
-          ========================================== */}
+          {/* MAIN CONTENT */}
           {activeTab === "marketplace" && (
-            <main className="max-w-[1400px] w-full mx-auto px-3 sm:px-6 py-5 flex-1 space-y-5">
-              {/* Hero Banner */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-orange-950 text-white rounded-3xl p-5 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                <div className="space-y-1.5 max-w-2xl">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-bold">
-                    <span>📍 {selectedCity.display}</span> • <span>Verified Trust & Review Algorithm</span>
+            <main className="max-w-[1400px] w-full mx-auto px-3 sm:px-6 py-5 flex-1 grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-5 items-start">
+              {/* LEFT: LISTINGS WITH MAP DIRECTIONS */}
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-orange-600 to-amber-600 text-white rounded-3xl p-5 shadow-md flex items-center justify-between gap-4">
+                  <div>
+                    <span className="px-3 py-1 rounded-full bg-white/20 text-xs font-bold">📍 {selectedCity.name} Local Geo-Leads</span>
+                    <h2 className="font-display font-bold text-xl mt-1.5">Strict City-Wise Matching & Map Navigation</h2>
+                    <p className="text-xs text-orange-100 mt-0.5">Yahan sirf <b>{selectedCity.name}</b> ke local hospitals, showrooms aur dukanen dikh rahi hain jinhe aap direct Map par pin-point dekh sakte hain.</p>
                   </div>
-                  <h1 className="font-display font-bold text-xl sm:text-2xl">
-                    Apna Asli Experience Share Karein Aur Rewards Kamayein!
-                  </h1>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    Positive reviews sabke liye free hain. Kisi bhi Hospital, Showroom, Coaching ya Hotel ke <b>Negative / Critical Reviews (1★-3★)</b> dekhne ke liye Full Reality Pass chahiye.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2.5 shrink-0">
-                  {!currentUser?.unlockedNegativePass && (
-                    <button
-                      onClick={() => setPaymentModal({
-                        title: "Unlock All Negative Reviews (Full Reality Pass)",
-                        amount: 49,
-                        desc: "Sabhi Hospitals, Showrooms, Coaching aur Hotels ke chhupe hue 1★-3★ negative reviews aur asli sachai dekhein.",
-                        onSuccess: () => {
-                          if (currentUser) setCurrentUser(prev => ({ ...prev, unlockedNegativePass: true }));
-                          processRevenueTransaction("User Full Reality Pass (Negative Reviews Unlock)", 49, currentUser?.name || "Public User");
-                          showToast("🔓 Full Reality Pass Activated! Ab aapko sabhi Negative Reviews bhi dikhenge.");
-                        }
-                      })}
-                      className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg transition"
-                    >
-                      🔒 Unlock Negative Reviews (₹49 Pass)
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setSuggestModal(true)}
-                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs shadow transition"
-                  >
-                    ➕ Add / Suggest Business in {selectedCity.name}
+                  <button onClick={() => setSuggestModal(true)} className="px-4 py-2.5 rounded-xl bg-white text-orange-700 font-bold text-xs shadow shrink-0">
+                    ➕ Add Your Shop
                   </button>
                 </div>
-              </div>
 
-              {/* Listings Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {cityBusinesses.map((biz, index) => {
-                  const posReviews = (biz.reviews || []).filter(r => r.stars >= 4);
-                  const negReviews = (biz.reviews || []).filter(r => r.stars <= 3);
-                  const canSeeNegative = currentUser?.unlockedNegativePass || currentUser?.role === "admin" || biz.businessPro;
+                <div className="space-y-3.5">
+                  {cityBusinesses.map((biz, index) => {
+                    const posRevs = (biz.reviews || []).filter(r => r.stars >= 4);
+                    const negRevs = (biz.reviews || []).filter(r => r.stars <= 3);
 
-                  return (
-                    <div
-                      key={biz.id}
-                      className={`bg-white rounded-3xl border-2 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between ${
-                        biz.isSponsored ? "border-amber-400 bg-gradient-to-b from-amber-50/30 to-white" : "border-slate-200"
-                      }`}
-                    >
-                      <div>
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-extrabold text-xs">
-                              #{index + 1} Rank
-                            </span>
-                            {biz.isSponsored && (
-                              <span className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px]">
-                                ⚡ SPONSORED
-                              </span>
-                            )}
-                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px]">
-                              {biz.category}
-                            </span>
-                          </div>
-
-                          <div>
-                            {biz.claimed ? (
-                              <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">
-                                ✅ Owner Verified
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => setClaimModalBiz(biz)}
-                                className="px-2.5 py-1 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-[11px] border border-orange-300 transition"
-                              >
-                                🏪 Claim Business (Owners)
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <h2 className="font-bold text-lg text-slate-900 leading-snug">{biz.name}</h2>
-                            <p className="text-xs text-slate-500 mt-0.5">📍 {biz.address} • 📞 {biz.phone}</p>
-                          </div>
-                          <div className="text-right shrink-0 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-2xl">
-                            <div className="text-sm font-extrabold text-emerald-800">
-                              ⭐ {biz.metrics.avgRating} <span className="text-[11px] font-normal">({biz.reviews.length})</span>
+                    return (
+                      <div key={biz.id} className="bg-white rounded-3xl border-2 border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                        <div>
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-extrabold text-xs">#{index + 1}</span>
+                              {biz.verifiedBadge && <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold text-[11px]">🛡️ Verified Blue Badge</span>}
+                              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[11px]">{biz.category}</span>
                             </div>
-                            <div className="text-[10px] font-bold text-emerald-600">
-                              🛡️ {biz.metrics.trustScore}% SahiTrust
-                            </div>
+                            <span className="text-xs font-bold text-emerald-700">⭐ {biz.metrics.avgRating} ({biz.reviews.length})</span>
                           </div>
-                        </div>
 
-                        {/* Traffic Teaser to Attract Business Owners to Pay */}
-                        <div className="mt-3 p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-                          <div className="flex items-center gap-3 text-slate-600 font-medium">
-                            <span>🔍 <b>{biz.searchAppearances}</b> People Searched</span>
-                            <span>👁️ <b>{biz.profileViews}</b> Views</span>
-                            <span>📞 <b>{biz.leadClicks}</b> Leads</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              if (currentUser?.role === "business") setActiveTab("business_dashboard");
-                              else setClaimModalBiz(biz);
-                            }}
-                            className="text-[11px] font-bold text-blue-600 hover:underline"
-                          >
-                            Is this your business? Unlock Leads →
-                          </button>
-                        </div>
+                          <h3 className="font-bold text-lg text-slate-900">{biz.name}</h3>
+                          <p className="text-xs text-slate-500 mt-0.5">📍 {biz.address} • 📞 {biz.phone}</p>
 
-                        {/* POSITIVE REVIEWS (FREE) */}
-                        <div className="mt-3 space-y-2">
-                          <div className="text-xs font-extrabold text-emerald-700 uppercase tracking-wider">
-                            😊 Positive Experiences ({posReviews.length})
-                          </div>
-                          {posReviews.slice(0, 2).map(r => (
-                            <div key={r.id} className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70 text-xs">
-                              <div className="flex items-center justify-between font-bold text-slate-800">
-                                <span>👤 {r.user} {r.verifiedBill && <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded ml-1">🧾 Verified</span>}</span>
-                                <span className="text-amber-600">{"⭐".repeat(r.stars)}</span>
+                          {/* POSITIVE REVIEWS */}
+                          <div className="mt-3 space-y-1.5">
+                            {posRevs.slice(0, 1).map(r => (
+                              <div key={r.id} className="p-2.5 rounded-xl bg-emerald-50 text-xs text-slate-700">
+                                <b>👤 {r.user}:</b> "{r.text}"
                               </div>
-                              <p className="text-slate-700 mt-1">{r.text}</p>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* NEGATIVE REVIEWS (LOCKED) */}
-                        <div className="mt-3 space-y-2 relative">
-                          <div className="text-xs font-extrabold text-red-600 uppercase tracking-wider flex items-center justify-between">
-                            <span>⚠️ Critical / Negative Reality ({negReviews.length})</span>
-                            {!canSeeNegative && <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full">🔒 Locked</span>}
+                            ))}
                           </div>
 
-                          {negReviews.length === 0 ? (
-                            <div className="text-xs text-slate-400 italic">Koi negative review nahi hai.</div>
-                          ) : (
-                            <div className="relative">
-                              <div className={canSeeNegative ? "space-y-2" : "space-y-2 blur-lock"}>
-                                {negReviews.map(r => (
-                                  <div key={r.id} className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs">
-                                    <div className="flex items-center justify-between font-bold text-red-900">
-                                      <span>👤 {r.user}</span>
-                                      <span>{"⭐".repeat(r.stars)}</span>
-                                    </div>
-                                    <p className="text-red-800 mt-1">{r.text}</p>
-                                  </div>
+                          {/* NEGATIVE REVIEWS (PAYWALL) */}
+                          {negRevs.length > 0 && (
+                            <div className="mt-2 relative">
+                              <div className="blur-lock space-y-1">
+                                {negRevs.map(r => (
+                                  <div key={r.id} className="p-2 rounded-xl bg-red-50 text-xs text-red-800"><b>{r.user}:</b> {r.text}</div>
                                 ))}
                               </div>
-
-                              {!canSeeNegative && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/65 backdrop-blur-[2px] rounded-xl p-3 text-center border border-red-200">
-                                  <div className="text-xs font-extrabold text-slate-900">
-                                    🔒 {negReviews.length} Critical Reviews Locked
-                                  </div>
-                                  <div className="flex gap-2 mt-2">
-                                    <button
-                                      onClick={() => setPaymentModal({
-                                        title: "User Full Reality Pass (Unlock All Negative Reviews)",
-                                        amount: 49,
-                                        desc: "Pure India ke sabhi businesses ke negative reviews 30 din tak dekhein.",
-                                        onSuccess: () => {
-                                          if (currentUser) setCurrentUser(prev => ({ ...prev, unlockedNegativePass: true }));
-                                          else setCurrentUser({ id: Date.now(), name: "Premium User", role: "individual", points: 100, walletEarnings: 0, unlockedNegativePass: true });
-                                          processRevenueTransaction("User Negative Review Unlock Pass", 49, currentUser?.name || "User");
-                                          showToast("🔓 Negative Reviews Unlocked!");
-                                        }
-                                      })}
-                                      className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] shadow"
-                                    >
-                                      👤 Unlock Reality (₹49)
-                                    </button>
-                                    <button
-                                      onClick={() => setPaymentModal({
-                                        title: `Business Pro Unlock — ${biz.name}`,
-                                        amount: 999,
-                                        desc: "Apne business ke sabhi negative reviews padhein, customer ka phone number payein aur unhe 10% OFF coupon bhejein.",
-                                        onSuccess: () => {
-                                          updateCityBusiness(biz.id, b => ({ ...b, businessPro: true, claimed: true }));
-                                          processRevenueTransaction(`Business Pro Subscription (${biz.name})`, 999, biz.name);
-                                          showToast("🏪 Business Pro Activated!");
-                                        }
-                                      })}
-                                      className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] shadow"
-                                    >
-                                      🏪 Owner Pro (₹999/mo)
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
-                        <button
-                          onClick={() => setReviewModalBiz(biz)}
-                          className="flex-1 py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow transition"
-                        >
-                          ✍️ Write Experience (+50 Pts)
-                        </button>
-                        <button
-                          onClick={() => setPaymentModal({
-                            title: `Sponsor #1 Rank Boost — ${biz.name}`,
-                            amount: 499,
-                            desc: `${selectedCity.name} me apni category me sabse upar (#1 Sponsored Rank) par dikhein.`,
-                            onSuccess: () => {
-                              updateCityBusiness(biz.id, b => ({ ...b, isSponsored: true }));
-                              processRevenueTransaction(`Sponsored Rank Boost (${biz.name})`, 499, biz.name);
-                              showToast(`⚡ ${biz.name} ab #1 Sponsored Rank par boost ho gaya!`);
-                            }
-                          })}
-                          className="py-2.5 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs transition"
-                        >
-                          ⚡ Sponsor #1 (₹499)
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </main>
-          )}
-
-          {/* ==========================================
-              VIEW 2: CREATOR STUDIO (FOR INDIVIDUAL REVIEWERS)
-          ========================================== */}
-          {activeTab === "creator_studio" && (
-            <main className="max-w-[1200px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
-              <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 text-white rounded-3xl p-6 shadow-xl">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <span className="px-3 py-1 rounded-full bg-black/25 text-xs font-extrabold uppercase">
-                      🎬 SahiRank Partner Program (20% Revenue Share)
-                    </span>
-                    <h1 className="font-display font-bold text-2xl sm:text-3xl mt-2">
-                      {currentUser?.name} — {creatorInfo.title}
-                    </h1>
-                    <p className="text-xs sm:text-sm text-orange-50 mt-1">
-                      Genuine reviews likhein, Level 5 (500 Points) pura karein aur shops/hospitals se aane wale Ad & Premium Revenue ka <b>20% hissa</b> kamayein!
-                    </p>
-                  </div>
-                  <div className="bg-white text-slate-900 rounded-2xl p-4 min-w-[220px] text-center shadow-lg">
-                    <div className="text-xs font-bold text-slate-500 uppercase">Creator Wallet Balance</div>
-                    <div className="text-3xl font-extrabold text-emerald-600 mt-1">₹{currentUser?.walletEarnings || 0}</div>
-                    <div className="text-[11px] font-semibold text-slate-500 mt-0.5">
-                      {creatorInfo.isMonetized ? "✅ 20% Partner Share ACTIVE" : "🔒 Complete 500 Pts to Withdraw"}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 bg-black/20 rounded-2xl p-4">
-                  <div className="flex justify-between text-xs font-bold mb-1.5">
-                    <span>Partner Level Criteria: {currentUser?.points || 0} / 500 Points</span>
-                    <span>{creatorInfo.progressPct}%</span>
-                  </div>
-                  <div className="w-full h-3 bg-white/25 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-400 transition-all" style={{ width: `${creatorInfo.progressPct}%` }}></div>
-                  </div>
-                  <div className="mt-2 flex flex-wrap justify-between text-[11px] text-orange-100 gap-2">
-                    <span>🛡️ Daily Anti-Spam Limit: <b>{currentUser?.reviewsPostedToday || 0} / 3 Reviews Used Today</b></span>
-                    <span>💡 1 Verified Bill Review = +50 Points</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
-                <h3 className="font-bold text-base text-slate-900 mb-3">
-                  🎁 Exclusive Discount Coupons Offered to You by Businesses
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {(currentUser?.couponsReceived || []).map((cp, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-orange-50 border-2 border-dashed border-orange-300 flex items-center justify-between">
-                      <div>
-                        <div className="text-xs font-bold text-orange-600">{cp.bizName}</div>
-                        <div className="text-sm font-extrabold text-slate-900 mt-0.5">{cp.discount}</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">{cp.date}</div>
-                      </div>
-                      <div className="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-mono font-bold text-xs">
-                        {cp.code}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </main>
-          )}
-
-          {/* ==========================================
-              VIEW 3: BUSINESS OWNER DASHBOARD
-          ========================================== */}
-          {activeTab === "business_dashboard" && (
-            <main className="max-w-[1300px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
-              <div className="bg-blue-950 text-white rounded-3xl p-6 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                <div>
-                  <span className="px-3 py-1 rounded-full bg-blue-500/30 border border-blue-400/40 text-blue-200 text-xs font-bold">
-                    🏪 Business Owner Traffic & Lead Intelligence
-                  </span>
-                  <h1 className="font-display font-bold text-2xl mt-2">
-                    Track Your Search Traffic, Customer Leads & Negative Feedback
-                  </h1>
-                  <p className="text-xs sm:text-sm text-blue-200 mt-1 max-w-2xl">
-                    Upgrade to Business Pro (₹999/mo) to unlock customer mobile numbers, view critical feedback, and send 10% OFF coupons.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSuggestModal(true)}
-                  className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow"
-                >
-                  ➕ List Your Business
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {cityBusinesses.map((biz) => {
-                  const negRevs = (biz.reviews || []).filter(r => r.stars <= 3);
-                  return (
-                    <div key={biz.id} className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-lg text-slate-900">{biz.name}</h3>
-                            {biz.businessPro ? (
-                              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
-                                ✅ Business Pro Active
-                              </span>
-                            ) : (
-                              <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold text-xs">
-                                🔒 Free Basic Plan (Leads Locked)
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-slate-500 mt-0.5">{biz.category} • {biz.city}, {biz.state}</p>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                          {!biz.businessPro && (
-                            <button
-                              onClick={() => setPaymentModal({
-                                title: `Upgrade to Business Pro — ${biz.name}`,
-                                amount: 999,
-                                desc: "Unlock full search analytics, read all negative reviews, view reviewer mobile numbers, and send 10% OFF retention coupons.",
-                                onSuccess: () => {
-                                  updateCityBusiness(biz.id, b => ({ ...b, businessPro: true, claimed: true }));
-                                  processRevenueTransaction(`Business Pro Plan (${biz.name})`, 999, biz.name);
-                                  showToast(`🎉 ${biz.name} Upgraded to Business Pro!`);
-                                }
-                              })}
-                              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow"
-                            >
-                              🔓 Unlock Full Data & Leads (₹999/mo)
-                            </button>
-                          )}
-                          <button
-                            onClick={() => setPaymentModal({
-                              title: `Sponsor #1 Listing — ${biz.name}`,
-                              amount: 499,
-                              desc: `Get #1 Sponsored Placement in ${biz.city} above all competitors.`,
-                              onSuccess: () => {
-                                updateCityBusiness(biz.id, b => ({ ...b, isSponsored: true }));
-                                processRevenueTransaction(`Sponsored Ad Boost (${biz.name})`, 499, biz.name);
-                                showToast(`⚡ ${biz.name} is now Sponsored #1!`);
-                              }
-                            })}
-                            className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs"
-                          >
-                            ⚡ Sponsor #1 Rank (₹499)
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
-                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                          <div className="text-[11px] font-bold text-slate-500">Search Appearances</div>
-                          <div className="text-xl font-extrabold text-slate-900 mt-0.5">{biz.searchAppearances}</div>
-                        </div>
-                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                          <div className="text-[11px] font-bold text-slate-500">Profile Views</div>
-                          <div className="text-xl font-extrabold text-slate-900 mt-0.5">{biz.profileViews}</div>
-                        </div>
-                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-                          <div className="text-[11px] font-bold text-slate-500">Customer Call Leads</div>
-                          <div className="text-xl font-extrabold text-blue-600 mt-0.5">{biz.leadClicks}</div>
-                        </div>
-                        <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200">
-                          <div className="text-[11px] font-bold text-red-700">Negative Reviews</div>
-                          <div className="text-xl font-extrabold text-red-600 mt-0.5">{negRevs.length} Critical</div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        {(biz.reviews || []).map(r => {
-                          const isLeadUnlocked = biz.businessPro || unlockedLeads[r.id];
-                          return (
-                            <div key={r.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                              <div>
-                                <div className="font-bold text-slate-900 flex items-center gap-2">
-                                  <span>👤 {r.user}</span>
-                                  <span className={r.stars >= 4 ? "text-emerald-600" : "text-red-600"}>({r.stars}★)</span>
-                                  <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono">
-                                    📞 {isLeadUnlocked ? r.userPhone : "+91 98XXX XXXXX (Locked)"}
-                                  </span>
-                                </div>
-                                <p className={`mt-1 ${!biz.businessPro && r.stars <= 3 ? "blur-lock" : "text-slate-600"}`}>"{r.text}"</p>
-                              </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                {!isLeadUnlocked && (
-                                  <button
-                                    onClick={() => setPaymentModal({
-                                      title: `Unlock Customer Phone Lead (${r.user})`,
-                                      amount: 99,
-                                      desc: "Unlock this customer's verified mobile number.",
-                                      onSuccess: () => {
-                                        setUnlockedLeads(prev => ({ ...prev, [r.id]: true }));
-                                        processRevenueTransaction(`Customer Lead Unlock (${biz.name})`, 99, biz.name);
-                                        showToast(`📞 ${r.user} phone unlocked!`);
-                                      }
-                                    })}
-                                    className="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-[11px]"
-                                  >
-                                    🔓 Unlock Phone (₹99)
-                                  </button>
-                                )}
+                              <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[1px] rounded-xl">
                                 <button
-                                  onClick={() => showToast(`🎁 10% OFF Coupon sent to ${r.user}!`)}
-                                  className="px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-[11px]"
+                                  onClick={() => setPaymentModal({
+                                    title: `Unlock Negative Reviews — ${biz.name}`,
+                                    amount: 49,
+                                    onSuccess: () => { processRevenueTransaction("Negative Review Unlock", 49); showToast("🔓 Unlocked!"); }
+                                  })}
+                                  className="px-3 py-1.5 rounded-lg bg-red-600 text-white font-bold text-xs shadow"
                                 >
-                                  🎁 Send 10% OFF Offer
+                                  🔒 1 Negative Feedback Hidden (Unlock ₹49)
                                 </button>
                               </div>
                             </div>
-                          );
-                        })}
+                          )}
+                        </div>
+
+                        {/* MAP DIRECTIONS BUTTON & ACTIONS */}
+                        <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${biz.lat},${biz.lng}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-center font-bold text-xs shadow transition flex items-center justify-center gap-1.5"
+                          >
+                            <span>🧭</span> Get Directions (Google Maps)
+                          </a>
+                          <button
+                            onClick={() => setReviewModalBiz(biz)}
+                            className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition"
+                          >
+                            ✍️ Write Review
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
+
+              {/* RIGHT: INTERACTIVE MAP PIN-POINT VIEW */}
+              <aside className="lg:sticky lg:top-24 space-y-3">
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <div className="text-sm font-bold text-slate-900">
+                      📍 {selectedCity.name} Live Map & Pinpoints ({cityBusinesses.length})
+                    </div>
+                  </div>
+                  <div id="mainMap" className="w-full h-[500px] bg-slate-100"></div>
+                </div>
+              </aside>
             </main>
           )}
 
           {/* ==========================================
-              VIEW 4: SECRET FOUNDER REVENUE HQ (ONLY VISIBLE WHEN ROLE === 'admin')
+              VIEW 2: BUSINESS OWNER TRAFFIC & MONETIZATION DASHBOARD
           ========================================== */}
-          {activeTab === "secret_admin" && currentUser?.role === "admin" && (
+          {activeTab === "business_dashboard" && (
             <main className="max-w-[1200px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
-              <div className="bg-emerald-950 text-white rounded-3xl p-6 shadow-xl border-2 border-emerald-400">
-                <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-200 text-xs font-extrabold uppercase">
-                    🔒 PRIVATE FOUNDER DASHBOARD (INVISIBLE TO PUBLIC)
-                  </span>
+              <div className="bg-blue-950 text-white rounded-3xl p-6 shadow-xl">
+                <span className="px-3 py-1 rounded-full bg-blue-500/30 text-blue-200 text-xs font-bold">🏪 Business Owner High-Yield Monetization</span>
+                <h1 className="font-display font-bold text-2xl mt-2">Apne {selectedCity.name} Business Ko Top Par Layein</h1>
+                <p className="text-xs text-blue-200 mt-1">Dukan malik apne business ke liye **Verified Badge (₹1,499)** aur **City Spotlight Banner (₹2,999/mo)** kharid sakte hain jisse unhe sabse zyada customer leads milegi.</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm space-y-3">
+                  <div className="text-xs font-bold text-orange-600 uppercase">Option A: Verified Trust Badge</div>
+                  <h3 className="font-bold text-lg text-slate-900">Blue Verified Trust Tick (₹1,499 One-Time)</h3>
+                  <p className="text-xs text-slate-600">Aapki dukan/hospital ke naam ke aage official verified badge dikhega jisse customers 3x zyada bharosa karenge.</p>
                   <button
-                    onClick={() => setActiveTab("marketplace")}
-                    className="text-xs px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+                    onClick={() => setPaymentModal({
+                      title: "Verified Blue Badge Setup",
+                      amount: 1499,
+                      onSuccess: () => { processRevenueTransaction("Verified Badge", 1499); showToast("✅ Verified Badge Activated!"); }
+                    })}
+                    className="w-full py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs"
                   >
-                    ← Back to Website
+                    Buy Verified Badge (₹1,499)
                   </button>
                 </div>
-                <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">
-                  SahiRank Master Revenue & 80/20 Split Ledger
-                </h1>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
-                  <div className="bg-white/10 border border-white/15 rounded-2xl p-4">
-                    <div className="text-xs text-emerald-200 font-bold">Total Gross Platform Collection</div>
-                    <div className="text-3xl font-extrabold text-white mt-1">₹{platformLedger.totalGrossRevenue}</div>
-                  </div>
-                  <div className="bg-emerald-500 text-slate-950 rounded-2xl p-4 shadow-lg">
-                    <div className="text-xs font-extrabold uppercase">Your Net Founder Profit (80%)</div>
-                    <div className="text-3xl font-extrabold mt-1">₹{platformLedger.adminNetProfit80Pct}</div>
-                  </div>
-                  <div className="bg-white/10 border border-white/15 rounded-2xl p-4">
-                    <div className="text-xs text-amber-300 font-bold">Creator Partner Pool (20%)</div>
-                    <div className="text-3xl font-extrabold text-amber-400 mt-1">₹{platformLedger.creatorPayoutPool20Pct}</div>
-                  </div>
-                </div>
-              </div>
 
-              <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
-                <h3 className="font-bold text-base text-slate-900 mb-3">💳 All Self-Serve Transactions</h3>
-                <div className="space-y-2.5">
-                  {platformLedger.transactions.map(tx => (
-                    <div key={tx.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
-                      <div>
-                        <div className="font-bold text-slate-900">{tx.type}</div>
-                        <div className="text-slate-500">Paid by: <b>{tx.from}</b> • {tx.time}</div>
-                      </div>
-                      <div className="flex items-center gap-3 font-bold">
-                        <span className="text-slate-700">Gross: ₹{tx.amount}</span>
-                        <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900">Creator 20%: ₹{tx.creatorShare}</span>
-                        <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">Your 80%: ₹{tx.adminShare}</span>
-                      </div>
-                    </div>
-                  ))}
+                <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm space-y-3">
+                  <div className="text-xs font-bold text-amber-600 uppercase">Option B: City Spotlight Banner</div>
+                  <h3 className="font-bold text-lg text-slate-900">#1 Top Spotlight Banner in {selectedCity.name} (₹2,999/mo)</h3>
+                  <p className="text-xs text-slate-600">Jab bhi koi user {selectedCity.name} me khojega, aapki dukan sabse upar banner me dikhegi.</p>
+                  <button
+                    onClick={() => setPaymentModal({
+                      title: `City Spotlight Banner — ${selectedCity.name}`,
+                      amount: 2999,
+                      onSuccess: () => { processRevenueTransaction("Spotlight Banner", 2999); showToast("⚡ Spotlight Banner Active!"); }
+                    })}
+                    className="w-full py-2.5 rounded-xl bg-amber-500 text-slate-950 font-extrabold text-xs"
+                  >
+                    Activate Spotlight (₹2,999/mo)
+                  </button>
                 </div>
               </div>
             </main>
           )}
 
-          {/* ==========================================
-              MODALS (AUTH, REVIEW, CLAIM, SUGGEST, PAYMENT, SECRET PIN)
-          ========================================== */}
+          {/* ADMIN HQ */}
+          {activeTab === "secret_admin" && (
+            <main className="max-w-[1200px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
+              <div className="bg-emerald-950 text-white rounded-3xl p-6 shadow-xl">
+                <h1 className="font-display font-bold text-2xl">👑 Founder Revenue Ledger</h1>
+                <div className="text-3xl font-extrabold text-emerald-400 mt-2">₹{platformLedger.adminNetProfit80Pct}</div>
+              </div>
+            </main>
+          )}
+
+          {/* MODALS */}
           {authModal && (
             <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
               <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
                 <button onClick={() => setAuthModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
-                <h2 className="font-display font-bold text-xl text-slate-900 text-center">
-                  Welcome to SahiRank
-                </h2>
-                <p className="text-xs text-slate-500 text-center mt-1">
-                  Apna Account Type chunein:
-                </p>
-
-                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl my-4">
-                  <button
-                    type="button"
-                    onClick={() => setAuthForm({ ...authForm, role: "individual" })}
-                    className={`py-2.5 rounded-xl text-xs font-extrabold transition ${
-                      authForm.role === "individual" ? "bg-orange-600 text-white shadow" : "text-slate-600"
-                    }`}
-                  >
-                    👤 Individual User
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthForm({ ...authForm, role: "business" })}
-                    className={`py-2.5 rounded-xl text-xs font-extrabold transition ${
-                      authForm.role === "business" ? "bg-blue-600 text-white shadow" : "text-slate-600"
-                    }`}
-                  >
-                    🏪 Business Owner
-                  </button>
-                </div>
-
-                <form onSubmit={handleAuthSubmit} className="space-y-3">
-                  <input
-                    type="text"
-                    value={authForm.name}
-                    onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
-                    placeholder={authForm.role === "business" ? "Business / Owner Name" : "Your Full Name"}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
-                  />
-                  <input
-                    type="text"
-                    required
-                    value={authForm.emailOrPhone}
-                    onChange={(e) => setAuthForm({ ...authForm, emailOrPhone: e.target.value })}
-                    placeholder="Email ID or Mobile Number *"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
-                  />
-                  {authForm.role === "business" && (
-                    <input
-                      type="text"
-                      required
-                      value={authForm.gstOrLicense}
-                      onChange={(e) => setAuthForm({ ...authForm, gstOrLicense: e.target.value })}
-                      placeholder="GSTIN / Shop License / Reg No. *"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-blue-300 bg-blue-50/40 text-xs"
-                    />
-                  )}
-                  <input
-                    type="password"
-                    required
-                    value={authForm.password}
-                    onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                    placeholder="Password *"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
-                  />
-                  <button
-                    type="submit"
-                    className={`w-full py-3 rounded-xl text-white font-bold text-xs shadow-lg ${
-                      authForm.role === "business" ? "bg-blue-600 hover:bg-blue-700" : "bg-orange-600 hover:bg-orange-500"
-                    }`}
-                  >
-                    {authForm.role === "business" ? "🏪 Login to Business Portal" : "👤 Login as Reviewer"}
-                  </button>
+                <h2 className="font-display font-bold text-xl text-slate-900 text-center">Login to SahiRank</h2>
+                <form onSubmit={handleAuthSubmit} className="mt-4 space-y-3">
+                  <input type="text" required value={authForm.emailOrPhone} onChange={(e) => setAuthForm({ ...authForm, emailOrPhone: e.target.value })} placeholder="Email or Mobile *" className="w-full px-3.5 py-2.5 rounded-xl border text-xs" />
+                  <input type="password" required value={authForm.password} onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })} placeholder="Password *" className="w-full px-3.5 py-2.5 rounded-xl border text-xs" />
+                  <button type="submit" className="w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs">Login</button>
                 </form>
               </div>
             </div>
           )}
 
-          {/* SECRET FOUNDER PIN MODAL (5-Clicks on Footer S Logo) */}
-          {pinModal && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/75 backdrop-blur-sm">
-              <div className="bg-slate-900 text-white rounded-3xl border border-emerald-500 shadow-2xl w-full max-w-xs p-6 text-center relative">
-                <button onClick={() => setPinModal(false)} className="absolute top-3 right-3 text-slate-400">✕</button>
-                <div className="text-2xl mb-2">👑</div>
-                <h3 className="font-bold text-base">Founder Secret Access</h3>
-                <form onSubmit={handlePinVerify} className="mt-3 space-y-3">
-                  <input
-                    type="password"
-                    value={pinInput}
-                    onChange={(e) => setPinInput(e.target.value)}
-                    placeholder="Enter Secret PIN (2026)"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-center text-sm text-white outline-none focus:border-emerald-400"
-                    autoFocus
-                  />
-                  <button type="submit" className="w-full py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
-                    Unlock Admin HQ
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* WRITE REVIEW MODAL */}
-          {reviewModalBiz && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
-                <button onClick={() => setReviewModalBiz(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
-                <span className="text-xs font-bold text-orange-600 uppercase">Earn +50 Trust Points</span>
-                <h3 className="font-display font-bold text-lg text-slate-900 mt-0.5">{reviewModalBiz.name}</h3>
-                <form onSubmit={handleReviewSubmit} className="mt-4 space-y-3">
-                  <div className="flex gap-1.5">
-                    {[5, 4, 3, 2, 1].map(st => (
-                      <button
-                        type="button"
-                        key={st}
-                        onClick={() => setReviewForm({ ...reviewForm, stars: st })}
-                        className={`flex-1 py-2 rounded-xl text-xs font-bold border ${
-                          reviewForm.stars === st ? "bg-orange-600 text-white border-orange-600" : "bg-slate-50 text-slate-700 border-slate-200"
-                        }`}
-                      >
-                        {st} ⭐
-                      </button>
-                    ))}
-                  </div>
-                  <textarea
-                    rows="3"
-                    required
-                    value={reviewForm.text}
-                    onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
-                    placeholder="Apna saccha experience likhein (Min 15 characters)..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
-                  ></textarea>
-                  <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={reviewForm.verifiedBill}
-                      onChange={(e) => setReviewForm({ ...reviewForm, verifiedBill: e.target.checked })}
-                    />
-                    <span>🧾 Mere paas Bill / Receipt hai (+50 Points)</span>
-                  </label>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-600 text-white font-bold text-xs shadow">
-                    ✅ Submit Genuine Review
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* CLAIM MODAL */}
-          {claimModalBiz && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
-                <button onClick={() => setClaimModalBiz(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
-                <h3 className="font-display font-bold text-lg text-slate-900">Claim '{claimModalBiz.name}'</h3>
-                <p className="text-xs text-slate-500 mt-1">Enter GSTIN, Shop Act License or Official Phone OTP to verify ownership.</p>
-                <form onSubmit={handleClaimBusiness} className="mt-4 space-y-3">
-                  <input
-                    type="text"
-                    required
-                    value={claimDoc}
-                    onChange={(e) => setClaimDoc(e.target.value)}
-                    placeholder="GSTIN / License / OTP *"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs"
-                  />
-                  <button type="submit" className="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow">
-                    ✅ Verify & Claim Business
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* SUGGEST MODAL */}
-          {suggestModal && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
-                <button onClick={() => setSuggestModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
-                <h3 className="font-display font-bold text-lg text-slate-900">Add / Suggest Listing in {selectedCity.name}</h3>
-                <form onSubmit={handleSuggestSubmit} className="mt-4 space-y-3">
-                  <input
-                    type="text"
-                    required
-                    value={suggestForm.name}
-                    onChange={(e) => setSuggestForm({ ...suggestForm, name: e.target.value })}
-                    placeholder="Business / Hospital / Showroom Name *"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
-                  />
-                  <select
-                    value={suggestForm.category}
-                    onChange={(e) => setSuggestForm({ ...suggestForm, category: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white"
-                  >
-                    {CATEGORIES.filter(c => c.id !== "All").map(c => (
-                      <option key={c.id} value={c.id}>{c.label}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={suggestForm.address}
-                    onChange={(e) => setSuggestForm({ ...suggestForm, address: e.target.value })}
-                    placeholder="Address / Area"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
-                  />
-                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-600 text-white font-bold text-xs shadow">
-                    ✅ Add Listing
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* PAYMENT MODAL (CLEAN FOR CUSTOMERS — NO REVENUE SPLIT SHOWN TO PUBLIC!) */}
           {paymentModal && (
             <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
               <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative text-center">
                 <button onClick={() => setPaymentModal(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 grid place-items-center mx-auto text-2xl font-bold">
-                  🔒
-                </div>
-                <h3 className="font-display font-bold text-lg text-slate-900 mt-3">{paymentModal.title}</h3>
-                <p className="text-xs text-slate-500 mt-1">{paymentModal.desc}</p>
-
-                <div className="my-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                  <div className="text-xs text-slate-500 font-bold">Payable Amount (Incl. GST)</div>
-                  <div className="text-3xl font-extrabold text-slate-900 mt-0.5">₹{paymentModal.amount}</div>
-                  <div className="text-[11px] text-emerald-700 font-semibold mt-1">
-                    ✅ 100% Secure UPI / Card / NetBanking Instant Unlock
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    paymentModal.onSuccess();
-                    setPaymentModal(null);
-                  }}
-                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg"
-                >
-                  ⚡ Pay ₹{paymentModal.amount} & Unlock Instantly
+                <h3 className="font-bold text-lg text-slate-900">{paymentModal.title}</h3>
+                <div className="text-3xl font-extrabold text-slate-900 my-3">₹{paymentModal.amount}</div>
+                <button onClick={() => { paymentModal.onSuccess(); setPaymentModal(null); }} className="w-full py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs">
+                  Pay ₹{paymentModal.amount} Instantly
                 </button>
               </div>
             </div>
           )}
 
-          {/* TOAST */}
           {toast && (
-            <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-slate-900 text-white text-xs sm:text-sm font-bold shadow-2xl border border-orange-500 max-w-lg text-center">
+            <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-slate-900 text-white text-xs sm:text-sm font-bold shadow-2xl border border-orange-500">
               {toast}
             </div>
           )}
-
-          {/* ==========================================
-              FOOTER (WITH HIDDEN 5-CLICK ADMIN TRIGGER ON 'S' BADGE)
-          ========================================== */}
-          <footer className="max-w-[1400px] w-full mx-auto px-3 sm:px-6 py-6 text-xs text-slate-500 border-t border-slate-200 mt-8 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span
-                onClick={handleSecretLogoClick}
-                className="w-5 h-5 rounded bg-slate-200 text-slate-600 inline-grid place-items-center font-bold text-[10px] select-none cursor-default"
-              >
-                S
-              </span>
-              <span>© 2026 SahiRank India — Verified Consumer Trust & Business Intelligence Platform.</span>
-            </div>
-            <div>All 28 States & 8 UTs Active • Genuine Review Protection Enabled</div>
-          </footer>
         </div>
       );
     }
