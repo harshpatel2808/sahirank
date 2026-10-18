@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SahiRank V17 Pro — All India Famous Places, Markets & Local Directory</title>
-  <!-- Tailwind CSS CDN -->
+  <title>SahiRank V18 Ultimate — All India Famous Places, Hospitals, Hotels, Coaching & Cloud Sync</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet Map CSS & JS -->
+  <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- Google Fonts -->
@@ -14,28 +14,20 @@
   <style>
     :root {
       --bg: #fff7ed;
-      --surface: #ffffff;
-      --surface-2: #ffedd5;
       --primary: #ff6b02;
-      --primary-dark: #e55e00;
-      --primary-soft: #fff1e6;
-      --text: #1a1207;
-      --text-2: #6b5a44;
-      --border: #fde5cc;
-      --shadow: 0 10px 30px rgba(255, 107, 2, 0.12);
     }
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
     .font-display { font-family: 'Fraunces', serif; }
-    body { background-color: var(--bg); color: var(--text); margin: 0; }
+    body { background-color: var(--bg); color: #1a1207; margin: 0; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-thumb { background: #fbd38d; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 99px; }
     .leaflet-container { z-index: 10 !important; font-family: 'Plus Jakarta Sans', sans-serif; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- React & Babel CDNs for Standalone Execution -->
+  <!-- React & Babel CDNs -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -44,14 +36,14 @@
     const { useState, useEffect, useMemo, useRef } = React;
 
     // ==========================================
-    // 1. COMPLETE ALL INDIA LOCATIONS (28 STATES + 8 UTs)
+    // 1. ALL INDIA 28 STATES + 8 UTs DATABASE
     // ==========================================
     const STATE_DISTRICTS = {
       "Uttar Pradesh": ["Agra","Aligarh","Ambedkar Nagar","Amethi","Amroha","Auraiya","Ayodhya","Azamgarh","Baghpat","Bahraich","Ballia","Balrampur","Banda","Barabanki","Bareilly","Basti","Bhadohi","Bijnor","Budaun","Bulandshahr","Chandauli","Chitrakoot","Deoria","Etah","Etawah","Farrukhabad","Fatehpur","Firozabad","Gautam Buddha Nagar","Ghaziabad","Ghazipur","Gonda","Gorakhpur","Hamirpur","Hapur","Hardoi","Hathras","Jalaun","Jaunpur","Jhansi","Kannauj","Kanpur Dehat","Kanpur Nagar","Kasganj","Kaushambi","Kushinagar","Lakhimpur Kheri","Lalitpur","Lucknow","Maharajganj","Mahoba","Mainpuri","Mathura","Mau","Meerut","Mirzapur","Moradabad","Muzaffarnagar","Noida","Pilibhit","Pratapgarh","Prayagraj","Rae Bareli","Rampur","Saharanpur","Sambhal","Sant Kabir Nagar","Shahjahanpur","Shamli","Shrawasti","Siddharthnagar","Sitapur","Sonbhadra","Sultanpur","Unnao","Varanasi"],
       "Bihar": ["Araria","Arwal","Aurangabad","Banka","Begusarai","Bhagalpur","Bhojpur","Buxar","Darbhanga","East Champaran","Gaya","Gopalganj","Jamui","Jehanabad","Kaimur","Katihar","Khagaria","Kishanganj","Lakhisarai","Madhepura","Madhubani","Munger","Muzaffarpur","Nalanda","Nawada","Patna","Purnia","Rohtas","Saharsa","Samastipur","Saran","Sheikhpura","Sheohar","Sitamarhi","Siwan","Supaul","Vaishali","West Champaran"],
       "Madhya Pradesh": ["Agar Malwa","Alirajpur","Anuppur","Ashoknagar","Balaghat","Barwani","Betul","Bhind","Bhopal","Burhanpur","Chhatarpur","Chhindwara","Damoh","Datia","Dewas","Dhar","Dindori","Guna","Gwalior","Harda","Hoshangabad","Indore","Jabalpur","Jhabua","Katni","Khandwa","Khargone","Maihar","Mandla","Mandsaur","Mauganj","Morena","Narsinghpur","Neemuch","Niwari","Pandhurna","Panna","Raisen","Rajgarh","Ratlam","Rewa","Sagar","Satna","Sehore","Seoni","Shahdol","Shajapur","Sheopur","Shivpuri","Sidhi","Singrauli","Tikamgarh","Ujjain","Umaria","Vidisha"],
       "Maharashtra": ["Ahmednagar","Akola","Amravati","Chhatrapati Sambhajinagar (Aurangabad)","Beed","Bhandara","Buldhana","Chandrapur","Dhule","Gadchiroli","Gondia","Hingoli","Jalgaon","Jalna","Kolhapur","Latur","Mumbai City","Mumbai Suburban","Nagpur","Nanded","Nandurbar","Nashik","Dharashiv (Osmanabad)","Palghar","Parbhani","Pune","Raigad","Ratnagiri","Sangli","Satara","Sindhudurg","Solapur","Thane","Wardha","Washim","Yavatmal"],
-      "Rajasthan": ["Ajmer","Alwar","Banswara","Baran","Barmer","Beawar","Bharatpur","Bhilwara","Bikaner","Bundi","Chittorgarh","Churu","Dausa","Deeg","Dholpur","Didwana-Kuchaman","Dungarpur","Hanumangarh","Jaipur","Jaisalmer","Jalore","Jhalawar","Jhunjhunu","Jodhpur","Karauli","Khairthal-Tijara","Kota","Kotputli-Behror","Nagaur","Pali","Phalodi","Pratapgarh","Rajsamand","Salumbar","Sawai Madhopur","Sikar","Sirohi","Sri Ganganagar","Tonk","Udaipur"],
+      "Rajasthan": ["Ajmer","Alwar","Banswara","Baran","Barmer","Beawar","Bharatpur","Bhilwara","Bikaner","Bundi","Chittorgarh","Churu","Dausa","Deeg","Dholpur","Dungarpur","Hanumangarh","Jaipur","Jaisalmer","Jalore","Jhalawar","Jhunjhunu","Jodhpur","Karauli","Kota","Nagaur","Pali","Phalodi","Pratapgarh","Rajsamand","Sawai Madhopur","Sikar","Sirohi","Sri Ganganagar","Tonk","Udaipur"],
       "Gujarat": ["Ahmedabad","Amreli","Anand","Aravalli","Banaskantha","Bharuch","Bhavnagar","Botad","Chhota Udaipur","Dahod","Dang","Devbhoomi Dwarka","Gandhinagar","Gir Somnath","Jamnagar","Junagadh","Kutch","Kheda","Mahisagar","Mehsana","Morbi","Narmada","Navsari","Panchmahal","Patan","Porbandar","Rajkot","Sabarkantha","Surat","Surendranagar","Tapi","Vadodara","Valsad"],
       "West Bengal": ["Alipurduar","Bankura","Birbhum","Cooch Behar","Dakshin Dinajpur","Darjeeling","Hooghly","Howrah","Jalpaiguri","Jhargram","Kalimpong","Kolkata","Malda","Murshidabad","Nadia","North 24 Parganas","Paschim Bardhaman","Paschim Medinipur","Purba Bardhaman","Purba Medinipur","Purulia","Siliguri","South 24 Parganas","Uttar Dinajpur"],
       "Tamil Nadu": ["Ariyalur","Chengalpattu","Chennai","Coimbatore","Cuddalore","Dharmapuri","Dindigul","Erode","Kallakurichi","Kanchipuram","Kanyakumari","Karur","Krishnagiri","Madurai","Mayiladuthurai","Nagapattinam","Namakkal","Nilgiris (Ooty)","Perambalur","Pudukkottai","Ramanathapuram","Ranipet","Salem","Sivaganga","Tenkasi","Thanjavur","Theni","Thoothukudi","Tiruchirappalli","Tirunelveli","Tirupathur","Tiruppur","Tiruvallur","Tiruvannamalai","Tiruvarur","Vellore","Viluppuram","Virudhunagar"],
@@ -63,27 +55,27 @@
       "Haryana": ["Ambala","Bhiwani","Charkhi Dadri","Faridabad","Fatehabad","Gurugram","Hisar","Jhajjar","Jind","Kaithal","Karnal","Kurukshetra","Mahendragarh","Nuh","Palwal","Panchkula","Panipat","Rewari","Rohtak","Sirsa","Sonipat","Yamunanagar"],
       "Himachal Pradesh": ["Bilaspur","Chamba","Dharamshala","Hamirpur","Kangra","Kinnaur","Kullu","Lahaul Spiti","Mandi","Manali","Shimla","Sirmaur","Solan","Una"],
       "Uttarakhand": ["Almora","Bageshwar","Chamoli","Champawat","Dehradun","Haridwar","Haldwani","Mussoorie","Nainital","Pauri Garhwal","Pithoragarh","Rishikesh","Roorkee","Rudraprayag","Tehri Garhwal","Udham Singh Nagar","Uttarkashi"],
-      "Delhi": ["Central Delhi","Connaught Place","Dwarka","East Delhi","Karol Bagh","New Delhi","North Delhi","North East Delhi","North West Delhi","Rohini","Saket","Shahdara","South Delhi","South East Delhi","South West Delhi","West Delhi"],
-      "Assam": ["Bajali","Baksa","Barpeta","Biswanath","Bongaigaon","Cachar (Silchar)","Charaideo","Chirang","Darrang","Dhemaji","Dhubri","Dibrugarh","Dima Hasao","Goalpara","Golaghat","Guwahati","Hailakandi","Hojai","Jorhat","Kamrup","Kamrup Metro","Karbi Anglong","Karimganj","Kokrajhar","Lakhimpur","Majuli","Morigaon","Nagaon","Nalbari","Sivasagar","Sonitpur (Tezpur)","South Salmara-Mankachar","Tamulpur","Tinsukia","Udalguri","West Karbi Anglong"],
+      "Delhi": ["Central Delhi","Connaught Place","Dwarka","East Delhi","Karol Bagh","Mukherjee Nagar","New Delhi","North Delhi","North East Delhi","North West Delhi","Rajinder Nagar","Rohini","Saket","Shahdara","South Delhi","West Delhi"],
+      "Assam": ["Bajali","Baksa","Barpeta","Biswanath","Bongaigaon","Cachar (Silchar)","Charaideo","Chirang","Darrang","Dhemaji","Dhubri","Dibrugarh","Dima Hasao","Goalpara","Golaghat","Guwahati","Hailakandi","Hojai","Jorhat","Kamrup","Kamrup Metro","Karbi Anglong","Karimganj","Kokrajhar","Lakhimpur","Majuli","Morigaon","Nagaon","Nalbari","Sivasagar","Sonitpur (Tezpur)","Tinsukia","Udalguri"],
       "Odisha": ["Angul","Balangir","Balasore","Bargarh","Bhadrak","Bhubaneswar","Boudh","Cuttack","Deogarh","Dhenkanal","Gajapati","Ganjam","Jagatsinghpur","Jajpur","Jharsuguda","Kalahandi","Kandhamal","Kendrapara","Kendujhar","Khordha","Koraput","Malkangiri","Mayurbhanj","Nabarangpur","Nayagarh","Nuapada","Puri","Rayagada","Rourkela","Sambalpur","Subarnapur","Sundargarh"],
-      "Chhattisgarh": ["Balod","Baloda Bazar","Balrampur","Bastar (Jagdalpur)","Bemetara","Bhilai","Bijapur","Bilaspur","Dantewada","Dhamtari","Durg","Gariaband","Gaurela-Pendra-Marwahi","Janjgir-Champa","Jashpur","Kabirdham","Kanker","Khairagarh","Kondagaon","Korba","Koriya","Mahasamund","Manendragarh","Mohla-Manpur","Mungeli","Narayanpur","Raigarh","Raipur","Rajnandgaon","Sakti","Sarangarh-Bilaigarh","Sukma","Surajpur","Surguja (Ambikapur)"],
+      "Chhattisgarh": ["Balod","Baloda Bazar","Balrampur","Bastar (Jagdalpur)","Bemetara","Bhilai","Bijapur","Bilaspur","Dantewada","Dhamtari","Durg","Gariaband","Janjgir-Champa","Jashpur","Kabirdham","Kanker","Kondagaon","Korba","Koriya","Mahasamund","Mungeli","Narayanpur","Raigarh","Raipur","Rajnandgaon","Sukma","Surajpur","Surguja (Ambikapur)"],
       "Jharkhand": ["Bokaro","Chatra","Deoghar","Dhanbad","Dumka","East Singhbhum (Jamshedpur)","Garhwa","Giridih","Godda","Gumla","Hazaribagh","Jamtara","Khunti","Koderma","Latehar","Lohardaga","Pakur","Palamu","Ramgarh","Ranchi","Sahibganj","Seraikela Kharsawan","Simdega","West Singhbhum"],
       "Jammu & Kashmir": ["Anantnag","Bandipora","Baramulla","Budgam","Doda","Ganderbal","Gulmarg","Jammu","Kathua","Katra (Vaishno Devi)","Kishtwar","Kulgam","Kupwara","Pahalgam","Poonch","Pulwama","Rajouri","Ramban","Reasi","Samba","Shopian","Srinagar","Udhampur"],
-      "Meghalaya": ["Cherrapunji (Sohra)","Dawki","East Garo Hills","East Jaintia Hills","East Khasi Hills","Eastern West Khasi Hills","North Garo Hills","Ri Bhoi","Shillong","South Garo Hills","South West Garo Hills","South West Khasi Hills","Tura","West Garo Hills","West Jaintia Hills","West Khasi Hills"],
-      "Arunachal Pradesh": ["Anjaw","Changlang","Dibang Valley","East Kameng","East Siang (Pasighat)","Itanagar","Kamle","Kra Daadi","Kurung Kumey","Lepa Rada","Lohit","Longding","Lower Dibang Valley","Lower Siang","Lower Subansiri (Ziro)","Namsai","Pakke Kessang","Papum Pare","Shi Yomi","Siang","Tawang","Tirap","Upper Siang","Upper Subansiri","West Kameng","West Siang"],
-      "Manipur": ["Bishnupur","Chandel","Churachandpur","Imphal East","Imphal West","Jiribam","Kakching","Kamjong","Kangpokpi","Noney","Pherzawl","Senapati","Tamenglong","Tengnoupal","Thoubal","Ukhrul"],
-      "Mizoram": ["Aizawl","Champhai","Hnahthial","Khawzawl","Kolasib","Lawngtlai","Lunglei","Mamit","Saiha","Saitual","Serchhip"],
-      "Nagaland": ["Chumukedima","Dimapur","Kiphire","Kohima","Longleng","Mokokchung","Mon","Niuland","Noklak","Peren","Phek","Shamator","Tseminyu","Tuensang","Wokha","Zunheboto"],
+      "Meghalaya": ["Cherrapunji (Sohra)","Dawki","East Garo Hills","East Jaintia Hills","East Khasi Hills","North Garo Hills","Ri Bhoi","Shillong","South Garo Hills","Tura","West Garo Hills","West Jaintia Hills","West Khasi Hills"],
+      "Arunachal Pradesh": ["Anjaw","Changlang","Dibang Valley","East Kameng","East Siang (Pasighat)","Itanagar","Lohit","Lower Subansiri (Ziro)","Namsai","Papum Pare","Tawang","Tirap","West Kameng","West Siang"],
+      "Manipur": ["Bishnupur","Chandel","Churachandpur","Imphal East","Imphal West","Jiribam","Kakching","Senapati","Tamenglong","Thoubal","Ukhrul"],
+      "Mizoram": ["Aizawl","Champhai","Kolasib","Lawngtlai","Lunglei","Mamit","Saiha","Serchhip"],
+      "Nagaland": ["Chumukedima","Dimapur","Kiphire","Kohima","Mokokchung","Mon","Peren","Phek","Tuensang","Wokha","Zunheboto"],
       "Sikkim": ["East Sikkim (Gangtok)","Gyalshing","Mangan","Namchi","North Sikkim","Pakyong","Soreng","South Sikkim","West Sikkim"],
       "Tripura": ["Agartala","Dhalai","Gomati (Udaipur)","Khowai","North Tripura","Sepahijala","South Tripura","Unakoti","West Tripura"],
       "Goa": ["Baga & Calangute","Madgaon (Margao)","Mapusa","North Goa","Panaji","South Goa","Vasco da Gama"],
-      "Union Territories": ["Chandigarh","Leh (Ladakh)","Kargil (Ladakh)","Nubra Valley (Ladakh)","Pangong (Ladakh)","Kavaratti (Lakshadweep)","Minicoy (Lakshadweep)","Puducherry","Karaikal (Puducherry)","Mahe (Puducherry)","Yanam (Puducherry)","Port Blair (Andaman)","Havelock / Swaraj Dweep (Andaman)","Neil Island (Andaman)","Daman","Diu","Silvassa (Dadra & Nagar Haveli)"]
+      "Union Territories": ["Chandigarh","Leh (Ladakh)","Kargil (Ladakh)","Kavaratti (Lakshadweep)","Puducherry","Karaikal","Port Blair (Andaman)","Havelock / Swaraj Dweep","Daman","Diu","Silvassa (Dadra & Nagar Haveli)"]
     };
 
     const BHADOHI_TOWNS = ["Gyanpur","Bhadohi","Suriyawan","Gopiganj","Aurai","Khamaria","Deegh","Kapsethi","Katra","Chauri","Jangiganj","Ghosia","Madhosingh","Itahara","Koirauna","Abholi","Baragaon","Durgaganj","Mahrajganj"];
 
     function buildLocations() {
-      const list = [{ name: "All India", district: "All", state: "India", display: "🌍 All India - Sabhi Famous Jagah & Dukan" }];
+      const list = [{ name: "All India", district: "All", state: "India", display: "🌍 All India - Sabhi Famous Jagah, Hospitals, Hotels & Coaching" }];
       Object.entries(STATE_DISTRICTS).forEach(([state, cities]) => {
         cities.forEach(c => {
           list.push({ name: c, district: c, state: state, display: `${c} - ${state}` });
@@ -100,14 +92,13 @@
     const ALL_LOCATIONS = buildLocations();
 
     // ==========================================
-    // 2. COORDINATES DATABASE + STATE FALLBACKS
+    // 2. COORDINATES DATABASE
     // ==========================================
     const COORDS_DB = {
       "all india": { lat: 22.5937, lng: 78.9629 },
       "varanasi": { lat: 25.3176, lng: 82.9739 },
       "mumbai": { lat: 19.0760, lng: 72.8777 },
       "mumbai city": { lat: 19.0760, lng: 72.8777 },
-      "mumbai suburban": { lat: 19.1197, lng: 72.8464 },
       "delhi": { lat: 28.6139, lng: 77.2090 },
       "new delhi": { lat: 28.6139, lng: 77.2090 },
       "bengaluru": { lat: 12.9716, lng: 77.5946 },
@@ -117,59 +108,33 @@
       "pune": { lat: 18.5204, lng: 73.8567 },
       "ahmedabad": { lat: 23.0225, lng: 72.5714 },
       "jaipur": { lat: 26.9124, lng: 75.7873 },
+      "kota": { lat: 25.2138, lng: 75.8648 },
       "lucknow": { lat: 26.8467, lng: 80.9462 },
       "agra": { lat: 27.1767, lng: 78.0081 },
       "ayodhya": { lat: 26.7922, lng: 82.1998 },
       "prayagraj": { lat: 25.4358, lng: 81.8463 },
-      "mathura": { lat: 27.4924, lng: 77.6737 },
       "patna": { lat: 25.5941, lng: 85.1376 },
       "gaya": { lat: 24.7914, lng: 85.0002 },
       "bhopal": { lat: 23.2599, lng: 77.4126 },
       "indore": { lat: 22.7196, lng: 75.8577 },
-      "ujjain": { lat: 23.1765, lng: 75.7885 },
       "amritsar": { lat: 31.6340, lng: 74.8723 },
       "chandigarh": { lat: 30.7333, lng: 76.7794 },
       "shimla": { lat: 31.1048, lng: 77.1734 },
-      "manali": { lat: 32.2432, lng: 77.1892 },
       "dehradun": { lat: 30.3165, lng: 78.0322 },
       "haridwar": { lat: 29.9457, lng: 78.1642 },
-      "rishikesh": { lat: 30.0869, lng: 78.2676 },
-      "nainital": { lat: 29.3919, lng: 79.4542 },
       "udaipur": { lat: 24.5854, lng: 73.7125 },
-      "jodhpur": { lat: 26.2389, lng: 73.0243 },
-      "jaisalmer": { lat: 26.9157, lng: 70.9083 },
-      "surat": { lat: 21.1702, lng: 72.8311 },
-      "vadodara": { lat: 22.3072, lng: 73.1812 },
-      "rajkot": { lat: 22.3039, lng: 70.8022 },
       "guwahati": { lat: 26.1445, lng: 91.7362 },
       "shillong": { lat: 25.5788, lng: 91.8933 },
       "puri": { lat: 19.8135, lng: 85.8312 },
-      "bhubaneswar": { lat: 20.2961, lng: 85.8245 },
       "ranchi": { lat: 23.3441, lng: 85.3096 },
-      "deoghar": { lat: 24.4852, lng: 86.6947 },
       "raipur": { lat: 21.2514, lng: 81.6296 },
       "srinagar": { lat: 34.0837, lng: 74.7973 },
-      "jammu": { lat: 32.7266, lng: 74.8570 },
-      "leh (ladakh)": { lat: 34.1526, lng: 77.5771 },
       "panaji": { lat: 15.4909, lng: 73.8278 },
-      "north goa": { lat: 15.5527, lng: 73.7517 },
-      "south goa": { lat: 15.2993, lng: 74.1240 },
-      "mysuru": { lat: 12.2958, lng: 76.6394 },
-      "madurai": { lat: 9.9252, lng: 78.1198 },
-      "coimbatore": { lat: 11.0168, lng: 76.9558 },
-      "tirupati": { lat: 13.6288, lng: 79.4192 },
-      "visakhapatnam": { lat: 17.6868, lng: 83.2185 },
-      "ernakulam (kochi)": { lat: 9.9312, lng: 76.2673 },
-      "thiruvananthapuram": { lat: 8.5241, lng: 76.9366 },
-      "darjeeling": { lat: 27.0410, lng: 88.2663 },
-      "puducherry": { lat: 11.9416, lng: 79.8083 },
       "gyanpur": { lat: 25.3567, lng: 82.4722 },
       "bhadohi": { lat: 25.3962, lng: 82.5701 },
       "suriyawan": { lat: 25.4486, lng: 82.4111 },
       "gopiganj": { lat: 25.2851, lng: 82.4473 },
       "aurai": { lat: 25.4241, lng: 82.5694 },
-      "khamaria": { lat: 25.3321, lng: 82.5433 },
-      // State Centers Fallback
       "uttar pradesh": { lat: 26.8467, lng: 80.9462 },
       "bihar": { lat: 25.5941, lng: 85.1376 },
       "madhya pradesh": { lat: 23.2599, lng: 77.4126 },
@@ -179,217 +144,213 @@
       "west bengal": { lat: 22.9868, lng: 87.8550 },
       "tamil nadu": { lat: 11.1271, lng: 78.6569 },
       "karnataka": { lat: 15.3173, lng: 75.7139 },
-      "kerala": { lat: 10.8505, lng: 76.2711 },
-      "andhra pradesh": { lat: 15.9129, lng: 79.7400 },
-      "telangana": { lat: 18.1124, lng: 79.0193 },
-      "punjab": { lat: 31.1471, lng: 75.3412 },
-      "haryana": { lat: 29.0588, lng: 76.0856 },
-      "himachal pradesh": { lat: 31.1048, lng: 77.1734 },
-      "uttarakhand": { lat: 30.0668, lng: 79.0193 },
-      "assam": { lat: 26.2006, lng: 92.9376 },
-      "odisha": { lat: 20.9517, lng: 85.0985 },
-      "chhattisgarh": { lat: 21.2787, lng: 81.8661 },
-      "jharkhand": { lat: 23.6102, lng: 85.2799 },
-      "jammu & kashmir": { lat: 33.7782, lng: 76.5762 },
-      "meghalaya": { lat: 25.4670, lng: 91.3662 },
-      "arunachal pradesh": { lat: 28.2180, lng: 94.7278 },
-      "manipur": { lat: 24.6637, lng: 93.9063 },
-      "mizoram": { lat: 23.1645, lng: 92.9376 },
-      "nagaland": { lat: 26.1584, lng: 94.5624 },
-      "sikkim": { lat: 27.5330, lng: 88.5122 },
-      "tripura": { lat: 23.9408, lng: 91.9882 },
-      "goa": { lat: 15.2993, lng: 74.1240 }
+      "kerala": { lat: 10.8505, lng: 76.2711 }
     };
 
     // ==========================================
-    // 3. CURATED FAMOUS PLACES & SHOPS ACROSS INDIA
+    // 3. CATEGORIES (INCLUDING HOSPITALS, HOTELS, COACHING)
     // ==========================================
-    const INITIAL_PLACES = [
-      // Varanasi
-      { id: 101, name: "Shri Kashi Vishwanath Temple & Corridor", category: "Famous Landmark", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3109, lng: 83.0107, rating: 4.9, reviews: 18450, phone: "+91 542 239 2629", open: true, isFamous: true, famousTag: "Jyotirlinga & Spiritual Heart of India", desc: "Ganga kinare sthit Vishwa prasiddh Jyotirlinga mandir aur naya Kashi Vishwanath Dham Corridor.", address: "Lahori Tola, Dashashwamedh, Varanasi" },
-      { id: 102, name: "Dashashwamedh Ghat Ganga Aarti", category: "Famous Landmark", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3062, lng: 83.0103, rating: 4.9, reviews: 14200, phone: "Public Heritage Site", open: true, isFamous: true, famousTag: "World Famous Evening Ganga Aarti", desc: "Har shaam 6:30 baje hone wali भव्य Ganga Aarti aur boat ride ke liye sabse mukhya ghat.", address: "Dashashwamedh Ghat Road, Varanasi" },
-      { id: 103, name: "Kashi Chat Bhandar & Blue Lassi", category: "Famous Food", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3095, lng: 83.0081, rating: 4.8, reviews: 5620, phone: "+91 542 241 2116", open: true, isFamous: true, famousTag: "Banarasi Tamatar Chaat & Rabri Lassi", desc: "Asli Banarasi Tamatar Chaat, Palak Patta Chaat aur kullhad wali Malai Lassi ka sabse purana kendra.", address: "Godowlia Chowk, Varanasi" },
-      { id: 104, name: "Thateri Bazar Banarasi Silk Emporium", category: "Famous Market", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3150, lng: 83.0095, rating: 4.7, reviews: 1890, phone: "+91 98390 11223", open: true, isFamous: true, famousTag: "GI Tagged Banarasi Zari Sarees", desc: "Handloom Banarasi Silk Sarees, Brocade aur Zari work ki sabse badi wholesale & retail market.", address: "Chowk & Thateri Bazar, Varanasi" },
-
-      // Agra
-      { id: 105, name: "Taj Mahal (East & West Gate)", category: "Famous Landmark", city: "Agra", district: "Agra", state: "Uttar Pradesh", lat: 27.1751, lng: 78.0421, rating: 5.0, reviews: 42100, phone: "+91 562 222 6431", open: true, isFamous: true, famousTag: "7 Wonders of the World • UNESCO", desc: "Safed sangmarmar se bana vishwa prasiddh smarak, Yamuna nadi ke kinare.", address: "Dharmapuri, Tajganj, Agra" },
-      { id: 106, name: "Panchhi Petha Store (Original)", category: "Famous Food", city: "Agra", district: "Agra", state: "Uttar Pradesh", lat: 27.1865, lng: 78.0154, rating: 4.7, reviews: 6340, phone: "+91 562 226 8364", open: true, isFamous: true, famousTag: "World Famous Agra Kesar & Angoori Petha", desc: "Agra ka sabse mashhoor Petha, Dalmoth aur Gajak store.", address: "Sadar Bazar & Hari Parwat, Agra" },
-
-      // Lucknow
-      { id: 107, name: "Bara Imambara & Bhool Bhulaiya", category: "Famous Landmark", city: "Lucknow", district: "Lucknow", state: "Uttar Pradesh", lat: 26.8696, lng: 80.9126, rating: 4.8, reviews: 9840, phone: "UP Tourism Heritage", open: true, isFamous: true, famousTag: "Historical Nawabi Architecture", desc: "1784 me bana nawabi kalakriti ka adbhut namuna aur Bhool Bhulaiya.", address: "Machchhi Bhavan, Lucknow" },
-      { id: 108, name: "Hazratganj Market & Chikankari Hub", category: "Famous Market", city: "Lucknow", district: "Lucknow", state: "Uttar Pradesh", lat: 26.8505, lng: 80.9465, rating: 4.8, reviews: 4510, phone: "+91 522 262 1400", open: true, isFamous: true, famousTag: "Famous Lucknawi Chikankari & Royal Market", desc: "Lucknawi Chikankari kurtis, Itra aur shopping ke liye sabse shandar heritage market.", address: "Hazratganj Main Road, Lucknow" },
-      { id: 109, name: "Royal Cafe Basket Chaat & Tunday Kababi", category: "Famous Food", city: "Lucknow", district: "Lucknow", state: "Uttar Pradesh", lat: 26.8489, lng: 80.9472, rating: 4.8, reviews: 7820, phone: "+91 522 409 5555", open: true, isFamous: true, famousTag: "Famous Basket Chaat, Kulfi & Awadhi Cuisine", desc: "Lucknow ki mashhoor Tokri Chaat, Shahi Tukda aur Awadhi zayka.", address: "Hazratganj / Aminabad, Lucknow" },
-
-      // Ayodhya
-      { id: 110, name: "Shri Ram Janmabhoomi Mandir", category: "Famous Landmark", city: "Ayodhya", district: "Ayodhya", state: "Uttar Pradesh", lat: 26.7956, lng: 82.1944, rating: 5.0, reviews: 35600, phone: "Shri Ram Janmabhoomi Teerth Kshetra", open: true, isFamous: true, famousTag: "Grand Shri Ram Lalla Temple", desc: "Bhagwan Shri Ram ka bhavya janmasthan mandir aur Ram Path corridor.", address: "Ram Kot, Ayodhya" },
-      { id: 111, name: "Hanuman Garhi & Saryu Ghat", category: "Famous Landmark", city: "Ayodhya", district: "Ayodhya", state: "Uttar Pradesh", lat: 26.7952, lng: 82.2015, rating: 4.9, reviews: 11200, phone: "Public Shrine", open: true, isFamous: true, famousTag: "Ancient Siddhapeeth & Besan Laddu", desc: "Ayodhya ka pramukh Hanuman mandir aur wahan ke prasiddh desi ghee ke laddu.", address: "Sai Nagar, Ayodhya" },
-
-      // Bhadohi & Gyanpur (Local Focus from V16)
-      { id: 112, name: "Bhadohi International Carpet Expo Mart", category: "Famous Market", city: "Bhadohi", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3962, lng: 82.5701, rating: 4.9, reviews: 1240, phone: "+91 5414 225401", open: true, isFamous: true, famousTag: "Carpet City of India (GI Tagged)", desc: "Asia ka sabse bada handmade woolen aur silk carpet hub.", address: "Station Road, Carpet City, Bhadohi" },
-      { id: 113, name: "Baba Hariharnath Temple & Gyan Sarovar", category: "Famous Landmark", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3567, lng: 82.4722, rating: 4.8, reviews: 645, phone: "District Heritage", open: true, isFamous: true, famousTag: "Historic Shiva Temple & District HQ", desc: "Gyanpur ka prachin Baba Hariharnath Mandir aur itihasik Gyan Sarovar talab.", address: "Gyanpur Main Bazar, Bhadohi" },
-      { id: 114, name: "Sita Samahit Sthal (Sitamarhi)", category: "Famous Landmark", city: "Gopiganj", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.2528, lng: 82.2611, rating: 4.9, reviews: 2150, phone: "UP Tourism Spot", open: true, isFamous: true, famousTag: "Sacred Ganga Bank Temple & 108ft Hanuman Statue", desc: "Ganga ke tat par sthit Mata Sita ka pavitra dham aur 108 feet unchi Hanuman pratima.", address: "Sitamarhi, Near Jangiganj/Gopiganj, Bhadohi" },
-      { id: 115, name: "Sharma Mobile & Electronics", category: "Mobile & Tech", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3575, lng: 82.4730, rating: 4.8, reviews: 124, phone: "+91 98765 43210", open: true, isFamous: false, famousTag: "Top Rated Local Electronics", desc: "Sabhi brands ke smartphones, accessories aur instant repair center.", address: "Kachahari Road, Gyanpur" },
-      { id: 116, name: "Suriyawan Medical & Bawan Bigha Talab", category: "Famous Landmark", city: "Suriyawan", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.4486, lng: 82.4111, rating: 4.8, reviews: 312, phone: "+91 98765 43212", open: true, isFamous: true, famousTag: "Historic Bawan Bigha Pond & Main Market", desc: "Suriyawan ka mashhoor Bawan Bigha Pakka Talab aur 24x7 Medical & Kirana bazar.", address: "Main Station Road, Suriyawan" },
-
-      // Mumbai
-      { id: 117, name: "Gateway of India & Marine Drive", category: "Famous Landmark", city: "Mumbai", district: "Mumbai City", state: "Maharashtra", lat: 18.9220, lng: 72.8347, rating: 4.9, reviews: 38900, phone: "Maharashtra Tourism", open: true, isFamous: true, famousTag: "Iconic Seafront Monument of Mumbai", desc: "Arabian Sea ke kinare Mumbai ki sabse pehchan wali jagah, Taj Mahal Palace Hotel ke samne.", address: "Apollo Bandar, Colaba, Mumbai" },
-      { id: 118, name: "Crawford Market & Colaba Causeway", category: "Famous Market", city: "Mumbai", district: "Mumbai City", state: "Maharashtra", lat: 18.9474, lng: 72.8342, rating: 4.7, reviews: 8420, phone: "+91 22 2261 7521", open: true, isFamous: true, famousTag: "Historic Wholesale & Street Shopping", desc: "Kapde, dry fruits, electronics, antiques aur fashion accessories ka sabse bada bazar.", address: "Lokmanya Tilak Marg, Fort, Mumbai" },
-      { id: 119, name: "Juhu Chowpatty & Ashok Vada Pav", category: "Famous Food", city: "Mumbai", district: "Mumbai Suburban", state: "Maharashtra", lat: 19.0176, lng: 72.8305, rating: 4.8, reviews: 11230, phone: "+91 98201 55667", open: true, isFamous: true, famousTag: "Mumbai's #1 Vada Pav & Pav Bhaji", desc: "Asli Mumbaikar Vada Pav, Sardar Pav Bhaji aur Chowpatty Bhel Puri.", address: "Dadar West / Juhu Beach, Mumbai" },
-
-      // Delhi
-      { id: 120, name: "India Gate & Kartavya Path", category: "Famous Landmark", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.6129, lng: 77.2295, rating: 4.9, reviews: 45200, phone: "Delhi Tourism", open: true, isFamous: true, famousTag: "National War Memorial & Evening Walk", desc: "Bharat ka rashtriya smarak aur naya bana Kartavya Path.", address: "Kartavya Path, New Delhi" },
-      { id: 121, name: "Chandni Chowk & Paranthe Wali Gali", category: "Famous Food", city: "Delhi", district: "Central Delhi", state: "Delhi", lat: 28.6562, lng: 77.2303, rating: 4.8, reviews: 19400, phone: "+91 11 2327 9480", open: true, isFamous: true, famousTag: "150+ Years Old Street Food & Lehenga Market", desc: "Lal Qila ke samne Purani Dilli ka famous paratha, Natraj Dahi Bhalle aur Dulhan shopping bazar.", address: "Chandni Chowk, Old Delhi" },
-      { id: 122, name: "Sarojini Nagar & Connaught Place", category: "Famous Market", city: "New Delhi", district: "New Delhi", state: "Delhi", lat: 28.5756, lng: 77.1966, rating: 4.7, reviews: 15800, phone: "Market Association", open: true, isFamous: true, famousTag: "India's Most Popular Fashion & Brand Hub", desc: "Budget fashion shopping se lekar luxury showrooms tak Dilli ka sabse bada kendra.", address: "Sarojini Nagar / CP, New Delhi" },
-
-      // Jaipur
-      { id: 123, name: "Hawa Mahal & Amer Fort", category: "Famous Landmark", city: "Jaipur", district: "Jaipur", state: "Rajasthan", lat: 26.9239, lng: 75.8267, rating: 4.9, reviews: 31200, phone: "+91 141 261 8862", open: true, isFamous: true, famousTag: "Palace of Winds • Pink City Heritage", desc: "953 jharokhon wala vishwa prasiddh Hawa Mahal aur shahi Amer Kila.", address: "Badi Choupad, Pink City, Jaipur" },
-      { id: 124, name: "Johari Bazar & Laxmi Mishthan Bhandar (LMB)", category: "Famous Food", city: "Jaipur", district: "Jaipur", state: "Rajasthan", lat: 26.9211, lng: 75.8271, rating: 4.8, reviews: 9420, phone: "+91 141 256 5844", open: true, isFamous: true, famousTag: "Dal Baati Churma, Paneeri Ghewar & Kundan Jewellery", desc: "Jaipur ki famous Kundan-Meenakari jewellery market aur LMB ka Rajasthani khana.", address: "Johari Bazar, Jaipur" },
-
-      // Patna & Gaya
-      { id: 125, name: "Takht Sri Harmandir Sahib (Patna Sahib) & Golghar", category: "Famous Landmark", city: "Patna", district: "Patna", state: "Bihar", lat: 25.5959, lng: 85.2307, rating: 4.9, reviews: 14500, phone: "+91 612 264 1741", open: true, isFamous: true, famousTag: "Birthplace of Guru Gobind Singh Ji & Historic Granary", desc: "Patna ka sabse pavitra Sikh Takht, Golghar aur Bihar Museum.", address: "Patna City / Gandhi Maidan, Patna" },
-      { id: 126, name: "Maurya Lok Litti Chokha & Khaja Hub", category: "Famous Food", city: "Patna", district: "Patna", state: "Bihar", lat: 25.6096, lng: 85.1342, rating: 4.7, reviews: 4120, phone: "+91 612 222 0911", open: true, isFamous: true, famousTag: "Authentic Bihari Desi Ghee Litti Chokha", desc: "Desi ghee me duba Bihari Litti Chokha, Silao Khaja aur Champaran Handi taste.", address: "Dakbunglow Chauraha, Maurya Lok, Patna" },
-      { id: 127, name: "Mahabodhi Temple & Vishnupad Mandir", category: "Famous Landmark", city: "Gaya", district: "Gaya", state: "Bihar", lat: 24.6959, lng: 84.9914, rating: 5.0, reviews: 18900, phone: "UNESCO World Heritage", open: true, isFamous: true, famousTag: "Bodh Gaya UNESCO Site & Tilkut Hub", desc: "Bhagwan Buddha ki gyan bhoomi Bodh Gaya aur Gaya ka prasiddh Tilkut.", address: "Bodh Gaya, Gaya" },
-
-      // Bengaluru, Hyderabad, Kolkata, Chennai, Indore, Amritsar, Puri
-      { id: 128, name: "Lalbagh Botanical Garden & Vidhana Soudha", category: "Famous Landmark", city: "Bengaluru", district: "Bengaluru", state: "Karnataka", lat: 12.9507, lng: 77.5848, rating: 4.8, reviews: 24500, phone: "+91 80 2657 8184", open: true, isFamous: true, famousTag: "Garden City Glass House & MTR Masala Dosa", desc: "240 acre ka historic garden aur pass me Mavalli Tiffin Room (MTR) ka world famous Dosa.", address: "Mavalli, Bengaluru" },
-      { id: 129, name: "Charminar, Laad Bazaar & Paradise Biryani", category: "Famous Landmark", city: "Hyderabad", district: "Hyderabad", state: "Telangana", lat: 17.3616, lng: 78.4747, rating: 4.9, reviews: 33400, phone: "+91 40 2452 3643", open: true, isFamous: true, famousTag: "1591 Monument, Pearl Bangles & Hyderabadi Dum Biryani", desc: "Hyderabad ki shaan Charminar, Choodi bazar aur Osmania Biscuit / Biryani.", address: "Charminar Road, Hyderabad" },
-      { id: 130, name: "Victoria Memorial, Howrah Bridge &KC Das Rosogolla", category: "Famous Landmark", city: "Kolkata", district: "Kolkata", state: "West Bengal", lat: 22.5448, lng: 88.3426, rating: 4.9, reviews: 29800, phone: "+91 33 2223 1890", open: true, isFamous: true, famousTag: "City of Joy Heritage & Bengali Sweets", desc: "Kolkata ka shandar Victoria Memorial, New Market aur asli Bengali Rasgulla & Mishti Doi.", address: "Maidan / Esplanade, Kolkata" },
-      { id: 131, name: "Marina Beach, Kapaleeshwarar Temple & T. Nagar", category: "Famous Landmark", city: "Chennai", district: "Chennai", state: "Tamil Nadu", lat: 13.0500, lng: 80.2824, rating: 4.8, reviews: 27100, phone: "TN Tourism", open: true, isFamous: true, famousTag: "India's Longest Urban Beach & Kanchipuram Silk Hub", desc: "Mylapore ka prachin Dravidian mandir, Marina Beach aur T. Nagar silk shopping.", address: "Mylapore / Marina, Chennai" },
-      { id: 132, name: "Sarafa Night Food Market & Chhappan Dukan", category: "Famous Food", city: "Indore", district: "Indore", state: "Madhya Pradesh", lat: 22.7180, lng: 75.8546, rating: 4.9, reviews: 16400, phone: "Cleanest City Food Hub", open: true, isFamous: true, famousTag: "Indori Poha-Jalebi, Bhutte Ka Kees & Night Street Food", desc: "Raat 8 baje se subah 2 baje tak lagne wala Bharat ka sabse anokha jewellers-turned-food bazar.", address: "Sarafa Bazar & 56 Dukan, Indore" },
-      { id: 133, name: "Sri Harmandir Sahib (Golden Temple) & Kesar Da Dhaba", category: "Famous Landmark", city: "Amritsar", district: "Amritsar", state: "Punjab", lat: 31.6200, lng: 74.8765, rating: 5.0, reviews: 52000, phone: "+91 183 255 3957", open: true, isFamous: true, famousTag: "Swarna Mandir, Wagah Border & Amritsari Kulcha", desc: "Vishwa prasiddh Swarna Mandir, Langar sewa aur Amritsari Chole Kulche.", address: "Golden Temple Road, Amritsar" },
-      { id: 134, name: "Shree Jagannath Temple & Golden Beach", category: "Famous Landmark", city: "Puri", district: "Puri", state: "Odisha", lat: 19.8049, lng: 85.8179, rating: 5.0, reviews: 28900, phone: "Char Dham Shrine", open: true, isFamous: true, famousTag: "Char Dham Pilgrimage, Mahaprasad & Blue Flag Beach", desc: "Char Dham me se ek Bhagwan Jagannath ka mandir aur Chhena Poda.", address: "Grand Road, Puri" }
+    const CATEGORIES = [
+      { id: "All", label: "🌟 All Everything" },
+      { id: "Famous Landmark", label: "🏛️ Famous Landmarks" },
+      { id: "Hospital & Clinic", label: "🏥 Hospitals & Clinics" },
+      { id: "Hotel & Stay", label: "🏨 Hotels & Stays" },
+      { id: "Coaching & Institute", label: "🎓 Coaching & Institutes" },
+      { id: "Famous Food", label: "🍲 Famous Food & Sweets" },
+      { id: "Famous Market", label: "🛍️ Famous Markets" },
+      { id: "Mobile & Tech", label: "📱 Mobile & Tech" },
+      { id: "Medical Store", label: "💊 Medical Stores" }
     ];
 
     // ==========================================
-    // 4. REGIONAL SPECIALTIES GENERATOR FOR ALL 800+ CITIES
-    // (Guarantees EVERY city in India shows rich famous places & markets)
+    // 4. CURATED FAMOUS LANDMARKS, HOSPITALS, HOTELS & COACHING
+    // ==========================================
+    const INITIAL_PLACES = [
+      // VARANASI (Landmarks, Hospital, Hotel, Coaching, Food)
+      { id: 101, name: "Shri Kashi Vishwanath Temple & Corridor", category: "Famous Landmark", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3109, lng: 83.0107, rating: 4.9, reviews: 18450, phone: "+91 542 239 2629", open: true, isFamous: true, famousTag: "Jyotirlinga & Spiritual Heart of India", desc: "Ganga kinare sthit Vishwa prasiddh Jyotirlinga mandir aur naya Kashi Vishwanath Dham Corridor.", address: "Lahori Tola, Dashashwamedh, Varanasi", reviewList: [{ user: "Amit Verma", stars: 5, text: "Corridor banne ke baad darshan bahut suvidhajanak ho gaya hai! Har Har Mahadev." }] },
+      { id: 102, name: "Sir Sunderlal Hospital & Trauma Centre (BHU)", category: "Hospital & Clinic", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.2745, lng: 82.9995, rating: 4.8, reviews: 9420, phone: "+91 542 236 9115", open: true, isFamous: true, famousTag: "Purvanchal's Largest Super-Specialty AIIMS-Level Hospital", desc: "Banaras Hindu University (IMS-BHU) ka sabse bada multi-specialty hospital aur 24x7 Trauma Centre.", address: "Lanka, BHU Campus, Varanasi", reviewList: [{ user: "Rajesh Singh", stars: 5, text: "Purvanchal aur Bihar ke patients ke liye sabse bharosemand hospital." }] },
+      { id: 103, name: "Taj Ganges & BrijRama Palace Ghat Hotel", category: "Hotel & Stay", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3356, lng: 82.9825, rating: 4.9, reviews: 3850, phone: "+91 542 666 0001", open: true, isFamous: true, famousTag: "5-Star Luxury & Heritage Ganga View Stay", desc: "Varanasi me thaharne ke liye shandar 5-star hotel aur Ganga ghat heritage palace.", address: "Nadesar Palace Grounds / Darbhanga Ghat, Varanasi", reviewList: [] },
+      { id: 104, name: "Durgakund Coaching Hub (JRS / Aakash / Allen)", category: "Coaching & Institute", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.2912, lng: 82.9992, rating: 4.8, reviews: 2640, phone: "+91 542 231 1878", open: true, isFamous: true, famousTag: "#1 IIT-JEE, NEET & CUET Coaching Hub in Purvanchal", desc: "Durgakund aur Kabir Nagar me IIT-JEE, NEET aur Foundation taiyari ka sabse bada education center.", address: "Durgakund Road, Near Sankat Mochan, Varanasi", reviewList: [] },
+      { id: 105, name: "Kashi Chat Bhandar & Blue Lassi", category: "Famous Food", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3095, lng: 83.0081, rating: 4.8, reviews: 5620, phone: "+91 542 241 2116", open: true, isFamous: true, famousTag: "Banarasi Tamatar Chaat & Rabri Lassi", desc: "Asli Banarasi Tamatar Chaat, Palak Patta Chaat aur kullhad wali Malai Lassi.", address: "Godowlia Chowk, Varanasi", reviewList: [] },
+
+      // BHADOHI & GYANPUR (Local Focus)
+      { id: 106, name: "Maharaja Chet Singh District Hospital", category: "Hospital & Clinic", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3540, lng: 82.4710, rating: 4.6, reviews: 520, phone: "108 / +91 5414 226200", open: true, isFamous: true, famousTag: "24x7 Emergency & District Govt Hospital", desc: "Gyanpur aur Bhadohi zile ka mukhya sarkari aspatal, OPD aur 24x7 emergency seva.", address: "Gyanpur Main Road, Bhadohi", reviewList: [] },
+      { id: 107, name: "Bhadohi International Carpet Expo Mart & Stay", category: "Hotel & Stay", city: "Bhadohi", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3962, lng: 82.5701, rating: 4.8, reviews: 1240, phone: "+91 5414 225401", open: true, isFamous: true, famousTag: "Carpet City Trade Hub & Business Suites", desc: "Asia ka sabse bada handmade carpet expo center aur international buyers ke liye executive stay.", address: "Carpet City, Station Road, Bhadohi", reviewList: [] },
+      { id: 108, name: "KNPG College & Gyanpur Coaching Academy", category: "Coaching & Institute", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3585, lng: 82.4745, rating: 4.7, reviews: 610, phone: "+91 98391 22334", open: true, isFamous: true, famousTag: "Top Degree College, SSC, UP Police & TET Coaching", desc: "Kashi Naresh Post Graduate College aur aas-pass ke top competitive exam coaching institutes.", address: "Gyanpur Kachahari Road, Bhadohi", reviewList: [] },
+      { id: 109, name: "Baba Hariharnath Temple & Gyan Sarovar", category: "Famous Landmark", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3567, lng: 82.4722, rating: 4.9, reviews: 845, phone: "District Heritage", open: true, isFamous: true, famousTag: "Historic Shiva Temple & District HQ", desc: "Gyanpur ka prachin Baba Hariharnath Mandir aur itihasik Gyan Sarovar talab.", address: "Gyanpur Main Bazar, Bhadohi", reviewList: [] },
+
+      // DELHI (AIIMS, Mukherjee Nagar Coaching, Taj Hotel, India Gate)
+      { id: 110, name: "AIIMS New Delhi (All India Institute of Medical Sciences)", category: "Hospital & Clinic", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.5672, lng: 77.2100, rating: 4.9, reviews: 38200, phone: "+91 11 2658 8500", open: true, isFamous: true, famousTag: "India's #1 Medical Institute & Hospital", desc: "Bharat ka sabse bada aur sarvashreshth medical college aur super-specialty research hospital.", address: "Ansari Nagar, Aurobindo Marg, New Delhi", reviewList: [] },
+      { id: 111, name: "Mukherjee Nagar & Rajinder Nagar UPSC Hub (Drishti / Vision / Vajiram)", category: "Coaching & Institute", city: "Delhi", district: "North Delhi", state: "Delhi", lat: 28.7041, lng: 77.2167, rating: 4.9, reviews: 19400, phone: "+91 11 4753 2596", open: true, isFamous: true, famousTag: "India's #1 IAS / UPSC & SSC Coaching Hub", desc: "Hindi aur English medium me IAS, IPS, UPSC aur SSC CGL ki taiyari ka sabse bada kendra.", address: "Mukherjee Nagar / Old Rajinder Nagar, Delhi", reviewList: [] },
+      { id: 112, name: "The Imperial & Taj Mahal Hotel New Delhi", category: "Hotel & Stay", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.6253, lng: 77.2186, rating: 4.9, reviews: 11200, phone: "+91 11 2334 1234", open: true, isFamous: true, famousTag: "Iconic 5-Star Luxury & Paharganj Budget Stays Nearby", desc: "Connaught Place aur Lutyens Delhi ke sabse mashhoor luxury aur family hotels.", address: "Janpath / Mansingh Road, New Delhi", reviewList: [] },
+      { id: 113, name: "India Gate & Chandni Chowk Heritage", category: "Famous Landmark", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.6129, lng: 77.2295, rating: 4.9, reviews: 45200, phone: "Delhi Tourism", open: true, isFamous: true, famousTag: "National War Memorial & Kartavya Path", desc: "Bharat ka rashtriya smarak aur naya bana Kartavya Path.", address: "Kartavya Path, New Delhi", reviewList: [] },
+
+      // KOTA & JAIPUR (Coaching Capital, SMS Hospital, Heritage Hotels)
+      { id: 114, name: "Kota Coaching Hub (Allen / PhysicsWallah / Resonance / Motion)", category: "Coaching & Institute", city: "Kota", district: "Kota", state: "Rajasthan", lat: 25.1460, lng: 75.8511, rating: 4.9, reviews: 41200, phone: "+91 744 275 7575", open: true, isFamous: true, famousTag: "Coaching Capital of India (IIT-JEE & NEET)", desc: "Talwandi, Indra Vihar aur Landmark City me Bharat ka sabse bada IIT-JEE aur Medical NEET coaching center.", address: "Indra Vihar / Rajiv Gandhi Nagar, Kota", reviewList: [] },
+      { id: 115, name: "Sawai Man Singh (SMS) Hospital & Santokba Durlabhji", category: "Hospital & Clinic", city: "Jaipur", district: "Jaipur", state: "Rajasthan", lat: 26.9061, lng: 75.8166, rating: 4.8, reviews: 8740, phone: "+91 141 256 0291", open: true, isFamous: true, famousTag: "Rajasthan's Premier Super-Specialty Hospital", desc: "Rajasthan ka sabse bada multi-specialty hospital aur emergency trauma care center.", address: "JLN Marg, Jaipur", reviewList: [] },
+      { id: 116, name: "Rambagh Palace & Chokhi Dhani Resort", category: "Hotel & Stay", city: "Jaipur", district: "Jaipur", state: "Rajasthan", lat: 26.8982, lng: 75.8081, rating: 4.9, reviews: 14600, phone: "+91 141 238 5700", open: true, isFamous: true, famousTag: "World's Best Royal Heritage Hotel & Rajasthani Village Stay", desc: "Shahi Rajasthani mehmaan-nawazi, Dal-Baati-Churma aur royal palace stay.", address: "Bhawani Singh Road / Tonk Road, Jaipur", reviewList: [] },
+
+      // MUMBAI (Tata Memorial Hospital, Taj Mahal Palace Hotel, IIT Powai Hub)
+      { id: 117, name: "Tata Memorial Hospital & Kokilaben Ambani Hospital", category: "Hospital & Clinic", city: "Mumbai", district: "Mumbai City", state: "Maharashtra", lat: 19.0049, lng: 72.8415, rating: 4.9, reviews: 26400, phone: "+91 22 2417 7000", open: true, isFamous: true, famousTag: "Asia's #1 Cancer Research & Multi-Specialty Care", desc: "Parel aur Andheri me Bharat ka sabse vishwasniya cancer evam super-specialty hospital.", address: "Dr. E Borges Road, Parel, Mumbai", reviewList: [] },
+      { id: 118, name: "The Taj Mahal Palace Hotel & Gateway of India", category: "Hotel & Stay", city: "Mumbai", district: "Mumbai City", state: "Maharashtra", lat: 18.9217, lng: 72.8332, rating: 5.0, reviews: 39800, phone: "+91 22 6665 3366", open: true, isFamous: true, famousTag: "1903 Iconic Seafront Heritage Hotel", desc: "Gateway of India ke bilkul samne sthit Bharat ka sabse mashhoor 5-star hotel.", address: "Apollo Bandar, Colaba, Mumbai", reviewList: [] },
+
+      // LUCKNOW & PRAYAGRAJ (SGPGI, Civil Services Coaching)
+      { id: 119, name: "SGPGI & King George's Medical University (KGMU)", category: "Hospital & Clinic", city: "Lucknow", district: "Lucknow", state: "Uttar Pradesh", lat: 26.7460, lng: 80.9455, rating: 4.9, reviews: 15800, phone: "+91 522 249 4000", open: true, isFamous: true, famousTag: "UP's Top Medical University & PGI Hospital", desc: "Lucknow ka विश्वस्तरीय Sanjay Gandhi Postgraduate Institute aur KGMU Medical College.", address: "Raebareli Road / Chowk, Lucknow", reviewList: [] },
+      { id: 120, name: "Civil Lines & Katra UPSC/UPPSC Coaching Hub (Dhyeya / GS World)", category: "Coaching & Institute", city: "Prayagraj", district: "Prayagraj", state: "Uttar Pradesh", lat: 25.4589, lng: 81.8348, rating: 4.8, reviews: 9120, phone: "+91 532 240 0120", open: true, isFamous: true, famousTag: "Oxford of the East • UPPSC, Judiciary & SSC Hub", desc: "Allahabad University ke pass UPPSC, PCS-J, RO/ARO aur One-Day exams ki taiyari ka sabse bada garh.", address: "Katra & Civil Lines, Prayagraj", reviewList: [] },
+
+      // PATNA (PMCH/AIIMS Patna, Khan Sir / Boring Road Coaching)
+      { id: 121, name: "Boring Road & Musallahpur Hat Coaching Hub (Khan Global Studies)", category: "Coaching & Institute", city: "Patna", district: "Patna", state: "Bihar", lat: 25.6155, lng: 85.1712, rating: 4.9, reviews: 28900, phone: "+91 612 230 0555", open: true, isFamous: true, famousTag: "Bihar's #1 BPSC, Railway, SSC & NEET Coaching Hub", desc: "Musallahpur Hat, Kankarbagh aur Boring Road me lakho chhatron ka sabse priya coaching hub.", address: "Musallahpur Hat / Boring Road, Patna", reviewList: [] },
+      { id: 122, name: "AIIMS Patna & PMCH Super Specialty Hospital", category: "Hospital & Clinic", city: "Patna", district: "Patna", state: "Bihar", lat: 25.5612, lng: 85.0418, rating: 4.8, reviews: 11400, phone: "+91 612 245 1070", open: true, isFamous: true, famousTag: "Bihar's Top AIIMS & Emergency Medical Center", desc: "Phulwari Sharif aur Ashok Rajpath par sthit Bihar ke sabse bade super-specialty hospitals.", address: "Phulwari Sharif / Ashok Rajpath, Patna", reviewList: [] }
+    ];
+
+    // ==========================================
+    // 5. SMART GENERATOR FOR ALL 800+ CITIES
+    // Guarantees EVERY clicked city shows:
+    // Famous Landmark, Market, Food, Hospital, Hotel & Coaching!
     // ==========================================
     const STATE_SPECIALTIES = {
-      "Uttar Pradesh": { dish: "Desi Ghee Kachori-Jalebi & Chaat", craft: "Handloom, Chikan & Brassware Bazar", landmark: "Prachin Shiv Mandir & Heritage Ghat/Fort" },
-      "Bihar": { dish: "Famous Desi Ghee Litti Chokha & Khaja", craft: "Madhubani Art & Silk Khadi Emporium", landmark: "Historic Buddha/Jain Stupa & Rajendra Chowk" },
-      "Madhya Pradesh": { dish: "Famous Poha-Jalebi & Sev Namkeen", craft: "Chanderi/Maheshwari Handloom Bazar", landmark: "Royal Heritage Fort & Prachin Mahadev Mandir" },
-      "Maharashtra": { dish: "Famous Misal Pav, Vada Pav & Puran Poli", craft: "Paithani Saree & Kolhapuri Market", landmark: "Chhatrapati Shivaji Maharaj Chowk & Heritage Fort" },
-      "Rajasthan": { dish: "Royal Dal Baati Churma & Pyaz Kachori", craft: "Bandhani Textile, Jutis & Kundan Bazar", landmark: "Shahi Haveli, Qila & Clock Tower (Ghanta Ghar)" },
-      "Gujarat": { dish: "Famous Khaman Dhokla, Fafda-Jalebi & Thali", craft: "Patola Silk & Bandhani Garment Hub", landmark: "Heritage Stepwell (Vav), Mandir & Gandhi Chowk" },
+      "Uttar Pradesh": { dish: "Desi Ghee Kachori-Jalebi & Chaat", craft: "Handloom, Chikan & Brassware Bazar", landmark: "Prachin Shiv Mandir & Heritage Fort" },
+      "Bihar": { dish: "Authentic Desi Ghee Litti Chokha & Khaja", craft: "Madhubani Art & Khadi Silk Emporium", landmark: "Historic Buddha Stupa & Rajendra Chowk" },
+      "Madhya Pradesh": { dish: "Famous Poha-Jalebi & Sev Namkeen", craft: "Chanderi & Maheshwari Handloom Bazar", landmark: "Royal Heritage Fort & Mahadev Mandir" },
+      "Maharashtra": { dish: "Famous Misal Pav, Vada Pav & Puran Poli", craft: "Paithani Saree & Kolhapuri Market", landmark: "Chhatrapati Shivaji Maharaj Chowk & Fort" },
+      "Rajasthan": { dish: "Royal Dal Baati Churma & Pyaz Kachori", craft: "Bandhani Textile, Jutis & Kundan Bazar", landmark: "Shahi Haveli, Qila & Ghanta Ghar" },
+      "Gujarat": { dish: "Famous Khaman Dhokla, Fafda-Jalebi & Thali", craft: "Patola Silk & Bandhani Garment Hub", landmark: "Heritage Stepwell (Vav) & Swaminarayan Mandir" },
       "West Bengal": { dish: "Famous Rosogolla, Mishti Doi & Kathi Roll", craft: "Tant & Baluchari Saree New Market", landmark: "Rajbari Heritage Palace & Kali Bari Mandir" },
-      "Tamil Nadu": { dish: "Filter Coffee, Ghee Roast Dosa & Idli", craft: "Kanchipuram Silk & Temple Jewellery Market", landmark: "Ancient Gopuram Amman Temple & Heritage Tank" },
-      "Karnataka": { dish: "Benne Masala Dosa & Mysore Pak House", craft: "Sandalwood Craft & Silk Saree Emporium", landmark: "Historical Wadiyar/Hoysala Temple & Botanical Park" },
-      "Kerala": { dish: "Malabar Appam Stew, Sadya & Banana Chips", craft: "Kasavu Saree & Spice Market", landmark: "Backwater Viewpoint & Ancient Bhagavathy Temple" },
-      "Andhra Pradesh": { dish: "Andhra Pesarattu,ootharekulu & Spicy Thali", craft: "Kalamkari & Uppada Silk Market", landmark: "Historic Hilltop Venkateswara Swamy Temple" },
-      "Telangana": { dish: "Famous Dum Biryani, Irani Chai & Osmania Biscuit", craft: "Pochampally Ikat & Pearl Market", landmark: "Kakatiya Heritage Fort & Tank Bund View" },
-      "Punjab": { dish: "Amritsari Kulcha, Makki Di Roti & Lassi", craft: "Phulkari Dupatta & Punjabi Jutti Bazar", landmark: "Historic Gurudwara Sahib & Heritage Bagh" },
-      "Haryana": { dish: "Desi Ghee Churma, Kachri Chutney & Sweet Lassi", craft: "Handloom Dari & Brass Market", landmark: "Prachin Sarovar & Historical Gate" },
-      "Himachal Pradesh": { dish: "Himachali Siddu, Dham & Kullu Trout", craft: "Kullu Shawl, Himachali Cap & Wooden Craft Mall Road", landmark: "Ridge Viewpoint, Hidimba/Shiva Temple & Pine Valley" },
-      "Uttarakhand": { dish: "Garhwali/Kumaoni Bal Mithai & Aloo Ke Gutke", craft: "pahadi Woolen Shawl & Organic Ringal Bazar", landmark: "Himalayan Viewpoint, Sangam Ghat & Siddhapeeth Mandir" },
-      "Assam": { dish: "Assam Tea Lounge, Pitha & Khar", craft: "Muga & Mekhela Chador Silk Hub", landmark: "Brahmaputra Riverfront & Ancient Shakti Temple" },
-      "Odisha": { dish: "Famous Chhena Poda, Rasabali & Dalma", craft: "Sambalpuri Ikat & Silver Filigree Bazar", landmark: "Kalinga Architecture Temple & Heritage Lake" },
-      "Chhattisgarh": { dish: "Chhattisgarhi Chila, Faraa & Dehrori", craft: "Bastar Dhokra Bell Metal & Kosa Silk Market", landmark: "Tribal Heritage Park, Waterfall & Danteshwari Chowk" },
-      "Jharkhand": { dish: "Dhuska-Ghugni, Litti & Dudhauri Sweets", craft: "Sohrai Art & Tussar Silk Emporium", landmark: "Scenic Hill Waterfall, Dam & Pahari Mandir" },
-      "Jammu & Kashmir": { dish: "Kashmiri Kahwa, Dum Aloo & Bakery", craft: "Pashmina Shawl, Saffron (Kesar) & Dry Fruit Market", landmark: "Snow Valley Viewpoint, Mughal Garden & Chashma" },
-      "Meghalaya": { dish: "Khasi Jadoh, Bamboo Shoot & Momos", craft: "Police Bazar Cane & Bamboo Handicrafts", landmark: "Living Root Bridge, Waterfall & Canyon Viewpoint" },
-      "Goa": { dish: "Goan Bebinca, Poi & Coastal Cafe", craft: "Anjuna/Panaji Cashew, Spice & Flea Market", landmark: "Golden Sunset Beach, Aguada Fort & Old Heritage Church" }
+      "Tamil Nadu": { dish: "Filter Coffee, Ghee Roast Dosa & Idli", craft: "Kanchipuram Silk & Temple Jewellery Market", landmark: "Ancient Gopuram Amman Temple" },
+      "Karnataka": { dish: "Benne Masala Dosa & Mysore Pak House", craft: "Sandalwood Craft & Silk Saree Emporium", landmark: "Historical Hoysala Temple & Botanical Park" },
+      "Kerala": { dish: "Malabar Appam Stew, Sadya & Banana Chips", craft: "Kasavu Saree & Spice Market", landmark: "Backwater Viewpoint & Bhagavathy Temple" }
     };
 
-    function generateCityHighlights(loc, centerCoords) {
+    function generateCompleteCityData(loc, centerCoords) {
       if (!loc || loc.name === "All India") return [];
       const spec = STATE_SPECIALTIES[loc.state] || {
         dish: "Famous Local Sweets, Chaat & Traditional Thali",
         craft: "Main City Handloom, Jewellery & Wholesale Bazar",
         landmark: "Historic City Mandir, Fort & Central Park"
       };
-      const baseLat = centerCoords.lat;
-      const baseLng = centerCoords.lng;
+      const lat = centerCoords.lat;
+      const lng = centerCoords.lng;
 
       return [
         {
-          id: `auto-1-${loc.name}`,
+          id: `gen-landmark-${loc.name}`,
           name: `${loc.name} — ${spec.landmark}`,
           category: "Famous Landmark",
           city: loc.name,
           district: loc.district,
           state: loc.state,
-          lat: baseLat + 0.004,
-          lng: baseLng + 0.003,
+          lat: lat + 0.004,
+          lng: lng + 0.003,
           rating: 4.9,
-          reviews: 1420,
-          phone: "Tourist & Heritage Info",
+          reviews: 1540,
+          phone: "District Tourism & Heritage",
           open: true,
           isFamous: true,
-          famousTag: `#1 Must-Visit Spot in ${loc.name}`,
-          desc: `${loc.name} (${loc.state}) ka sabse prasiddh darshaniya sthal aur historical landmark jahan log dur-dur se ghumne aate hain.`,
-          address: `Central Heritage Zone, ${loc.name}, ${loc.state}`
+          famousTag: `#1 Famous Darshaniya Sthal in ${loc.name}`,
+          desc: `${loc.name} (${loc.state}) ka sabse prasiddh tourist attraction aur historical/spiritual landmark.`,
+          address: `Heritage Zone, ${loc.name}, ${loc.state}`,
+          reviewList: [{ user: "Local Guide", stars: 5, text: `${loc.name} aane par yahan zaroor jayein!` }]
         },
         {
-          id: `auto-2-${loc.name}`,
-          name: `${loc.name} Main Sadar Bazar & ${spec.craft}`,
-          category: "Famous Market",
+          id: `gen-hospital-${loc.name}`,
+          name: `${loc.name} District Hospital & Apex Super-Specialty Care`,
+          category: "Hospital & Clinic",
           city: loc.name,
           district: loc.district,
           state: loc.state,
-          lat: baseLat - 0.003,
-          lng: baseLng + 0.005,
-          rating: 4.8,
-          reviews: 980,
-          phone: "Main Market Association",
+          lat: lat - 0.003,
+          lng: lng + 0.004,
+          rating: 4.7,
+          reviews: 890,
+          phone: "108 / +91 1800-180-1104",
           open: true,
           isFamous: true,
-          famousTag: `Famous Shopping & ${spec.craft.split(" ")[0]} Hub`,
-          desc: `${loc.name} ka sabse bada aur purana bazar. Yahan ${spec.craft.toLowerCase()}, kapde, jewellery aur local saman sabse saste daam par milta hai.`,
-          address: `Main Chowk / Station Road, ${loc.name}`
+          famousTag: `24x7 Emergency, ICU, Maternity & Trauma Center`,
+          desc: `${loc.name} ka sabse bada सरकारी evam private multi-specialty hospital, pathology lab aur 24 ghante ambulance seva.`,
+          address: `Civil Lines / Hospital Road, ${loc.name}`,
+          reviewList: []
         },
         {
-          id: `auto-3-${loc.name}`,
+          id: `gen-hotel-${loc.name}`,
+          name: `Hotel Grand ${loc.name} Palace & Family Residency`,
+          category: "Hotel & Stay",
+          city: loc.name,
+          district: loc.district,
+          state: loc.state,
+          lat: lat + 0.002,
+          lng: lng - 0.004,
+          rating: 4.8,
+          reviews: 640,
+          phone: "+91 98765 11220",
+          open: true,
+          isFamous: true,
+          famousTag: `Best AC Rooms, Banquet Hall & Pure Veg Restaurant`,
+          desc: `${loc.name} railway station aur bus stand ke pass thaharne ke liye sabse surakshit aur shandar family hotel.`,
+          address: `Station Road, Civil Lines, ${loc.name}`,
+          reviewList: []
+        },
+        {
+          id: `gen-coaching-${loc.name}`,
+          name: `${loc.name} Career Point — IIT-JEE, NEET, UPSC & SSC Hub`,
+          category: "Coaching & Institute",
+          city: loc.name,
+          district: loc.district,
+          state: loc.state,
+          lat: lat - 0.004,
+          lng: lng - 0.003,
+          rating: 4.8,
+          reviews: 780,
+          phone: "+91 94152 00991",
+          open: true,
+          isFamous: true,
+          famousTag: `#1 Competitive Exam, Foundation & Computer Institute`,
+          desc: `${loc.name} me NEET, JEE, UPएससी/State PSC, Police, Bank, SSC aur Digital Library ki sabse best coaching.`,
+          address: `College Road / Degree College Chauraha, ${loc.name}`,
+          reviewList: []
+        },
+        {
+          id: `gen-food-${loc.name}`,
           name: `Prasiddh ${loc.name} Mishthan & ${spec.dish.split("&")[0]}`,
           category: "Famous Food",
           city: loc.name,
           district: loc.district,
           state: loc.state,
-          lat: baseLat + 0.002,
-          lng: baseLng - 0.004,
-          rating: 4.8,
-          reviews: 1150,
-          phone: "+91 98765 00111",
+          lat: lat + 0.005,
+          lng: lng - 0.002,
+          rating: 4.9,
+          reviews: 1320,
+          phone: "+91 98765 44556",
           open: true,
           isFamous: true,
           famousTag: `Famous Taste: ${spec.dish}`,
-          desc: `${loc.name} ki sabse mashhoor swadisht dukan — ${spec.dish} ke liye pure zile me jani jati hai.`,
-          address: `Bada Bazar Chowk, ${loc.name}`
+          desc: `${loc.name} ki sabse mashhoor dukan jahan subah se shaam tak ${spec.dish} ke liye bheed lagti hai.`,
+          address: `Main Sadar Chowk, ${loc.name}`,
+          reviewList: []
         },
         {
-          id: `auto-4-${loc.name}`,
-          name: `${loc.name} Digital Mobile, Medical & Super Mart`,
-          category: "Mobile & Tech",
+          id: `gen-market-${loc.name}`,
+          name: `${loc.name} Sadar Bazar & ${spec.craft}`,
+          category: "Famous Market",
           city: loc.name,
           district: loc.district,
           state: loc.state,
-          lat: baseLat - 0.004,
-          lng: baseLng - 0.002,
-          rating: 4.6,
-          reviews: 340,
-          phone: "+91 94150 22334",
+          lat: lat - 0.002,
+          lng: lng + 0.002,
+          rating: 4.7,
+          reviews: 1100,
+          phone: "Vyapar Mandal Association",
           open: true,
-          isFamous: false,
-          famousTag: "Verified Local Business Hub",
-          desc: `${loc.name} me electronics, mobile repair, 24x7 medical store aur daily kirana needs ka bharosemand center.`,
-          address: `Civil Lines / Main Road, ${loc.name}`
+          isFamous: true,
+          famousTag: `Wholesale & Retail Shopping Hub`,
+          desc: `${loc.name} ka sabse bada market — Saree, Kapde, Gold Jewellery, Electronics aur Kirana wholesale bazar.`,
+          address: `Bada Bazar, ${loc.name}`,
+          reviewList: []
         }
       ];
     }
 
-    const CATEGORIES = [
-      "All",
-      "Famous Landmark",
-      "Famous Food",
-      "Famous Market",
-      "Mobile & Tech",
-      "Kirana & Mart",
-      "Medical",
-      "Clothes & Saree",
-      "Jewellery"
-    ];
-
     // ==========================================
-    // 5. LOCATION AUTOCOMPLETE COMPONENT
+    // 6. LOCATION AUTOCOMPLETE PICKER
     // ==========================================
     function LocationPicker({ value, onSelect, placeholder, allowCustom = false }) {
       const [query, setQuery] = useState(value);
@@ -406,7 +367,7 @@
 
       const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q || q.includes("all india")) return ALL_LOCATIONS.slice(0, 18);
+        if (!q || q.includes("all india")) return ALL_LOCATIONS.slice(0, 20);
         return ALL_LOCATIONS.filter(loc =>
           loc.display.toLowerCase().includes(q) ||
           loc.name.toLowerCase().includes(q) ||
@@ -418,7 +379,7 @@
           const aStarts = a.name.toLowerCase().startsWith(q) ? -1 : 0;
           const bStarts = b.name.toLowerCase().startsWith(q) ? -1 : 0;
           return aStarts - bStarts;
-        }).slice(0, 20);
+        }).slice(0, 22);
       }, [query]);
 
       const canAddCustom = allowCustom && query.trim().length > 2 && !ALL_LOCATIONS.some(l => l.name.toLowerCase() === query.trim().toLowerCase());
@@ -460,7 +421,9 @@
                   <span className="text-base">{loc.name === "All India" ? "🌍" : "📍"}</span>
                   <div className="flex-1">
                     <div className="text-sm font-semibold text-stone-900">{loc.display}</div>
-                    <div className="text-[11px] text-stone-500">{loc.state} • {loc.district} • Famous Spots & Shops Available</div>
+                    <div className="text-[11px] text-stone-500">
+                      {loc.state} • Famous Places, Hospitals, Hotels & Coaching Available
+                    </div>
                   </div>
                 </button>
               ))}
@@ -485,45 +448,59 @@
     }
 
     // ==========================================
-    // 6. MAIN APPLICATION COMPONENT
+    // 7. MAIN APP COMPONENT
     // ==========================================
     function App() {
-      // Auth State (Saved in LocalStorage)
+      // Users & Auth
       const [users, setUsers] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_users")) || []; } catch { return []; }
+        try { return JSON.parse(localStorage.getItem("sahirank_v18_users")) || []; } catch { return []; }
       });
       const [currentUser, setCurrentUser] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_current_user")) || null; } catch { return null; }
+        try { return JSON.parse(localStorage.getItem("sahirank_v18_current_user")) || null; } catch { return null; }
       });
       const [authModal, setAuthModal] = useState(false);
-      const [authMode, setAuthMode] = useState("login"); // 'login' | 'signup'
+      const [authMode, setAuthMode] = useState("login");
       const [authForm, setAuthForm] = useState({ name: "", phoneOrEmail: "", password: "", city: "Varanasi" });
 
-      // Places State (Saved in LocalStorage)
+      // Cloud Backend Config (Firebase Realtime DB / Supabase REST Endpoint)
+      const [cloudConfig, setCloudConfig] = useState(() => {
+        try { return JSON.parse(localStorage.getItem("sahirank_v18_cloud")) || { provider: "firebase", url: "", apiKey: "", enabled: false }; }
+        catch { return { provider: "firebase", url: "", apiKey: "", enabled: false }; }
+      });
+      const [cloudModal, setCloudModal] = useState(false);
+      const [syncing, setSyncing] = useState(false);
+
+      // Places & Reviews
       const [customPlaces, setCustomPlaces] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_custom_places")) || []; } catch { return []; }
+        try { return JSON.parse(localStorage.getItem("sahirank_v18_places")) || []; } catch { return []; }
+      });
+      const [reviewsMap, setReviewsMap] = useState(() => {
+        try { return JSON.parse(localStorage.getItem("sahirank_v18_reviews")) || {}; } catch { return {}; }
       });
       const [savedIds, setSavedIds] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_saved_ids")) || []; } catch { return []; }
+        try { return JSON.parse(localStorage.getItem("sahirank_v18_saved")) || []; } catch { return []; }
       });
 
-      // Filters & Navigation
+      // Active Review Modal State
+      const [reviewTarget, setReviewTarget] = useState(null);
+      const [newReview, setNewReview] = useState({ stars: 5, text: "" });
+
+      // Filters & UI State
       const [selectedLoc, setSelectedLoc] = useState(ALL_LOCATIONS[0]);
       const [category, setCategory] = useState("All");
       const [searchText, setSearchText] = useState("");
       const [toast, setToast] = useState(null);
       const [addModal, setAddModal] = useState(false);
-      const [selectedDetailPlace, setSelectedDetailPlace] = useState(null);
 
-      // Live Internet Wiki / Geo Data for any clicked city
+      // Live Internet Info (Wikipedia + Nominatim)
       const [cityWiki, setCityWiki] = useState(null);
       const [loadingWiki, setLoadingWiki] = useState(false);
       const [dynamicCoords, setDynamicCoords] = useState({ lat: 22.5937, lng: 78.9629 });
 
-      // New Business Form
+      // New Place / Business Form
       const [bizForm, setBizForm] = useState({
         name: "",
-        category: "Famous Landmark",
+        category: "Hospital & Clinic",
         cityLoc: ALL_LOCATIONS[1],
         phone: "",
         famousTag: "",
@@ -531,47 +508,70 @@
         address: ""
       });
 
-      // Map Refs
       const mapRef = useRef(null);
       const markersRef = useRef([]);
 
-      const showToast = (msg) => {
-        setToast(msg);
-      };
+      const showToast = (msg) => setToast(msg);
 
       useEffect(() => {
         if (!toast) return;
-        const timer = setTimeout(() => setToast(null), 3000);
-        return () => clearTimeout(timer);
+        const t = setTimeout(() => setToast(null), 3200);
+        return () => clearTimeout(t);
       }, [toast]);
 
-      // Resolve Coordinates + Live Nominatim Fallback + Wikipedia Summary Fetch
+      // Cloud Sync Pull on Load (if configured)
       useEffect(() => {
-        const rawName = selectedLoc.name.replace(/\(.*\)/, "").trim().toLowerCase();
+        if (!cloudConfig.enabled || !cloudConfig.url) return;
+        setSyncing(true);
+        const endpoint = cloudConfig.provider === "firebase"
+          ? `${cloudConfig.url.replace(/\/$/, "")}/sahirank_places.json`
+          : `${cloudConfig.url.replace(/\/$/, "")}/rest/v1/sahirank_places?select=*`;
+
+        const headers = cloudConfig.provider === "supabase" && cloudConfig.apiKey
+          ? { "apikey": cloudConfig.apiKey, "Authorization": `Bearer ${cloudConfig.apiKey}` }
+          : {};
+
+        fetch(endpoint, { headers })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (!data) return;
+            const list = Array.isArray(data) ? data : Object.values(data);
+            if (list.length > 0) {
+              setCustomPlaces(list);
+              localStorage.setItem("sahirank_v18_places", JSON.stringify(list));
+              showToast(`☁️ Cloud Database se ${list.length} records sync ho gaye!`);
+            }
+          })
+          .catch(() => {})
+          .finally(() => setSyncing(false));
+      }, [cloudConfig.enabled, cloudConfig.url]);
+
+      // Fetch Wikipedia & Live Coordinates when City changes
+      useEffect(() => {
+        const cleanName = selectedLoc.name.replace(/\(.*\)/, "").trim().toLowerCase();
         const stateName = selectedLoc.state.toLowerCase();
-        let resolved = COORDS_DB[selectedLoc.name.toLowerCase()] || COORDS_DB[rawName] || COORDS_DB[stateName] || { lat: 25.3176, lng: 82.9739 };
-        setDynamicCoords(resolved);
+        const fallback = COORDS_DB[selectedLoc.name.toLowerCase()] || COORDS_DB[cleanName] || COORDS_DB[stateName] || { lat: 25.3176, lng: 82.9739 };
+        setDynamicCoords(fallback);
 
         if (selectedLoc.name === "All India") {
           setCityWiki(null);
           return;
         }
 
-        // Fetch Wikipedia Summary & Accurate Coordinates from Internet
-        let isMounted = true;
+        let active = true;
         setLoadingWiki(true);
-        const cleanCity = selectedLoc.name.replace(/\(.*\)/, "").trim();
+        const queryCity = selectedLoc.name.replace(/\(.*\)/, "").trim();
 
-        fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanCity)}`)
-          .then(res => res.ok ? res.json() : null)
+        fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(queryCity)}`)
+          .then(r => r.ok ? r.json() : null)
           .then(data => {
-            if (!isMounted) return;
+            if (!active) return;
             if (data && data.extract) {
               setCityWiki({
                 title: data.title,
                 extract: data.extract,
                 thumbnail: data.thumbnail?.source || null,
-                url: data.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${cleanCity}`
+                url: data.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${queryCity}`
               });
               if (data.coordinates) {
                 setDynamicCoords({ lat: data.coordinates.lat, lng: data.coordinates.lon });
@@ -580,55 +580,51 @@
               setCityWiki(null);
             }
           })
-          .catch(() => { if (isMounted) setCityWiki(null); })
-          .finally(() => { if (isMounted) setLoadingWiki(false); });
+          .catch(() => { if (active) setCityWiki(null); })
+          .finally(() => { if (active) setLoadingWiki(false); });
 
-        return () => { isMounted = false; };
+        return () => { active = false; };
       }, [selectedLoc]);
 
-      // Combine Curated + User Added + Auto-Generated Famous Places for Selected City
-      const allDisplayedPlaces = useMemo(() => {
-        const combined = [...customPlaces, ...INITIAL_PLACES];
+      // Combine Curated + Cloud/Custom + Smart Generated Places
+      const displayedPlaces = useMemo(() => {
+        const base = [...customPlaces, ...INITIAL_PLACES];
+        let result = base;
 
-        let list = combined;
         if (selectedLoc.name !== "All India") {
           const cleanName = selectedLoc.name.replace(/\(.*\)/, "").trim().toLowerCase();
-          const cityMatches = combined.filter(p =>
+          const matched = base.filter(p =>
             p.city.toLowerCase() === cleanName ||
             p.city.toLowerCase() === selectedLoc.name.toLowerCase() ||
             p.district.toLowerCase() === cleanName
           );
 
-          // Guaranteed Famous Places even if city has 0 users/listings!
-          const generated = generateCityHighlights(selectedLoc, dynamicCoords);
-          if (cityMatches.length === 0) {
-            list = generated;
-          } else if (cityMatches.length < 3) {
-            list = [...cityMatches, ...generated.slice(0, 3)];
-          } else {
-            list = cityMatches;
-          }
+          const generated = generateCompleteCityData(selectedLoc, dynamicCoords);
+          // Merge so every city has Landmarks, Hospitals, Hotels, Coaching, Food & Markets!
+          const existingCats = new Set(matched.map(m => m.category));
+          const missingGenerated = generated.filter(g => !existingCats.has(g.category));
+          result = [...matched, ...missingGenerated];
         }
 
         if (category !== "All") {
-          list = list.filter(p => p.category === category);
+          result = result.filter(p => p.category === category);
         }
 
         if (searchText.trim()) {
           const q = searchText.trim().toLowerCase();
-          list = list.filter(p =>
+          result = result.filter(p =>
             `${p.name} ${p.category} ${p.city} ${p.state} ${p.famousTag || ""} ${p.desc || ""}`.toLowerCase().includes(q)
           );
         }
 
-        return list;
+        return result;
       }, [customPlaces, selectedLoc, category, searchText, dynamicCoords]);
 
-      // Initialize & Sync Leaflet Map
+      // Sync Leaflet Map
       useEffect(() => {
         if (!window.L) return;
-        const container = document.getElementById("mainMap");
-        if (!container) return;
+        const el = document.getElementById("mainMap");
+        if (!el) return;
 
         if (!mapRef.current) {
           mapRef.current = window.L.map("mainMap").setView([dynamicCoords.lat, dynamicCoords.lng], selectedLoc.name === "All India" ? 5 : 13);
@@ -637,30 +633,28 @@
             maxZoom: 19
           }).addTo(mapRef.current);
         } else {
-          const zoom = selectedLoc.name === "All India" ? 5 : 13;
-          mapRef.current.setView([dynamicCoords.lat, dynamicCoords.lng], zoom);
+          mapRef.current.setView([dynamicCoords.lat, dynamicCoords.lng], selectedLoc.name === "All India" ? 5 : 13);
         }
 
-        // Clear old markers
         markersRef.current.forEach(m => { try { m.remove(); } catch {} });
         markersRef.current = [];
 
-        allDisplayedPlaces.forEach(p => {
-          const marker = window.L.marker([p.lat, p.lng])
+        displayedPlaces.forEach(p => {
+          const m = window.L.marker([p.lat, p.lng])
             .addTo(mapRef.current)
             .bindPopup(`
-              <div style="min-width:180px">
+              <div style="min-width:190px">
                 <b style="color:#ff6b02;font-size:13px">${p.name}</b><br/>
-                <span style="font-size:11px;color:#555">${p.famousTag || p.category}</span><br/>
-                <span style="font-size:11px">📍 ${p.city}, ${p.state} • ⭐ ${p.rating}</span><br/>
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name + ' ' + p.city)}" target="_blank" style="color:#ff6b02;font-weight:bold;font-size:11px">Google Maps par kholein →</a>
+                <span style="font-size:11px;font-weight:600;color:#333">${p.category}</span><br/>
+                <span style="font-size:11px;color:#666">${p.famousTag || ""}</span><br/>
+                <span style="font-size:11px">📍 ${p.city} • ⭐ ${p.rating}</span>
               </div>
             `);
-          markersRef.current.push(marker);
+          markersRef.current.push(m);
         });
-      }, [dynamicCoords, allDisplayedPlaces, selectedLoc]);
+      }, [dynamicCoords, displayedPlaces, selectedLoc]);
 
-      // Auth Handlers
+      // Auth Submit
       const handleAuthSubmit = (e) => {
         e.preventDefault();
         const { name, phoneOrEmail, password, city } = authForm;
@@ -668,48 +662,60 @@
           showToast("⚠️ Email/Phone aur Password zaroor bharein!");
           return;
         }
-
         if (authMode === "signup") {
-          if (!name.trim()) {
-            showToast("⚠️ Apna Naam bharein!");
-            return;
-          }
+          if (!name.trim()) { showToast("⚠️ Apna Naam bharein!"); return; }
           if (users.some(u => u.phoneOrEmail.toLowerCase() === phoneOrEmail.trim().toLowerCase())) {
             showToast("⚠️ Yeh Email/Phone pehle se registered hai. Kripya Login karein.");
             setAuthMode("login");
             return;
           }
           const newUser = { id: Date.now(), name: name.trim(), phoneOrEmail: phoneOrEmail.trim(), password, city };
-          const updatedUsers = [...users, newUser];
-          setUsers(updatedUsers);
+          const nextUsers = [...users, newUser];
+          setUsers(nextUsers);
           setCurrentUser(newUser);
-          localStorage.setItem("sahirank_users", JSON.stringify(updatedUsers));
-          localStorage.setItem("sahirank_current_user", JSON.stringify(newUser));
+          localStorage.setItem("sahirank_v18_users", JSON.stringify(nextUsers));
+          localStorage.setItem("sahirank_v18_current_user", JSON.stringify(newUser));
           setAuthModal(false);
-          showToast(`🎉 Welcome ${newUser.name}! Aapka account ban gaya.`);
+          showToast(`🎉 Welcome ${newUser.name}! Account ban gaya.`);
         } else {
-          const found = users.find(
-            u => u.phoneOrEmail.toLowerCase() === phoneOrEmail.trim().toLowerCase() && u.password === password
-          );
+          const found = users.find(u => u.phoneOrEmail.toLowerCase() === phoneOrEmail.trim().toLowerCase() && u.password === password);
           if (!found) {
-            showToast("❌ Galat Email/Phone ya Password! Naya account banane ke liye Sign Up par click karein.");
+            showToast("❌ Galat Email/Phone ya Password! Naya account banane ke liye Sign Up chunein.");
             return;
           }
           setCurrentUser(found);
-          localStorage.setItem("sahirank_current_user", JSON.stringify(found));
+          localStorage.setItem("sahirank_v18_current_user", JSON.stringify(found));
           setAuthModal(false);
           showToast(`✅ Welcome back, ${found.name}!`);
         }
       };
 
-      const handleLogout = () => {
-        setCurrentUser(null);
-        localStorage.removeItem("sahirank_current_user");
-        showToast("👋 Aap safaltapurvak Logout ho gaye.");
+      // Push to Cloud Helper
+      const pushPlaceToCloud = async (entry) => {
+        if (!cloudConfig.enabled || !cloudConfig.url) return;
+        try {
+          if (cloudConfig.provider === "firebase") {
+            const url = `${cloudConfig.url.replace(/\/$/, "")}/sahirank_places.json`;
+            await fetch(url, { method: "POST", body: JSON.stringify(entry) });
+          } else if (cloudConfig.provider === "supabase") {
+            const url = `${cloudConfig.url.replace(/\/$/, "")}/rest/v1/sahirank_places`;
+            await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "apikey": cloudConfig.apiKey,
+                "Authorization": `Bearer ${cloudConfig.apiKey}`
+              },
+              body: JSON.stringify(entry)
+            });
+          }
+        } catch (err) {
+          console.warn("Cloud push failed, saved locally", err);
+        }
       };
 
-      // Add Place / Business Handler
-      const handleAddBusiness = (e) => {
+      // Add Place / Business Submit
+      const handleAddBusiness = async (e) => {
         e.preventDefault();
         if (!bizForm.name.trim() || !bizForm.cityLoc) {
           showToast("⚠️ Naam aur City select karna zaroori hai!");
@@ -732,35 +738,80 @@
           reviews: 1,
           phone: bizForm.phone || "+91 98765 XXXXX",
           open: true,
-          isFamous: bizForm.category.startsWith("Famous"),
-          famousTag: bizForm.famousTag || `Popular ${bizForm.category} in ${loc.name}`,
-          desc: bizForm.desc || `${loc.name} me sthit bharosemand aur mashhoor sthan.`,
-          address: bizForm.address || `Main Market, ${loc.name}, ${loc.state}`,
-          addedBy: currentUser ? currentUser.name : "Guest User"
+          isFamous: true,
+          famousTag: bizForm.famousTag || `Verified ${bizForm.category} in ${loc.name}`,
+          desc: bizForm.desc || `${loc.name} me sthit pramukh ${bizForm.category} kendra.`,
+          address: bizForm.address || `Main Market Road, ${loc.name}, ${loc.state}`,
+          addedBy: currentUser ? currentUser.name : "Community Member",
+          reviewList: []
         };
 
         const updated = [newEntry, ...customPlaces];
         setCustomPlaces(updated);
-        localStorage.setItem("sahirank_custom_places", JSON.stringify(updated));
+        localStorage.setItem("sahirank_v18_places", JSON.stringify(updated));
+        await pushPlaceToCloud(newEntry);
+
         setSelectedLoc(loc);
         setAddModal(false);
-        setBizForm({ name: "", category: "Famous Landmark", cityLoc: loc, phone: "", famousTag: "", desc: "", address: "" });
+        setBizForm({ name: "", category: "Hospital & Clinic", cityLoc: loc, phone: "", famousTag: "", desc: "", address: "" });
         showToast(`✅ '${newEntry.name}' ab ${loc.name} me live ho gaya!`);
       };
 
-      const toggleSavePlace = (id) => {
-        const updated = savedIds.includes(id) ? savedIds.filter(x => x !== id) : [...savedIds, id];
-        setSavedIds(updated);
-        localStorage.setItem("sahirank_saved_ids", JSON.stringify(updated));
-        showToast(savedIds.includes(id) ? "Bookmark hata diya gaya" : "❤️ Saved list me jud gaya!");
+      // Submit Review
+      const handleReviewSubmit = (e) => {
+        e.preventDefault();
+        if (!currentUser) {
+          setReviewTarget(null);
+          setAuthMode("login");
+          setAuthModal(true);
+          showToast("🔐 Review dene ke liye pehle Login ya Sign Up karein!");
+          return;
+        }
+        if (!newReview.text.trim()) {
+          showToast("⚠️ Kripya apna review likhein!");
+          return;
+        }
+        const pid = reviewTarget.id;
+        const existing = reviewsMap[pid] || reviewTarget.reviewList || [];
+        const entry = {
+          user: currentUser.name,
+          stars: Number(newReview.stars),
+          text: newReview.text.trim(),
+          date: new Date().toLocaleDateString("en-IN")
+        };
+        const updatedList = [entry, ...existing];
+        const nextMap = { ...reviewsMap, [pid]: updatedList };
+        setReviewsMap(nextMap);
+        localStorage.setItem("sahirank_v18_reviews", JSON.stringify(nextMap));
+        setNewReview({ stars: 5, text: "" });
+        showToast(`⭐ Dhanyawad ${currentUser.name}! Aapka review post ho gaya.`);
+      };
+
+      const getCategoryBadgeStyle = (cat) => {
+        if (cat === "Hospital & Clinic") return "bg-red-50 text-red-700 border-red-200";
+        if (cat === "Hotel & Stay") return "bg-blue-50 text-blue-700 border-blue-200";
+        if (cat === "Coaching & Institute") return "bg-purple-50 text-purple-700 border-purple-200";
+        if (cat === "Famous Landmark") return "bg-amber-100 text-amber-900 border-amber-300";
+        return "bg-orange-50 text-orange-800 border-orange-200";
+      };
+
+      const getCategoryIcon = (cat) => {
+        if (cat === "Hospital & Clinic") return "🏥";
+        if (cat === "Hotel & Stay") return "🏨";
+        if (cat === "Coaching & Institute") return "🎓";
+        if (cat === "Famous Landmark") return "🏛️";
+        if (cat === "Famous Food") return "🍲";
+        if (cat === "Famous Market") return "🛍️";
+        if (cat === "Medical Store") return "💊";
+        return "📱";
       };
 
       return (
         <div className="min-h-screen flex flex-col">
-          {/* TOP NAVBAR */}
+          {/* NAVBAR */}
           <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-orange-200 shadow-sm">
-            <div className="max-w-[1360px] mx-auto px-3 sm:px-6 py-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
-              {/* Brand Logo */}
+            <div className="max-w-[1380px] mx-auto px-3 sm:px-6 py-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
+              {/* Brand */}
               <div className="flex items-center justify-between gap-3 shrink-0">
                 <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setSelectedLoc(ALL_LOCATIONS[0])}>
                   <div className="w-10 h-10 rounded-xl bg-orange-500 grid place-items-center text-white font-bold text-lg shadow">
@@ -768,38 +819,44 @@
                   </div>
                   <div>
                     <div className="font-display font-bold text-lg leading-none">
-                      SahiRank <span className="text-orange-500">V17 Pro</span>
+                      SahiRank <span className="text-orange-500">V18 Ultimate</span>
                     </div>
                     <div className="text-[10px] text-stone-500 tracking-wider uppercase font-semibold mt-0.5">
-                      28 States • 8 UTs • Famous Places & Shops
+                      Hospitals • Hotels • Coaching • Landmarks • Cloud DB
                     </div>
                   </div>
                 </div>
 
-                {/* Mobile Auth Button */}
-                <div className="flex lg:hidden items-center gap-2">
+                {/* Mobile Auth & Cloud */}
+                <div className="flex lg:hidden items-center gap-1.5">
+                  <button
+                    onClick={() => setCloudModal(true)}
+                    className={`text-xs px-2.5 py-1.5 rounded-xl border font-semibold ${cloudConfig.enabled ? "bg-green-50 text-green-700 border-green-300" : "bg-stone-100 text-stone-700 border-stone-200"}`}
+                  >
+                    ☁️ {cloudConfig.enabled ? "Synced" : "Cloud DB"}
+                  </button>
                   {currentUser ? (
-                    <button onClick={handleLogout} className="text-xs px-3 py-1.5 rounded-xl bg-orange-100 text-orange-800 font-semibold">
-                      👤 {currentUser.name.split(" ")[0]} (Logout)
+                    <button onClick={() => { setCurrentUser(null); localStorage.removeItem("sahirank_v18_current_user"); }} className="text-xs px-2.5 py-1.5 rounded-xl bg-orange-100 text-orange-800 font-semibold">
+                      👤 {currentUser.name.split(" ")[0]}
                     </button>
                   ) : (
                     <button onClick={() => { setAuthMode("login"); setAuthModal(true); }} className="text-xs px-3 py-1.5 rounded-xl bg-stone-900 text-white font-semibold">
-                      🔐 Login / Sign Up
+                      🔐 Login
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Search Controls */}
+              {/* Search & Location Picker */}
               <div className="flex-1 flex flex-col sm:flex-row gap-2">
                 <div className="flex-1 min-w-0">
                   <LocationPicker
                     value={selectedLoc.display}
                     onSelect={(loc) => {
                       setSelectedLoc(loc);
-                      showToast(`📍 ${loc.name} ke Famous Spots & Locations load ho gaye!`);
+                      showToast(`📍 ${loc.name} ke Hospitals, Hotels, Coaching & Famous Places load ho gaye!`);
                     }}
-                    placeholder="📍 Koi bhi City, Zila ya Gaon chunein (Varanasi, Agra, Goa, Gyanpur...)"
+                    placeholder="📍 Koi bhi City/Zila chunein (Varanasi, Kota, Delhi, Gyanpur, Patna...)"
                     allowCustom={true}
                   />
                 </div>
@@ -808,7 +865,7 @@
                   <input
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
-                    placeholder="Famous chiz, mandir, food ya dukan khojein..."
+                    placeholder="Search Hospital, Coaching, Hotel, Mandir ya Food..."
                     className="flex-1 bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400"
                   />
                   {searchText && (
@@ -817,19 +874,30 @@
                 </div>
               </div>
 
-              {/* Action Buttons (Add Place + Login/Signup) */}
+              {/* Desktop Action Buttons */}
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => {
                     setBizForm(prev => ({ ...prev, cityLoc: selectedLoc.name === "All India" ? ALL_LOCATIONS[1] : selectedLoc }));
                     setAddModal(true);
                   }}
-                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm shadow transition"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-xs sm:text-sm shadow transition"
                 >
-                  <span>➕</span> Add Famous Spot / Shop
+                  <span>➕</span> Add Listing
                 </button>
 
-                <div className="hidden lg:flex items-center gap-2">
+                <button
+                  onClick={() => setCloudModal(true)}
+                  className={`hidden lg:inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-bold transition ${
+                    cloudConfig.enabled
+                      ? "bg-green-50 text-green-700 border-green-300"
+                      : "bg-white hover:bg-orange-50 text-stone-700 border-orange-200"
+                  }`}
+                >
+                  <span>☁️</span> {cloudConfig.enabled ? "Cloud Connected" : "Cloud DB"}
+                </button>
+
+                <div className="hidden lg:flex items-center">
                   {currentUser ? (
                     <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl">
                       <div className="w-7 h-7 rounded-full bg-orange-500 text-white grid place-items-center text-xs font-bold">
@@ -837,7 +905,14 @@
                       </div>
                       <div className="text-xs">
                         <div className="font-bold text-stone-900 leading-tight">{currentUser.name}</div>
-                        <button onClick={handleLogout} className="text-[10px] text-red-600 font-semibold hover:underline">
+                        <button
+                          onClick={() => {
+                            setCurrentUser(null);
+                            localStorage.removeItem("sahirank_v18_current_user");
+                            showToast("👋 Logged out!");
+                          }}
+                          className="text-[10px] text-red-600 font-semibold hover:underline"
+                        >
                           Logout
                         </button>
                       </div>
@@ -854,40 +929,37 @@
               </div>
             </div>
 
-            {/* Category Bar + Quick Famous Cities */}
+            {/* CATEGORY PILLS */}
             <div className="border-t border-orange-100 bg-orange-50/60">
-              <div className="max-w-[1360px] mx-auto px-3 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto">
-                <span className="text-[11px] font-bold text-stone-500 uppercase shrink-0">Filter:</span>
+              <div className="max-w-[1380px] mx-auto px-3 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto">
                 {CATEGORIES.map(cat => (
                   <button
-                    key={cat}
-                    onClick={() => setCategory(cat)}
-                    className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition ${
-                      category === cat
+                    key={cat.id}
+                    onClick={() => setCategory(cat.id)}
+                    className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
+                      category === cat.id
                         ? "bg-orange-500 text-white border-orange-500 shadow-sm"
                         : "bg-white text-stone-700 border-orange-200 hover:border-orange-400"
                     }`}
                   >
-                    {cat === "Famous Landmark" ? "🏛️ Famous Landmarks" :
-                     cat === "Famous Food" ? "🍲 Famous Food & Sweets" :
-                     cat === "Famous Market" ? "🛍️ Famous Markets" : cat}
+                    {cat.label}
                   </button>
                 ))}
               </div>
             </div>
           </header>
 
-          {/* QUICK POPULAR CITY BAR */}
-          <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-6 pt-3 flex items-center gap-1.5 flex-wrap text-xs">
-            <span className="font-bold text-stone-600 mr-1">🔥 Popular Cities:</span>
-            {["All India", "Varanasi", "Ayodhya", "Agra", "Lucknow", "Gyanpur", "Bhadohi", "Mumbai", "Delhi", "Jaipur", "Patna", "Indore", "Amritsar", "Puri", "Shillong", "Panaji"].map(city => {
+          {/* QUICK CITY CHIPS */}
+          <div className="max-w-[1380px] w-full mx-auto px-3 sm:px-6 pt-3 flex items-center gap-1.5 flex-wrap text-xs">
+            <span className="font-bold text-stone-600 mr-1">⚡ Quick Jump:</span>
+            {["All India", "Varanasi", "Kota", "Delhi", "Patna", "Prayagraj", "Lucknow", "Gyanpur", "Bhadohi", "Mumbai", "Jaipur", "Agra", "Ayodhya", "Indore", "Bengaluru"].map(city => {
               const locObj = ALL_LOCATIONS.find(l => l.name.toLowerCase() === city.toLowerCase()) || ALL_LOCATIONS[0];
               const active = selectedLoc.name.toLowerCase() === city.toLowerCase();
               return (
                 <button
                   key={city}
                   onClick={() => setSelectedLoc(locObj)}
-                  className={`px-2.5 py-1 rounded-full border font-medium transition ${
+                  className={`px-2.5 py-1 rounded-full border font-semibold transition ${
                     active ? "bg-stone-900 text-white border-stone-900" : "bg-white border-orange-200 hover:border-orange-500 text-stone-700"
                   }`}
                 >
@@ -897,101 +969,107 @@
             })}
           </div>
 
-          {/* CITY HERO & WIKIPEDIA LIVE INFO BANNER (When a specific city is selected) */}
+          {/* CITY LIVE WIKIPEDIA & OVERVIEW BANNER */}
           {selectedLoc.name !== "All India" && (
-            <div className="max-w-[1360px] w-full mx-auto px-3 sm:px-6 mt-3">
-              <div className="bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div className="max-w-[1380px] w-full mx-auto px-3 sm:px-6 mt-3">
+              <div className="bg-gradient-to-r from-stone-900 via-stone-800 to-orange-950 text-white rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 <div className="flex items-start gap-4 flex-1">
                   {cityWiki?.thumbnail && (
                     <img
                       src={cityWiki.thumbnail}
                       alt={selectedLoc.name}
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border-2 border-white/60 shrink-0 bg-white"
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border-2 border-orange-400 shrink-0 bg-white"
                     />
                   )}
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-[11px] font-semibold mb-1">
-                      <span>✨ City Explorer Guide</span> • <span>{selectedLoc.state}</span>
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/30 border border-orange-400/40 text-orange-200 text-[11px] font-semibold mb-1">
+                      <span>🌍 {selectedLoc.state}</span> • <span>Verified City Portal</span>
                     </div>
-                    <h1 className="font-display font-bold text-xl sm:text-2xl">
-                      {selectedLoc.name} — Famous Places, Markets & Local Guide
+                    <h1 className="font-display font-bold text-xl sm:text-2xl text-white">
+                      {selectedLoc.name} — Famous Places, Hospitals, Hotels & Coaching Guide
                     </h1>
-                    <p className="text-xs sm:text-sm text-orange-50 mt-1 line-clamp-2 max-w-3xl">
+                    <p className="text-xs sm:text-sm text-stone-300 mt-1 line-clamp-2 max-w-3xl">
                       {loadingWiki
-                        ? `Internet se ${selectedLoc.name} ki prasiddh jankari aur map locations load ho rahi hai...`
-                        : cityWiki?.extract || `${selectedLoc.name} (${selectedLoc.state}) ke sabse mashhoor darshaniya sthal, prasiddh bazar, khane-peene ki jagah aur verified local shops niche diye gaye hain.`}
+                        ? `Internet se ${selectedLoc.name} ka live data aur coordinates load ho rahe hain...`
+                        : cityWiki?.extract || `${selectedLoc.name} (${selectedLoc.state}) ke top Hospitals, Hotels, Coaching Institutes, Famous Landmarks aur Markets ki puri list niche uplabdh hai.`}
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0">
-                  <a
-                    href={`https://www.google.com/maps/search/Tourist+Attractions+in+${encodeURIComponent(selectedLoc.name + " " + selectedLoc.state)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3.5 py-2 rounded-xl bg-white text-orange-600 font-bold text-xs shadow hover:bg-orange-50"
+                  <button
+                    onClick={() => setCategory("Hospital & Clinic")}
+                    className="px-3 py-1.5 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 hover:bg-red-500/30 text-xs font-semibold"
                   >
-                    🗺️ Google Maps Tourist Spots
-                  </a>
-                  {cityWiki?.url && (
-                    <a
-                      href={cityWiki.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3.5 py-2 rounded-xl bg-black/25 hover:bg-black/35 text-white font-semibold text-xs"
-                    >
-                      📖 Read Wikipedia
-                    </a>
-                  )}
+                    🏥 Hospitals
+                  </button>
+                  <button
+                    onClick={() => setCategory("Hotel & Stay")}
+                    className="px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-200 hover:bg-blue-500/30 text-xs font-semibold"
+                  >
+                    🏨 Hotels
+                  </button>
+                  <button
+                    onClick={() => setCategory("Coaching & Institute")}
+                    className="px-3 py-1.5 rounded-xl bg-purple-500/20 border border-purple-400/40 text-purple-200 hover:bg-purple-500/30 text-xs font-semibold"
+                  >
+                    🎓 Coaching
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* MAIN CONTENT GRID */}
-          <main className="max-w-[1360px] w-full mx-auto px-3 sm:px-6 py-4 flex-1 grid grid-cols-1 lg:grid-cols-[1.25fr_0.75fr] gap-5 items-start">
-            {/* LEFT: CARDS LIST */}
+          {/* MAIN CONTENT */}
+          <main className="max-w-[1380px] w-full mx-auto px-3 sm:px-6 py-4 flex-1 grid grid-cols-1 lg:grid-cols-[1.25fr_0.75fr] gap-5 items-start">
+            {/* LEFT: LISTINGS */}
             <section className="space-y-3">
               <div className="flex items-center justify-between text-xs text-stone-600 px-1">
                 <span>
-                  Showing <b>{allDisplayedPlaces.length}</b> famous places & verified locations in <b>{selectedLoc.name}</b>
+                  Showing <b>{displayedPlaces.length}</b> results in <b>{selectedLoc.name}</b> {category !== "All" && `(${category})`}
                 </span>
-                <span>{ALL_LOCATIONS.length}+ Indian Cities & Districts Active</span>
+                <span>Click on ⭐ Review to add your rating</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {allDisplayedPlaces.map((item) => {
+                {displayedPlaces.map((item) => {
+                  const itemReviews = reviewsMap[item.id] || item.reviewList || [];
+                  const totalRevs = item.reviews + itemReviews.length;
                   const isSaved = savedIds.includes(item.id);
+
                   return (
                     <div
                       key={item.id}
-                      className="bg-white rounded-2xl border border-orange-200/80 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+                      className="bg-white rounded-2xl border border-orange-200/90 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                     >
                       <div>
-                        {/* Top Badges */}
+                        {/* Category & Rating Header */}
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
-                            item.isFamous
-                              ? "bg-amber-100 text-amber-900 border border-amber-300"
-                              : "bg-orange-50 text-orange-700 border border-orange-200"
-                          }`}>
-                            {item.isFamous ? "🌟 Famous Highlight" : `🏪 ${item.category}`}
+                          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${getCategoryBadgeStyle(item.category)}`}>
+                            {getCategoryIcon(item.category)} {item.category}
                           </span>
                           <div className="flex items-center gap-1.5">
-                            <span className="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full text-stone-800">
-                              ⭐ {item.rating} <span className="text-[10px] font-normal text-stone-500">({item.reviews})</span>
-                            </span>
                             <button
-                              onClick={() => toggleSavePlace(item.id)}
-                              title="Save Place"
-                              className={`text-sm px-1.5 py-0.5 rounded-lg border ${isSaved ? "bg-red-50 border-red-200 text-red-500" : "border-stone-200 text-stone-400"}`}
+                              onClick={() => setReviewTarget(item)}
+                              className="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full text-stone-800 transition"
+                              title="Click to read or write reviews"
+                            >
+                              ⭐ {item.rating} <span className="text-[10px] font-normal text-stone-500">({totalRevs})</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                const next = isSaved ? savedIds.filter(x => x !== item.id) : [...savedIds, item.id];
+                                setSavedIds(next);
+                                localStorage.setItem("sahirank_v18_saved", JSON.stringify(next));
+                              }}
+                              className={`text-xs px-1.5 py-0.5 rounded-lg border ${isSaved ? "bg-red-50 border-red-200 text-red-500" : "border-stone-200 text-stone-400"}`}
                             >
                               {isSaved ? "❤️" : "🤍"}
                             </button>
                           </div>
                         </div>
 
-                        {/* Title & Famous Tag */}
-                        <h3 className="font-bold text-base text-stone-900 leading-snug">
+                        {/* Name & Tagline */}
+                        <h3 className="font-bold text-[15px] text-stone-900 leading-snug">
                           {item.name}
                         </h3>
                         {item.famousTag && (
@@ -1002,18 +1080,25 @@
 
                         {/* Description */}
                         <p className="text-xs text-stone-600 mt-1.5 line-clamp-2 leading-relaxed">
-                          {item.desc || `${item.city}, ${item.state} ka pramukh ${item.category} sthan.`}
+                          {item.desc}
                         </p>
 
-                        {/* Address & Location */}
+                        {/* Address & Phone */}
                         <div className="mt-2.5 pt-2 border-t border-orange-100 text-[11px] text-stone-500 space-y-0.5">
-                          <div>📍 <b>Location:</b> {item.address || `${item.city}, ${item.district} - ${item.state}`}</div>
-                          <div>📞 <b>Contact/Info:</b> {item.phone}</div>
+                          <div>📍 <b>Address:</b> {item.address || `${item.city}, ${item.state}`}</div>
+                          <div>📞 <b>Contact:</b> {item.phone}</div>
                         </div>
+
+                        {/* Latest User Review Snippet */}
+                        {itemReviews.length > 0 && (
+                          <div className="mt-2 p-2 rounded-xl bg-orange-50/70 border border-orange-100 text-[11px] text-stone-700">
+                            💬 <b>{itemReviews[0].user}:</b> "{itemReviews[0].text}"
+                          </div>
+                        )}
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className="mt-3 pt-2 flex gap-2">
+                      {/* Footer Buttons */}
+                      <div className="mt-3 pt-2 flex gap-1.5">
                         <button
                           onClick={() => {
                             if (mapRef.current) {
@@ -1021,17 +1106,23 @@
                               showToast(`🗺️ Map centered on ${item.name}`);
                             }
                           }}
-                          className="flex-1 py-2 px-2.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-800 border border-orange-200 text-xs font-semibold transition"
+                          className="flex-1 py-2 px-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-800 border border-orange-200 text-xs font-semibold transition"
                         >
-                          📍 Show on Map
+                          📍 Map
+                        </button>
+                        <button
+                          onClick={() => setReviewTarget(item)}
+                          className="flex-1 py-2 px-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition"
+                        >
+                          ⭐ Review
                         </button>
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + " " + item.city + " " + item.state)}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 py-2 px-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-center text-xs font-semibold transition"
+                          className="flex-1 py-2 px-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-center text-xs font-semibold transition"
                         >
-                          🧭 Google Direction
+                          🧭 Direction
                         </a>
                       </div>
                     </div>
@@ -1040,13 +1131,12 @@
               </div>
             </section>
 
-            {/* RIGHT: LIVE INTERACTIVE MAP */}
+            {/* RIGHT: INTERACTIVE MAP */}
             <aside className="lg:sticky lg:top-28 space-y-3">
               <div className="bg-white rounded-2xl border border-orange-200 overflow-hidden shadow-sm">
                 <div className="px-4 py-3 border-b border-orange-100 flex items-center justify-between">
-                  <div className="text-sm font-bold text-stone-900 flex items-center gap-1.5">
-                    <span>🗺️</span>
-                    <span>{selectedLoc.name === "All India" ? "All India Live Map" : `${selectedLoc.name} Famous Map`}</span>
+                  <div className="text-sm font-bold text-stone-900">
+                    🗺️ {selectedLoc.name} Live Map ({displayedPlaces.length})
                   </div>
                   <button
                     onClick={() => {
@@ -1056,29 +1146,180 @@
                     }}
                     className="text-xs px-2.5 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-200 font-semibold"
                   >
-                    🎯 Reset Center
+                    🎯 Center Map
                   </button>
                 </div>
-
-                <div id="mainMap" className="w-full h-[400px] bg-orange-50"></div>
-
-                <div className="p-3 bg-orange-50/50 border-t border-orange-100 text-[11px] text-stone-600 flex items-center justify-between">
-                  <span>✅ Live OpenStreetMap + Wikipedia Coordinates</span>
-                  <a
-                    href={`https://www.google.com/maps/search/${encodeURIComponent("Famous places in " + selectedLoc.name)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-bold text-orange-600 hover:underline"
-                  >
-                    Open Full Google Earth View ↗
-                  </a>
-                </div>
+                <div id="mainMap" className="w-full h-[420px] bg-orange-50"></div>
               </div>
             </aside>
           </main>
 
           {/* ==========================================
-              7. LOGIN & SIGN UP MODAL
+              8. REVIEW & RATING MODAL
+          ========================================== */}
+          {reviewTarget && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-orange-200 shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-auto">
+                <button
+                  onClick={() => setReviewTarget(null)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600"
+                >
+                  ✕
+                </button>
+                <span className="text-xs font-bold text-orange-600 uppercase">{reviewTarget.category}</span>
+                <h3 className="font-display font-bold text-lg text-stone-900 mt-0.5">{reviewTarget.name}</h3>
+                <p className="text-xs text-stone-500">📍 {reviewTarget.city}, {reviewTarget.state}</p>
+
+                <form onSubmit={handleReviewSubmit} className="mt-4 space-y-3 bg-orange-50/60 p-3.5 rounded-2xl border border-orange-200">
+                  <div className="text-xs font-bold text-stone-800">Apni Rating aur Review Dein:</div>
+                  <div className="flex items-center gap-2">
+                    {[5, 4, 3, 2, 1].map(num => (
+                      <button
+                        type="button"
+                        key={num}
+                        onClick={() => setNewReview({ ...newReview, stars: num })}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${
+                          newReview.stars === num ? "bg-orange-500 text-white border-orange-500" : "bg-white text-stone-700 border-orange-200"
+                        }`}
+                      >
+                        {num} ⭐
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    rows="2"
+                    value={newReview.text}
+                    onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                    placeholder="Yahan apna anubhav likhein (Jaise: Doctor bahut acche hain / Best coaching)..."
+                    className="w-full px-3 py-2 rounded-xl border border-orange-200 text-xs outline-none focus:border-orange-500 bg-white"
+                  ></textarea>
+                  <button type="submit" className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow">
+                    ✅ Submit Review
+                  </button>
+                </form>
+
+                <div className="mt-4 space-y-2">
+                  <div className="text-xs font-bold text-stone-700">Recent User Reviews:</div>
+                  {(reviewsMap[reviewTarget.id] || reviewTarget.reviewList || []).length === 0 ? (
+                    <div className="text-xs text-stone-400 italic">Abhi tak koi text review nahi hai. Sabse pehle aap review dein!</div>
+                  ) : (
+                    (reviewsMap[reviewTarget.id] || reviewTarget.reviewList || []).map((r, i) => (
+                      <div key={i} className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs">
+                        <div className="flex justify-between font-bold text-stone-800">
+                          <span>👤 {r.user}</span>
+                          <span className="text-amber-600">{"⭐".repeat(r.stars)}</span>
+                        </div>
+                        <p className="text-stone-600 mt-1">{r.text}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ==========================================
+              9. CLOUD DATABASE CONNECTOR MODAL (FIREBASE / SUPABASE)
+          ========================================== */}
+          {cloudModal && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-orange-200 shadow-2xl w-full max-w-lg p-6 relative">
+                <button
+                  onClick={() => setCloudModal(false)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600"
+                >
+                  ✕
+                </button>
+                <h2 className="font-display font-bold text-xl text-stone-900">
+                  ☁️ Connect Live Cloud Database (Firebase / Supabase)
+                </h2>
+                <p className="text-xs text-stone-500 mt-1">
+                  Apna Firebase Realtime Database ya Supabase URL yahan dalein taki har user dwara add kiya gaya Hospital, Hotel ya Shop pure India me live dikhe.
+                </p>
+
+                <div className="mt-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-2 p-1 bg-orange-50 rounded-xl border border-orange-200">
+                    <button
+                      type="button"
+                      onClick={() => setCloudConfig({ ...cloudConfig, provider: "firebase" })}
+                      className={`py-2 rounded-lg text-xs font-bold ${cloudConfig.provider === "firebase" ? "bg-orange-500 text-white" : "text-stone-600"}`}
+                    >
+                      🔥 Firebase Realtime DB
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCloudConfig({ ...cloudConfig, provider: "supabase" })}
+                      className={`py-2 rounded-lg text-xs font-bold ${cloudConfig.provider === "supabase" ? "bg-orange-500 text-white" : "text-stone-600"}`}
+                    >
+                      ⚡ Supabase REST API
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-stone-700">
+                      {cloudConfig.provider === "firebase"
+                        ? "Firebase Database URL (e.g. https://your-project-default-rtdb.firebaseio.com)"
+                        : "Supabase Project URL (e.g. https://xyzcompany.supabase.co)"}
+                    </label>
+                    <input
+                      type="url"
+                      value={cloudConfig.url}
+                      onChange={(e) => setCloudConfig({ ...cloudConfig, url: e.target.value })}
+                      placeholder="https://..."
+                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm outline-none focus:border-orange-500"
+                    />
+                  </div>
+
+                  {cloudConfig.provider === "supabase" && (
+                    <div>
+                      <label className="text-xs font-semibold text-stone-700">Supabase Anon Public Key</label>
+                      <input
+                        type="text"
+                        value={cloudConfig.apiKey}
+                        onChange={(e) => setCloudConfig({ ...cloudConfig, apiKey: e.target.value })}
+                        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."
+                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm outline-none focus:border-orange-500"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = { ...cloudConfig, enabled: Boolean(cloudConfig.url.trim()) };
+                        setCloudConfig(next);
+                        localStorage.setItem("sahirank_v18_cloud", JSON.stringify(next));
+                        setCloudModal(false);
+                        showToast(next.enabled ? "☁️ Cloud Database Connected & Active!" : "💾 LocalStorage Mode Active");
+                      }}
+                      className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow"
+                    >
+                      ✅ Save & Sync Database
+                    </button>
+                    {cloudConfig.enabled && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const reset = { provider: "firebase", url: "", apiKey: "", enabled: false };
+                          setCloudConfig(reset);
+                          localStorage.setItem("sahirank_v18_cloud", JSON.stringify(reset));
+                          setCloudModal(false);
+                          showToast("Cloud Disconnected. Running on LocalStorage.");
+                        }}
+                        className="px-4 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-xs border border-red-200"
+                      >
+                        Disconnect
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ==========================================
+              10. LOGIN / SIGN UP MODAL
           ========================================== */}
           {authModal && (
             <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
@@ -1089,94 +1330,55 @@
                 >
                   ✕
                 </button>
-
-                <div className="text-center mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-orange-500 text-white font-bold text-xl grid place-items-center mx-auto mb-2 shadow">
-                    S
-                  </div>
-                  <h2 className="font-display font-bold text-xl text-stone-900">
-                    {authMode === "login" ? "Welcome Back! Login Karein" : "Naya Account Banayein (Sign Up)"}
-                  </h2>
-                  <p className="text-xs text-stone-500 mt-1">
-                    Apna business add karne, places save karne aur review dene ke liye judein.
-                  </p>
-                </div>
-
-                {/* Mode Switch Tabs */}
-                <div className="grid grid-cols-2 gap-1 p-1 bg-orange-50 rounded-xl border border-orange-200 mb-4">
+                <h2 className="font-display font-bold text-xl text-stone-900 text-center">
+                  {authMode === "login" ? "🔐 Login to SahiRank" : "✨ Create New Account"}
+                </h2>
+                <div className="grid grid-cols-2 gap-1 p-1 bg-orange-50 rounded-xl border border-orange-200 my-4">
                   <button
                     type="button"
                     onClick={() => setAuthMode("login")}
-                    className={`py-2 rounded-lg text-xs font-bold transition ${authMode === "login" ? "bg-orange-500 text-white shadow" : "text-stone-600"}`}
+                    className={`py-2 rounded-lg text-xs font-bold ${authMode === "login" ? "bg-orange-500 text-white" : "text-stone-600"}`}
                   >
-                    🔐 Login
+                    Login
                   </button>
                   <button
                     type="button"
                     onClick={() => setAuthMode("signup")}
-                    className={`py-2 rounded-lg text-xs font-bold transition ${authMode === "signup" ? "bg-orange-500 text-white shadow" : "text-stone-600"}`}
+                    className={`py-2 rounded-lg text-xs font-bold ${authMode === "signup" ? "bg-orange-500 text-white" : "text-stone-600"}`}
                   >
-                    ✨ Sign Up
+                    Sign Up
                   </button>
                 </div>
 
                 <form onSubmit={handleAuthSubmit} className="space-y-3">
                   {authMode === "signup" && (
-                    <div>
-                      <label className="text-xs font-semibold text-stone-700">Aapka Pura Naam *</label>
-                      <input
-                        type="text"
-                        required
-                        value={authForm.name}
-                        onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
-                        placeholder="Jaise: Rahul Sharma"
-                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 outline-none focus:border-orange-500 text-sm"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="text-xs font-semibold text-stone-700">Mobile Number ya Email ID *</label>
                     <input
                       type="text"
                       required
-                      value={authForm.phoneOrEmail}
-                      onChange={(e) => setAuthForm({ ...authForm, phoneOrEmail: e.target.value })}
-                      placeholder="9876543210 ya rahul@gmail.com"
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 outline-none focus:border-orange-500 text-sm"
+                      value={authForm.name}
+                      onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                      placeholder="Aapka Pura Naam *"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
                     />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-stone-700">Password *</label>
-                    <input
-                      type="password"
-                      required
-                      value={authForm.password}
-                      onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                      placeholder="••••••••"
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 outline-none focus:border-orange-500 text-sm"
-                    />
-                  </div>
-
-                  {authMode === "signup" && (
-                    <div>
-                      <label className="text-xs font-semibold text-stone-700">Aapka Shehar / Zila</label>
-                      <input
-                        type="text"
-                        value={authForm.city}
-                        onChange={(e) => setAuthForm({ ...authForm, city: e.target.value })}
-                        placeholder="Varanasi, Mumbai, Gyanpur..."
-                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 outline-none focus:border-orange-500 text-sm"
-                      />
-                    </div>
                   )}
-
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-md transition mt-2"
-                  >
-                    {authMode === "login" ? "✅ Login Karein" : "🚀 Account Create Karein"}
+                  <input
+                    type="text"
+                    required
+                    value={authForm.phoneOrEmail}
+                    onChange={(e) => setAuthForm({ ...authForm, phoneOrEmail: e.target.value })}
+                    placeholder="Mobile Number ya Email ID *"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
+                  />
+                  <input
+                    type="password"
+                    required
+                    value={authForm.password}
+                    onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                    placeholder="Password *"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
+                  />
+                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow">
+                    {authMode === "login" ? "✅ Login Karein" : "🚀 Sign Up Karein"}
                   </button>
                 </form>
               </div>
@@ -1184,7 +1386,7 @@
           )}
 
           {/* ==========================================
-              8. ADD FAMOUS SPOT / BUSINESS MODAL
+              11. ADD HOSPITAL / HOTEL / COACHING / PLACE MODAL
           ========================================== */}
           {addModal && (
             <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
@@ -1195,27 +1397,21 @@
                 >
                   ✕
                 </button>
-
                 <h2 className="font-display font-bold text-xl text-stone-900 mb-1">
-                  ➕ Add Famous Spot ya Apni Dukan
+                  ➕ Add Hospital, Hotel, Coaching ya Shop
                 </h2>
-                <p className="text-xs text-stone-500 mb-4">
-                  Kisi bhi shehar ya gaon ki mashhoor jagah, mandir, food joint ya apna business jodein.
-                </p>
-
-                <form onSubmit={handleAddBusiness} className="space-y-3">
+                <form onSubmit={handleAddBusiness} className="space-y-3 mt-3">
                   <div>
-                    <label className="text-xs font-semibold text-stone-700">Jagah ya Dukan ka Naam *</label>
+                    <label className="text-xs font-semibold text-stone-700">Name (Hospital / Coaching / Hotel / Landmark) *</label>
                     <input
                       type="text"
                       required
                       value={bizForm.name}
                       onChange={(e) => setBizForm({ ...bizForm, name: e.target.value })}
-                      placeholder="Jaise: Kashi Chaat Bhandar ya Sharma Electronics"
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 outline-none focus:border-orange-500 text-sm"
+                      placeholder="Jaise: Apex Hospital, Allen Coaching, Hotel Surya..."
+                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
                     />
                   </div>
-
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs font-semibold text-stone-700">Category *</label>
@@ -1224,13 +1420,13 @@
                         onChange={(e) => setBizForm({ ...bizForm, category: e.target.value })}
                         className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 bg-white text-sm"
                       >
-                        {CATEGORIES.filter(c => c !== "All").map(c => (
-                          <option key={c} value={c}>{c}</option>
+                        {CATEGORIES.filter(c => c.id !== "All").map(c => (
+                          <option key={c.id} value={c.id}>{c.label}</option>
                         ))}
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-stone-700">Phone / Contact</label>
+                      <label className="text-xs font-semibold text-stone-700">Phone / Helpline</label>
                       <input
                         type="text"
                         value={bizForm.phone}
@@ -1240,64 +1436,51 @@
                       />
                     </div>
                   </div>
-
                   <div>
-                    <label className="text-xs font-semibold text-stone-700">City / Zila / Gaon Chunein *</label>
+                    <label className="text-xs font-semibold text-stone-700">City / Zila / Gaon *</label>
                     <div className="mt-1">
                       <LocationPicker
                         value={bizForm.cityLoc?.display || ""}
                         onSelect={(loc) => setBizForm({ ...bizForm, cityLoc: loc })}
-                        placeholder="Shehar ya Gaon type karein..."
+                        placeholder="City ya Gaon chunein..."
                         allowCustom={true}
                       />
                     </div>
                   </div>
-
                   <div>
-                    <label className="text-xs font-semibold text-stone-700">Kis Chiz Ke Liye Famous Hai? (Tagline)</label>
+                    <label className="text-xs font-semibold text-stone-700">Specialty / Famous Tagline</label>
                     <input
                       type="text"
                       value={bizForm.famousTag}
                       onChange={(e) => setBizForm({ ...bizForm, famousTag: e.target.value })}
-                      placeholder="Jaise: Best Samosa & Jalebi Since 1985"
+                      placeholder="Jaise: 24x7 ICU & Trauma Center / Best NEET Coaching"
                       className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
                     />
                   </div>
-
                   <div>
-                    <label className="text-xs font-semibold text-stone-700">Pura Pata (Address) & Vivaran</label>
+                    <label className="text-xs font-semibold text-stone-700">Address & Details</label>
                     <input
                       type="text"
                       value={bizForm.address}
                       onChange={(e) => setBizForm({ ...bizForm, address: e.target.value })}
-                      placeholder="Main Road, Station Chowk..."
+                      placeholder="Near Station Road, Civil Lines..."
                       className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
                     />
                   </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow-md transition"
-                  >
-                    ✅ Publish on SahiRank Map
+                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow">
+                    ✅ Publish Listing Now
                   </button>
                 </form>
               </div>
             </div>
           )}
 
-          {/* TOAST NOTIFICATION */}
+          {/* TOAST */}
           {toast && (
             <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-stone-900 text-white text-xs sm:text-sm font-semibold shadow-2xl border border-orange-400">
               {toast}
             </div>
           )}
-
-          {/* FOOTER */}
-          <footer className="max-w-[1360px] w-full mx-auto px-3 sm:px-6 py-6 text-xs text-stone-500 border-t border-orange-200/70 mt-8 flex flex-wrap justify-between gap-2">
-            <div>✅ <b>SahiRank V17 Pro:</b> All 28 States + 8 UTs Covered ({ALL_LOCATIONS.length}+ Locations)</div>
-            <div>✅ Instant Famous Landmarks, Markets, Food & Live Wikipedia/Map Explorer</div>
-          </footer>
         </div>
       );
     }
