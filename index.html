@@ -1,945 +1,787 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SahiRank V18 Ultimate — All India Famous Places, Hospitals, Hotels, Coaching & Cloud Sync</title>
-  <!-- Tailwind CSS -->
+  <title>SahiRank — India's Genuine Review, Ranking & Partner Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #fff7ed;
-      --primary: #ff6b02;
-    }
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
     .font-display { font-family: 'Fraunces', serif; }
-    body { background-color: var(--bg); color: #1a1207; margin: 0; }
+    body { background-color: #f8fafc; color: #0f172a; margin: 0; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 99px; }
-    .leaflet-container { z-index: 10 !important; font-family: 'Plus Jakarta Sans', sans-serif; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    .blur-lock { filter: blur(5px); user-select: none; pointer-events: none; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
-  <!-- React & Babel CDNs -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
+    const { useState, useEffect, useMemo } = React;
 
     // ==========================================
-    // 1. ALL INDIA 28 STATES + 8 UTs DATABASE
+    // SECRET ADMIN CREDENTIALS (SIRF AAPKE LIYE)
     // ==========================================
-    const STATE_DISTRICTS = {
-      "Uttar Pradesh": ["Agra","Aligarh","Ambedkar Nagar","Amethi","Amroha","Auraiya","Ayodhya","Azamgarh","Baghpat","Bahraich","Ballia","Balrampur","Banda","Barabanki","Bareilly","Basti","Bhadohi","Bijnor","Budaun","Bulandshahr","Chandauli","Chitrakoot","Deoria","Etah","Etawah","Farrukhabad","Fatehpur","Firozabad","Gautam Buddha Nagar","Ghaziabad","Ghazipur","Gonda","Gorakhpur","Hamirpur","Hapur","Hardoi","Hathras","Jalaun","Jaunpur","Jhansi","Kannauj","Kanpur Dehat","Kanpur Nagar","Kasganj","Kaushambi","Kushinagar","Lakhimpur Kheri","Lalitpur","Lucknow","Maharajganj","Mahoba","Mainpuri","Mathura","Mau","Meerut","Mirzapur","Moradabad","Muzaffarnagar","Noida","Pilibhit","Pratapgarh","Prayagraj","Rae Bareli","Rampur","Saharanpur","Sambhal","Sant Kabir Nagar","Shahjahanpur","Shamli","Shrawasti","Siddharthnagar","Sitapur","Sonbhadra","Sultanpur","Unnao","Varanasi"],
-      "Bihar": ["Araria","Arwal","Aurangabad","Banka","Begusarai","Bhagalpur","Bhojpur","Buxar","Darbhanga","East Champaran","Gaya","Gopalganj","Jamui","Jehanabad","Kaimur","Katihar","Khagaria","Kishanganj","Lakhisarai","Madhepura","Madhubani","Munger","Muzaffarpur","Nalanda","Nawada","Patna","Purnia","Rohtas","Saharsa","Samastipur","Saran","Sheikhpura","Sheohar","Sitamarhi","Siwan","Supaul","Vaishali","West Champaran"],
-      "Madhya Pradesh": ["Agar Malwa","Alirajpur","Anuppur","Ashoknagar","Balaghat","Barwani","Betul","Bhind","Bhopal","Burhanpur","Chhatarpur","Chhindwara","Damoh","Datia","Dewas","Dhar","Dindori","Guna","Gwalior","Harda","Hoshangabad","Indore","Jabalpur","Jhabua","Katni","Khandwa","Khargone","Maihar","Mandla","Mandsaur","Mauganj","Morena","Narsinghpur","Neemuch","Niwari","Pandhurna","Panna","Raisen","Rajgarh","Ratlam","Rewa","Sagar","Satna","Sehore","Seoni","Shahdol","Shajapur","Sheopur","Shivpuri","Sidhi","Singrauli","Tikamgarh","Ujjain","Umaria","Vidisha"],
-      "Maharashtra": ["Ahmednagar","Akola","Amravati","Chhatrapati Sambhajinagar (Aurangabad)","Beed","Bhandara","Buldhana","Chandrapur","Dhule","Gadchiroli","Gondia","Hingoli","Jalgaon","Jalna","Kolhapur","Latur","Mumbai City","Mumbai Suburban","Nagpur","Nanded","Nandurbar","Nashik","Dharashiv (Osmanabad)","Palghar","Parbhani","Pune","Raigad","Ratnagiri","Sangli","Satara","Sindhudurg","Solapur","Thane","Wardha","Washim","Yavatmal"],
-      "Rajasthan": ["Ajmer","Alwar","Banswara","Baran","Barmer","Beawar","Bharatpur","Bhilwara","Bikaner","Bundi","Chittorgarh","Churu","Dausa","Deeg","Dholpur","Dungarpur","Hanumangarh","Jaipur","Jaisalmer","Jalore","Jhalawar","Jhunjhunu","Jodhpur","Karauli","Kota","Nagaur","Pali","Phalodi","Pratapgarh","Rajsamand","Sawai Madhopur","Sikar","Sirohi","Sri Ganganagar","Tonk","Udaipur"],
-      "Gujarat": ["Ahmedabad","Amreli","Anand","Aravalli","Banaskantha","Bharuch","Bhavnagar","Botad","Chhota Udaipur","Dahod","Dang","Devbhoomi Dwarka","Gandhinagar","Gir Somnath","Jamnagar","Junagadh","Kutch","Kheda","Mahisagar","Mehsana","Morbi","Narmada","Navsari","Panchmahal","Patan","Porbandar","Rajkot","Sabarkantha","Surat","Surendranagar","Tapi","Vadodara","Valsad"],
-      "West Bengal": ["Alipurduar","Bankura","Birbhum","Cooch Behar","Dakshin Dinajpur","Darjeeling","Hooghly","Howrah","Jalpaiguri","Jhargram","Kalimpong","Kolkata","Malda","Murshidabad","Nadia","North 24 Parganas","Paschim Bardhaman","Paschim Medinipur","Purba Bardhaman","Purba Medinipur","Purulia","Siliguri","South 24 Parganas","Uttar Dinajpur"],
-      "Tamil Nadu": ["Ariyalur","Chengalpattu","Chennai","Coimbatore","Cuddalore","Dharmapuri","Dindigul","Erode","Kallakurichi","Kanchipuram","Kanyakumari","Karur","Krishnagiri","Madurai","Mayiladuthurai","Nagapattinam","Namakkal","Nilgiris (Ooty)","Perambalur","Pudukkottai","Ramanathapuram","Ranipet","Salem","Sivaganga","Tenkasi","Thanjavur","Theni","Thoothukudi","Tiruchirappalli","Tirunelveli","Tirupathur","Tiruppur","Tiruvallur","Tiruvannamalai","Tiruvarur","Vellore","Viluppuram","Virudhunagar"],
-      "Karnataka": ["Bagalkot","Ballari","Belagavi","Bengaluru Rural","Bengaluru","Bidar","Chamarajanagar","Chikballapur","Chikkamagaluru","Chitradurga","Dakshina Kannada (Mangaluru)","Davangere","Dharwad","Gadag","Hassan","Haveri","Kalaburagi","Kodagu (Coorg)","Kolar","Koppal","Mandya","Mysuru","Raichur","Ramanagara","Shivamogga","Tumakuru","Udupi","Uttara Kannada","Vijayanagara","Vijayapura","Yadgir"],
-      "Kerala": ["Alappuzha","Ernakulam (Kochi)","Idukki","Kannur","Kasaragod","Kollam","Kottayam","Kozhikode","Malappuram","Palakkad","Pathanamthitta","Thiruvananthapuram","Thrissur","Wayanad"],
-      "Andhra Pradesh": ["Alluri Sitharama Raju","Anakapalli","Anantapur","Annamayya","Bapatla","Chittoor","East Godavari","Eluru","Guntur","Kadapa","Kakinada","Konaseema","Krishna","Kurnool","Nandyal","Nellore","NTR (Vijayawada)","Palnadu","Parvathipuram Manyam","Prakasam","Sri Sathya Sai","Srikakulam","Tirupati","Visakhapatnam","Vizianagaram","West Godavari"],
-      "Telangana": ["Adilabad","Bhadradri Kothagudem","Hanamkonda","Hyderabad","Jagtial","Jangaon","Jayashankar Bhupalpally","Jogulamba Gadwal","Kamareddy","Karimnagar","Khammam","Komaram Bheem","Mahabubabad","Mahabubnagar","Mancherial","Medak","Medchal-Malkajgiri","Mulugu","Nagarkurnool","Nalgonda","Narayanpet","Nirmal","Nizamabad","Peddapalli","Rajanna Sircilla","Rangareddy","Sangareddy","Secunderabad","Siddipet","Suryapet","Vikarabad","Wanaparthy","Warangal","Yadadri Bhuvanagiri"],
-      "Punjab": ["Amritsar","Barnala","Bathinda","Faridkot","Fatehgarh Sahib","Fazilka","Ferozepur","Gurdaspur","Hoshiarpur","Jalandhar","Kapurthala","Ludhiana","Malerkotla","Mansa","Moga","Mohali","Muktsar","Pathankot","Patiala","Rupnagar","Sangrur","Shaheed Bhagat Singh Nagar","Tarn Taran"],
-      "Haryana": ["Ambala","Bhiwani","Charkhi Dadri","Faridabad","Fatehabad","Gurugram","Hisar","Jhajjar","Jind","Kaithal","Karnal","Kurukshetra","Mahendragarh","Nuh","Palwal","Panchkula","Panipat","Rewari","Rohtak","Sirsa","Sonipat","Yamunanagar"],
-      "Himachal Pradesh": ["Bilaspur","Chamba","Dharamshala","Hamirpur","Kangra","Kinnaur","Kullu","Lahaul Spiti","Mandi","Manali","Shimla","Sirmaur","Solan","Una"],
-      "Uttarakhand": ["Almora","Bageshwar","Chamoli","Champawat","Dehradun","Haridwar","Haldwani","Mussoorie","Nainital","Pauri Garhwal","Pithoragarh","Rishikesh","Roorkee","Rudraprayag","Tehri Garhwal","Udham Singh Nagar","Uttarkashi"],
-      "Delhi": ["Central Delhi","Connaught Place","Dwarka","East Delhi","Karol Bagh","Mukherjee Nagar","New Delhi","North Delhi","North East Delhi","North West Delhi","Rajinder Nagar","Rohini","Saket","Shahdara","South Delhi","West Delhi"],
-      "Assam": ["Bajali","Baksa","Barpeta","Biswanath","Bongaigaon","Cachar (Silchar)","Charaideo","Chirang","Darrang","Dhemaji","Dhubri","Dibrugarh","Dima Hasao","Goalpara","Golaghat","Guwahati","Hailakandi","Hojai","Jorhat","Kamrup","Kamrup Metro","Karbi Anglong","Karimganj","Kokrajhar","Lakhimpur","Majuli","Morigaon","Nagaon","Nalbari","Sivasagar","Sonitpur (Tezpur)","Tinsukia","Udalguri"],
-      "Odisha": ["Angul","Balangir","Balasore","Bargarh","Bhadrak","Bhubaneswar","Boudh","Cuttack","Deogarh","Dhenkanal","Gajapati","Ganjam","Jagatsinghpur","Jajpur","Jharsuguda","Kalahandi","Kandhamal","Kendrapara","Kendujhar","Khordha","Koraput","Malkangiri","Mayurbhanj","Nabarangpur","Nayagarh","Nuapada","Puri","Rayagada","Rourkela","Sambalpur","Subarnapur","Sundargarh"],
-      "Chhattisgarh": ["Balod","Baloda Bazar","Balrampur","Bastar (Jagdalpur)","Bemetara","Bhilai","Bijapur","Bilaspur","Dantewada","Dhamtari","Durg","Gariaband","Janjgir-Champa","Jashpur","Kabirdham","Kanker","Kondagaon","Korba","Koriya","Mahasamund","Mungeli","Narayanpur","Raigarh","Raipur","Rajnandgaon","Sukma","Surajpur","Surguja (Ambikapur)"],
-      "Jharkhand": ["Bokaro","Chatra","Deoghar","Dhanbad","Dumka","East Singhbhum (Jamshedpur)","Garhwa","Giridih","Godda","Gumla","Hazaribagh","Jamtara","Khunti","Koderma","Latehar","Lohardaga","Pakur","Palamu","Ramgarh","Ranchi","Sahibganj","Seraikela Kharsawan","Simdega","West Singhbhum"],
-      "Jammu & Kashmir": ["Anantnag","Bandipora","Baramulla","Budgam","Doda","Ganderbal","Gulmarg","Jammu","Kathua","Katra (Vaishno Devi)","Kishtwar","Kulgam","Kupwara","Pahalgam","Poonch","Pulwama","Rajouri","Ramban","Reasi","Samba","Shopian","Srinagar","Udhampur"],
-      "Meghalaya": ["Cherrapunji (Sohra)","Dawki","East Garo Hills","East Jaintia Hills","East Khasi Hills","North Garo Hills","Ri Bhoi","Shillong","South Garo Hills","Tura","West Garo Hills","West Jaintia Hills","West Khasi Hills"],
-      "Arunachal Pradesh": ["Anjaw","Changlang","Dibang Valley","East Kameng","East Siang (Pasighat)","Itanagar","Lohit","Lower Subansiri (Ziro)","Namsai","Papum Pare","Tawang","Tirap","West Kameng","West Siang"],
-      "Manipur": ["Bishnupur","Chandel","Churachandpur","Imphal East","Imphal West","Jiribam","Kakching","Senapati","Tamenglong","Thoubal","Ukhrul"],
-      "Mizoram": ["Aizawl","Champhai","Kolasib","Lawngtlai","Lunglei","Mamit","Saiha","Serchhip"],
-      "Nagaland": ["Chumukedima","Dimapur","Kiphire","Kohima","Mokokchung","Mon","Peren","Phek","Tuensang","Wokha","Zunheboto"],
-      "Sikkim": ["East Sikkim (Gangtok)","Gyalshing","Mangan","Namchi","North Sikkim","Pakyong","Soreng","South Sikkim","West Sikkim"],
-      "Tripura": ["Agartala","Dhalai","Gomati (Udaipur)","Khowai","North Tripura","Sepahijala","South Tripura","Unakoti","West Tripura"],
-      "Goa": ["Baga & Calangute","Madgaon (Margao)","Mapusa","North Goa","Panaji","South Goa","Vasco da Gama"],
-      "Union Territories": ["Chandigarh","Leh (Ladakh)","Kargil (Ladakh)","Kavaratti (Lakshadweep)","Puducherry","Karaikal","Port Blair (Andaman)","Havelock / Swaraj Dweep","Daman","Diu","Silvassa (Dadra & Nagar Haveli)"]
+    const ADMIN_EMAIL = "admin@sahirank.com";
+    const ADMIN_PHONE = "9999999999";
+    const ADMIN_PASS = "SahiBoss@2026";
+    const ADMIN_PIN = "2026";
+
+    // ==========================================
+    // 1. ALL INDIA CITIES & DISTRICTS DATABASE
+    // ==========================================
+    const STATE_CITIES = {
+      "Uttar Pradesh": ["Varanasi","Lucknow","Noida","Ghaziabad","Kanpur","Agra","Prayagraj","Ayodhya","Meerut","Gorakhpur","Bareilly","Aligarh","Moradabad","Mathura","Jhansi","Gyanpur","Bhadohi","Suriyawan","Gopiganj","Aurai","Khamaria","Mirzapur","Jaunpur","Azamgarh","Ballia","Deoria","Basti","Sultanpur","Sonbhadra","Chandauli","Ghazipur","Mau","Sitapur","Hardoi","Lakhimpur Kheri","Shahjahanpur","Rampur","Muzaffarnagar","Saharanpur","Bijnor","Bulandshahr","Etawah","Firozabad","Mainpuri","Fatehpur","Pratapgarh","Rae Bareli","Unnao","Banda","Chitrakoot"],
+      "Bihar": ["Patna","Gaya","Muzaffarpur","Bhagalpur","Darbhanga","Purnia","Begusarai","Munger","Chapra (Saran)","Arrah (Bhojpur)","Buxar","Sasaram (Rohtas)","Katihar","Kishanganj","Siwan","Gopalganj","Motihari","Bettiah","Samastipur","Madhubani","Sitamarhi","Hajipur (Vaishali)","Nalanda","Nawada","Aurangabad","Jehanabad","Jamui","Lakhisarai","Khagaria","Saharsa","Supaul","Madhepura","Araria","Banka"],
+      "Maharashtra": ["Mumbai","Pune","Nagpur","Thane","Nashik","Chhatrapati Sambhajinagar","Solapur","Kolhapur","Amravati","Navi Mumbai","Kalyan","Vasai-Virar","Jalgaon","Akola","Latur","Dhule","Ahmednagar","Chandrapur","Parbhani","Jalna","Panvel","Satara","Beed","Yavatmal","Nanded","Wardha","Ratnagiri"],
+      "Delhi NCR": ["New Delhi","South Delhi","Connaught Place","Rohini","Dwarka","Karol Bagh","Laxmi Nagar","Saket","Janakpuri","Gurugram","Faridabad"],
+      "Madhya Pradesh": ["Indore","Bhopal","Jabalpur","Gwalior","Ujjain","Sagar","Rewa","Satna","Ratlam","Dewas","Katni","Singrauli","Chhindwara","Khandwa","Burhanpur","Morena","Bhind","Shivpuri","Vidisha","Chhatarpur","Mandsaur","Neemuch"],
+      "Rajasthan": ["Jaipur","Kota","Jodhpur","Udaipur","Ajmer","Bikaner","Bhilwara","Alwar","Sikar","Bharatpur","Pali","Sri Ganganagar","Hanumangarh","Chittorgarh","Jaisalmer","Barmer","Nagaur","Tonk","Jhunjhunu","Sawai Madhopur"],
+      "Gujarat": ["Ahmedabad","Surat","Vadodara","Rajkot","Bhavnagar","Jamnagar","Gandhinagar","Junagadh","Anand","Navsari","Morbi","Bharuch","Vapi","Mehsana","Bhuj (Kutch)","Patan","Palanpur","Valsad","Godhra"],
+      "Karnataka": ["Bengaluru","Mysuru","Mangaluru","Hubballi-Dharwad","Belagavi","Kalaburagi","Davangere","Ballari","Vijayapura","Shivamogga","Tumakuru","Udupi","Hassan","Bidar","Raichur"],
+      "Tamil Nadu": ["Chennai","Coimbatore","Madurai","Tiruchirappalli","Salem","Tirunelveli","Tiruppur","Vellore","Erode","Thoothukudi","Dindigul","Thanjavur","Hosur","Nagercoil","Kanchipuram"],
+      "West Bengal": ["Kolkata","Howrah","Siliguri","Durgapur","Asansol","Darjeeling","Kharagpur","Haldia","Malda","Bardhaman","Krishnanagar","Baharampur","Jalpaiguri","Cooch Behar"],
+      "Telangana & AP": ["Hyderabad","Secunderabad","Warangal","Nizamabad","Karimnagar","Khammam","Visakhapatnam","Vijayawada","Guntur","Tirupati","Nellore","Kurnool","Rajahmundry","Kakinada","Anantapur"],
+      "Punjab & Haryana": ["Chandigarh","Ludhiana","Amritsar","Jalandhar","Patiala","Bathinda","Mohali","Pathankot","Hoshiarpur","Ambala","Panipat","Karnal","Hisar","Rohtak","Sonipat","Kurukshetra","Yamunanagar","Panchkula"],
+      "Other States & UTs": ["Dehradun","Haridwar","Rishikesh","Nainital","Haldwani","Roorkee","Shimla","Manali","Dharamshala","Solan","Mandi","Ranchi","Jamshedpur","Dhanbad","Bokaro","Deoghar","Hazaribagh","Raipur","Bhilai","Bilaspur","Korba","Durg","Bhubaneswar","Cuttack","Rourkela","Puri","Sambalpur","Guwahati","Silchar","Dibrugarh","Jorhat","Tezpur","Kochi","Thiruvananthapuram","Kozhikode","Thrissur","Kollam","Panaji","Madgaon","Srinagar","Jammu","Shillong","Agartala","Imphal","Aizawl","Kohima","Gangtok","Itanagar","Leh","Puducherry","Port Blair"]
     };
 
-    const BHADOHI_TOWNS = ["Gyanpur","Bhadohi","Suriyawan","Gopiganj","Aurai","Khamaria","Deegh","Kapsethi","Katra","Chauri","Jangiganj","Ghosia","Madhosingh","Itahara","Koirauna","Abholi","Baragaon","Durgaganj","Mahrajganj"];
-
-    function buildLocations() {
-      const list = [{ name: "All India", district: "All", state: "India", display: "🌍 All India - Sabhi Famous Jagah, Hospitals, Hotels & Coaching" }];
-      Object.entries(STATE_DISTRICTS).forEach(([state, cities]) => {
-        cities.forEach(c => {
-          list.push({ name: c, district: c, state: state, display: `${c} - ${state}` });
-        });
-      });
-      BHADOHI_TOWNS.forEach(t => {
-        if (!list.some(x => x.name.toLowerCase() === t.toLowerCase())) {
-          list.push({ name: t, district: "Bhadohi", state: "Uttar Pradesh", display: `${t}, Bhadohi - Uttar Pradesh` });
-        }
-      });
-      return list;
-    }
-
-    const ALL_LOCATIONS = buildLocations();
+    const ALL_CITIES = [];
+    Object.entries(STATE_CITIES).forEach(([state, cities]) => {
+      cities.forEach(c => ALL_CITIES.push({ name: c, state, display: `${c}, ${state}` }));
+    });
 
     // ==========================================
-    // 2. COORDINATES DATABASE
-    // ==========================================
-    const COORDS_DB = {
-      "all india": { lat: 22.5937, lng: 78.9629 },
-      "varanasi": { lat: 25.3176, lng: 82.9739 },
-      "mumbai": { lat: 19.0760, lng: 72.8777 },
-      "mumbai city": { lat: 19.0760, lng: 72.8777 },
-      "delhi": { lat: 28.6139, lng: 77.2090 },
-      "new delhi": { lat: 28.6139, lng: 77.2090 },
-      "bengaluru": { lat: 12.9716, lng: 77.5946 },
-      "hyderabad": { lat: 17.3850, lng: 78.4867 },
-      "chennai": { lat: 13.0827, lng: 80.2707 },
-      "kolkata": { lat: 22.5726, lng: 88.3639 },
-      "pune": { lat: 18.5204, lng: 73.8567 },
-      "ahmedabad": { lat: 23.0225, lng: 72.5714 },
-      "jaipur": { lat: 26.9124, lng: 75.7873 },
-      "kota": { lat: 25.2138, lng: 75.8648 },
-      "lucknow": { lat: 26.8467, lng: 80.9462 },
-      "agra": { lat: 27.1767, lng: 78.0081 },
-      "ayodhya": { lat: 26.7922, lng: 82.1998 },
-      "prayagraj": { lat: 25.4358, lng: 81.8463 },
-      "patna": { lat: 25.5941, lng: 85.1376 },
-      "gaya": { lat: 24.7914, lng: 85.0002 },
-      "bhopal": { lat: 23.2599, lng: 77.4126 },
-      "indore": { lat: 22.7196, lng: 75.8577 },
-      "amritsar": { lat: 31.6340, lng: 74.8723 },
-      "chandigarh": { lat: 30.7333, lng: 76.7794 },
-      "shimla": { lat: 31.1048, lng: 77.1734 },
-      "dehradun": { lat: 30.3165, lng: 78.0322 },
-      "haridwar": { lat: 29.9457, lng: 78.1642 },
-      "udaipur": { lat: 24.5854, lng: 73.7125 },
-      "guwahati": { lat: 26.1445, lng: 91.7362 },
-      "shillong": { lat: 25.5788, lng: 91.8933 },
-      "puri": { lat: 19.8135, lng: 85.8312 },
-      "ranchi": { lat: 23.3441, lng: 85.3096 },
-      "raipur": { lat: 21.2514, lng: 81.6296 },
-      "srinagar": { lat: 34.0837, lng: 74.7973 },
-      "panaji": { lat: 15.4909, lng: 73.8278 },
-      "gyanpur": { lat: 25.3567, lng: 82.4722 },
-      "bhadohi": { lat: 25.3962, lng: 82.5701 },
-      "suriyawan": { lat: 25.4486, lng: 82.4111 },
-      "gopiganj": { lat: 25.2851, lng: 82.4473 },
-      "aurai": { lat: 25.4241, lng: 82.5694 },
-      "uttar pradesh": { lat: 26.8467, lng: 80.9462 },
-      "bihar": { lat: 25.5941, lng: 85.1376 },
-      "madhya pradesh": { lat: 23.2599, lng: 77.4126 },
-      "maharashtra": { lat: 19.7515, lng: 75.7139 },
-      "rajasthan": { lat: 26.9124, lng: 75.7873 },
-      "gujarat": { lat: 22.2587, lng: 71.1924 },
-      "west bengal": { lat: 22.9868, lng: 87.8550 },
-      "tamil nadu": { lat: 11.1271, lng: 78.6569 },
-      "karnataka": { lat: 15.3173, lng: 75.7139 },
-      "kerala": { lat: 10.8505, lng: 76.2711 }
-    };
-
-    // ==========================================
-    // 3. CATEGORIES (INCLUDING HOSPITALS, HOTELS, COACHING)
+    // 2. CATEGORIES
     // ==========================================
     const CATEGORIES = [
-      { id: "All", label: "🌟 All Everything" },
-      { id: "Famous Landmark", label: "🏛️ Famous Landmarks" },
-      { id: "Hospital & Clinic", label: "🏥 Hospitals & Clinics" },
-      { id: "Hotel & Stay", label: "🏨 Hotels & Stays" },
-      { id: "Coaching & Institute", label: "🎓 Coaching & Institutes" },
-      { id: "Famous Food", label: "🍲 Famous Food & Sweets" },
-      { id: "Famous Market", label: "🛍️ Famous Markets" },
-      { id: "Mobile & Tech", label: "📱 Mobile & Tech" },
-      { id: "Medical Store", label: "💊 Medical Stores" }
+      { id: "All", label: "🌐 All Categories" },
+      { id: "Hospital & Clinic", label: "🏥 Hospital & Diagnostics" },
+      { id: "Car & Bike Showroom", label: "🚗 Car & Bike Showroom" },
+      { id: "Service Center & Repair", label: "🔧 Bike/Car/AC Service" },
+      { id: "Mall & Supermarket", label: "🏬 Shopping Mall & Mart" },
+      { id: "Hotel & Restaurant", label: "🏨 Hotel & Restaurant" },
+      { id: "Coaching & School", label: "🎓 Coaching, School & College" },
+      { id: "Tech & Electronics", label: "📱 Mobile, Laptop & Tech" },
+      { id: "Local Shop & Services", label: "🏪 Local Shop, Salon & Gym" }
     ];
 
     // ==========================================
-    // 4. CURATED FAMOUS LANDMARKS, HOSPITALS, HOTELS & COACHING
+    // 3. PRE-SEEDED 7 BUSINESSES PER CITY (SO NO CITY IS EVER EMPTY)
     // ==========================================
-    const INITIAL_PLACES = [
-      // VARANASI (Landmarks, Hospital, Hotel, Coaching, Food)
-      { id: 101, name: "Shri Kashi Vishwanath Temple & Corridor", category: "Famous Landmark", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3109, lng: 83.0107, rating: 4.9, reviews: 18450, phone: "+91 542 239 2629", open: true, isFamous: true, famousTag: "Jyotirlinga & Spiritual Heart of India", desc: "Ganga kinare sthit Vishwa prasiddh Jyotirlinga mandir aur naya Kashi Vishwanath Dham Corridor.", address: "Lahori Tola, Dashashwamedh, Varanasi", reviewList: [{ user: "Amit Verma", stars: 5, text: "Corridor banne ke baad darshan bahut suvidhajanak ho gaya hai! Har Har Mahadev." }] },
-      { id: 102, name: "Sir Sunderlal Hospital & Trauma Centre (BHU)", category: "Hospital & Clinic", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.2745, lng: 82.9995, rating: 4.8, reviews: 9420, phone: "+91 542 236 9115", open: true, isFamous: true, famousTag: "Purvanchal's Largest Super-Specialty AIIMS-Level Hospital", desc: "Banaras Hindu University (IMS-BHU) ka sabse bada multi-specialty hospital aur 24x7 Trauma Centre.", address: "Lanka, BHU Campus, Varanasi", reviewList: [{ user: "Rajesh Singh", stars: 5, text: "Purvanchal aur Bihar ke patients ke liye sabse bharosemand hospital." }] },
-      { id: 103, name: "Taj Ganges & BrijRama Palace Ghat Hotel", category: "Hotel & Stay", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3356, lng: 82.9825, rating: 4.9, reviews: 3850, phone: "+91 542 666 0001", open: true, isFamous: true, famousTag: "5-Star Luxury & Heritage Ganga View Stay", desc: "Varanasi me thaharne ke liye shandar 5-star hotel aur Ganga ghat heritage palace.", address: "Nadesar Palace Grounds / Darbhanga Ghat, Varanasi", reviewList: [] },
-      { id: 104, name: "Durgakund Coaching Hub (JRS / Aakash / Allen)", category: "Coaching & Institute", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.2912, lng: 82.9992, rating: 4.8, reviews: 2640, phone: "+91 542 231 1878", open: true, isFamous: true, famousTag: "#1 IIT-JEE, NEET & CUET Coaching Hub in Purvanchal", desc: "Durgakund aur Kabir Nagar me IIT-JEE, NEET aur Foundation taiyari ka sabse bada education center.", address: "Durgakund Road, Near Sankat Mochan, Varanasi", reviewList: [] },
-      { id: 105, name: "Kashi Chat Bhandar & Blue Lassi", category: "Famous Food", city: "Varanasi", district: "Varanasi", state: "Uttar Pradesh", lat: 25.3095, lng: 83.0081, rating: 4.8, reviews: 5620, phone: "+91 542 241 2116", open: true, isFamous: true, famousTag: "Banarasi Tamatar Chaat & Rabri Lassi", desc: "Asli Banarasi Tamatar Chaat, Palak Patta Chaat aur kullhad wali Malai Lassi.", address: "Godowlia Chowk, Varanasi", reviewList: [] },
-
-      // BHADOHI & GYANPUR (Local Focus)
-      { id: 106, name: "Maharaja Chet Singh District Hospital", category: "Hospital & Clinic", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3540, lng: 82.4710, rating: 4.6, reviews: 520, phone: "108 / +91 5414 226200", open: true, isFamous: true, famousTag: "24x7 Emergency & District Govt Hospital", desc: "Gyanpur aur Bhadohi zile ka mukhya sarkari aspatal, OPD aur 24x7 emergency seva.", address: "Gyanpur Main Road, Bhadohi", reviewList: [] },
-      { id: 107, name: "Bhadohi International Carpet Expo Mart & Stay", category: "Hotel & Stay", city: "Bhadohi", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3962, lng: 82.5701, rating: 4.8, reviews: 1240, phone: "+91 5414 225401", open: true, isFamous: true, famousTag: "Carpet City Trade Hub & Business Suites", desc: "Asia ka sabse bada handmade carpet expo center aur international buyers ke liye executive stay.", address: "Carpet City, Station Road, Bhadohi", reviewList: [] },
-      { id: 108, name: "KNPG College & Gyanpur Coaching Academy", category: "Coaching & Institute", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3585, lng: 82.4745, rating: 4.7, reviews: 610, phone: "+91 98391 22334", open: true, isFamous: true, famousTag: "Top Degree College, SSC, UP Police & TET Coaching", desc: "Kashi Naresh Post Graduate College aur aas-pass ke top competitive exam coaching institutes.", address: "Gyanpur Kachahari Road, Bhadohi", reviewList: [] },
-      { id: 109, name: "Baba Hariharnath Temple & Gyan Sarovar", category: "Famous Landmark", city: "Gyanpur", district: "Bhadohi", state: "Uttar Pradesh", lat: 25.3567, lng: 82.4722, rating: 4.9, reviews: 845, phone: "District Heritage", open: true, isFamous: true, famousTag: "Historic Shiva Temple & District HQ", desc: "Gyanpur ka prachin Baba Hariharnath Mandir aur itihasik Gyan Sarovar talab.", address: "Gyanpur Main Bazar, Bhadohi", reviewList: [] },
-
-      // DELHI (AIIMS, Mukherjee Nagar Coaching, Taj Hotel, India Gate)
-      { id: 110, name: "AIIMS New Delhi (All India Institute of Medical Sciences)", category: "Hospital & Clinic", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.5672, lng: 77.2100, rating: 4.9, reviews: 38200, phone: "+91 11 2658 8500", open: true, isFamous: true, famousTag: "India's #1 Medical Institute & Hospital", desc: "Bharat ka sabse bada aur sarvashreshth medical college aur super-specialty research hospital.", address: "Ansari Nagar, Aurobindo Marg, New Delhi", reviewList: [] },
-      { id: 111, name: "Mukherjee Nagar & Rajinder Nagar UPSC Hub (Drishti / Vision / Vajiram)", category: "Coaching & Institute", city: "Delhi", district: "North Delhi", state: "Delhi", lat: 28.7041, lng: 77.2167, rating: 4.9, reviews: 19400, phone: "+91 11 4753 2596", open: true, isFamous: true, famousTag: "India's #1 IAS / UPSC & SSC Coaching Hub", desc: "Hindi aur English medium me IAS, IPS, UPSC aur SSC CGL ki taiyari ka sabse bada kendra.", address: "Mukherjee Nagar / Old Rajinder Nagar, Delhi", reviewList: [] },
-      { id: 112, name: "The Imperial & Taj Mahal Hotel New Delhi", category: "Hotel & Stay", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.6253, lng: 77.2186, rating: 4.9, reviews: 11200, phone: "+91 11 2334 1234", open: true, isFamous: true, famousTag: "Iconic 5-Star Luxury & Paharganj Budget Stays Nearby", desc: "Connaught Place aur Lutyens Delhi ke sabse mashhoor luxury aur family hotels.", address: "Janpath / Mansingh Road, New Delhi", reviewList: [] },
-      { id: 113, name: "India Gate & Chandni Chowk Heritage", category: "Famous Landmark", city: "Delhi", district: "New Delhi", state: "Delhi", lat: 28.6129, lng: 77.2295, rating: 4.9, reviews: 45200, phone: "Delhi Tourism", open: true, isFamous: true, famousTag: "National War Memorial & Kartavya Path", desc: "Bharat ka rashtriya smarak aur naya bana Kartavya Path.", address: "Kartavya Path, New Delhi", reviewList: [] },
-
-      // KOTA & JAIPUR (Coaching Capital, SMS Hospital, Heritage Hotels)
-      { id: 114, name: "Kota Coaching Hub (Allen / PhysicsWallah / Resonance / Motion)", category: "Coaching & Institute", city: "Kota", district: "Kota", state: "Rajasthan", lat: 25.1460, lng: 75.8511, rating: 4.9, reviews: 41200, phone: "+91 744 275 7575", open: true, isFamous: true, famousTag: "Coaching Capital of India (IIT-JEE & NEET)", desc: "Talwandi, Indra Vihar aur Landmark City me Bharat ka sabse bada IIT-JEE aur Medical NEET coaching center.", address: "Indra Vihar / Rajiv Gandhi Nagar, Kota", reviewList: [] },
-      { id: 115, name: "Sawai Man Singh (SMS) Hospital & Santokba Durlabhji", category: "Hospital & Clinic", city: "Jaipur", district: "Jaipur", state: "Rajasthan", lat: 26.9061, lng: 75.8166, rating: 4.8, reviews: 8740, phone: "+91 141 256 0291", open: true, isFamous: true, famousTag: "Rajasthan's Premier Super-Specialty Hospital", desc: "Rajasthan ka sabse bada multi-specialty hospital aur emergency trauma care center.", address: "JLN Marg, Jaipur", reviewList: [] },
-      { id: 116, name: "Rambagh Palace & Chokhi Dhani Resort", category: "Hotel & Stay", city: "Jaipur", district: "Jaipur", state: "Rajasthan", lat: 26.8982, lng: 75.8081, rating: 4.9, reviews: 14600, phone: "+91 141 238 5700", open: true, isFamous: true, famousTag: "World's Best Royal Heritage Hotel & Rajasthani Village Stay", desc: "Shahi Rajasthani mehmaan-nawazi, Dal-Baati-Churma aur royal palace stay.", address: "Bhawani Singh Road / Tonk Road, Jaipur", reviewList: [] },
-
-      // MUMBAI (Tata Memorial Hospital, Taj Mahal Palace Hotel, IIT Powai Hub)
-      { id: 117, name: "Tata Memorial Hospital & Kokilaben Ambani Hospital", category: "Hospital & Clinic", city: "Mumbai", district: "Mumbai City", state: "Maharashtra", lat: 19.0049, lng: 72.8415, rating: 4.9, reviews: 26400, phone: "+91 22 2417 7000", open: true, isFamous: true, famousTag: "Asia's #1 Cancer Research & Multi-Specialty Care", desc: "Parel aur Andheri me Bharat ka sabse vishwasniya cancer evam super-specialty hospital.", address: "Dr. E Borges Road, Parel, Mumbai", reviewList: [] },
-      { id: 118, name: "The Taj Mahal Palace Hotel & Gateway of India", category: "Hotel & Stay", city: "Mumbai", district: "Mumbai City", state: "Maharashtra", lat: 18.9217, lng: 72.8332, rating: 5.0, reviews: 39800, phone: "+91 22 6665 3366", open: true, isFamous: true, famousTag: "1903 Iconic Seafront Heritage Hotel", desc: "Gateway of India ke bilkul samne sthit Bharat ka sabse mashhoor 5-star hotel.", address: "Apollo Bandar, Colaba, Mumbai", reviewList: [] },
-
-      // LUCKNOW & PRAYAGRAJ (SGPGI, Civil Services Coaching)
-      { id: 119, name: "SGPGI & King George's Medical University (KGMU)", category: "Hospital & Clinic", city: "Lucknow", district: "Lucknow", state: "Uttar Pradesh", lat: 26.7460, lng: 80.9455, rating: 4.9, reviews: 15800, phone: "+91 522 249 4000", open: true, isFamous: true, famousTag: "UP's Top Medical University & PGI Hospital", desc: "Lucknow ka विश्वस्तरीय Sanjay Gandhi Postgraduate Institute aur KGMU Medical College.", address: "Raebareli Road / Chowk, Lucknow", reviewList: [] },
-      { id: 120, name: "Civil Lines & Katra UPSC/UPPSC Coaching Hub (Dhyeya / GS World)", category: "Coaching & Institute", city: "Prayagraj", district: "Prayagraj", state: "Uttar Pradesh", lat: 25.4589, lng: 81.8348, rating: 4.8, reviews: 9120, phone: "+91 532 240 0120", open: true, isFamous: true, famousTag: "Oxford of the East • UPPSC, Judiciary & SSC Hub", desc: "Allahabad University ke pass UPPSC, PCS-J, RO/ARO aur One-Day exams ki taiyari ka sabse bada garh.", address: "Katra & Civil Lines, Prayagraj", reviewList: [] },
-
-      // PATNA (PMCH/AIIMS Patna, Khan Sir / Boring Road Coaching)
-      { id: 121, name: "Boring Road & Musallahpur Hat Coaching Hub (Khan Global Studies)", category: "Coaching & Institute", city: "Patna", district: "Patna", state: "Bihar", lat: 25.6155, lng: 85.1712, rating: 4.9, reviews: 28900, phone: "+91 612 230 0555", open: true, isFamous: true, famousTag: "Bihar's #1 BPSC, Railway, SSC & NEET Coaching Hub", desc: "Musallahpur Hat, Kankarbagh aur Boring Road me lakho chhatron ka sabse priya coaching hub.", address: "Musallahpur Hat / Boring Road, Patna", reviewList: [] },
-      { id: 122, name: "AIIMS Patna & PMCH Super Specialty Hospital", category: "Hospital & Clinic", city: "Patna", district: "Patna", state: "Bihar", lat: 25.5612, lng: 85.0418, rating: 4.8, reviews: 11400, phone: "+91 612 245 1070", open: true, isFamous: true, famousTag: "Bihar's Top AIIMS & Emergency Medical Center", desc: "Phulwari Sharif aur Ashok Rajpath par sthit Bihar ke sabse bade super-specialty hospitals.", address: "Phulwari Sharif / Ashok Rajpath, Patna", reviewList: [] }
-    ];
-
-    // ==========================================
-    // 5. SMART GENERATOR FOR ALL 800+ CITIES
-    // Guarantees EVERY clicked city shows:
-    // Famous Landmark, Market, Food, Hospital, Hotel & Coaching!
-    // ==========================================
-    const STATE_SPECIALTIES = {
-      "Uttar Pradesh": { dish: "Desi Ghee Kachori-Jalebi & Chaat", craft: "Handloom, Chikan & Brassware Bazar", landmark: "Prachin Shiv Mandir & Heritage Fort" },
-      "Bihar": { dish: "Authentic Desi Ghee Litti Chokha & Khaja", craft: "Madhubani Art & Khadi Silk Emporium", landmark: "Historic Buddha Stupa & Rajendra Chowk" },
-      "Madhya Pradesh": { dish: "Famous Poha-Jalebi & Sev Namkeen", craft: "Chanderi & Maheshwari Handloom Bazar", landmark: "Royal Heritage Fort & Mahadev Mandir" },
-      "Maharashtra": { dish: "Famous Misal Pav, Vada Pav & Puran Poli", craft: "Paithani Saree & Kolhapuri Market", landmark: "Chhatrapati Shivaji Maharaj Chowk & Fort" },
-      "Rajasthan": { dish: "Royal Dal Baati Churma & Pyaz Kachori", craft: "Bandhani Textile, Jutis & Kundan Bazar", landmark: "Shahi Haveli, Qila & Ghanta Ghar" },
-      "Gujarat": { dish: "Famous Khaman Dhokla, Fafda-Jalebi & Thali", craft: "Patola Silk & Bandhani Garment Hub", landmark: "Heritage Stepwell (Vav) & Swaminarayan Mandir" },
-      "West Bengal": { dish: "Famous Rosogolla, Mishti Doi & Kathi Roll", craft: "Tant & Baluchari Saree New Market", landmark: "Rajbari Heritage Palace & Kali Bari Mandir" },
-      "Tamil Nadu": { dish: "Filter Coffee, Ghee Roast Dosa & Idli", craft: "Kanchipuram Silk & Temple Jewellery Market", landmark: "Ancient Gopuram Amman Temple" },
-      "Karnataka": { dish: "Benne Masala Dosa & Mysore Pak House", craft: "Sandalwood Craft & Silk Saree Emporium", landmark: "Historical Hoysala Temple & Botanical Park" },
-      "Kerala": { dish: "Malabar Appam Stew, Sadya & Banana Chips", craft: "Kasavu Saree & Spice Market", landmark: "Backwater Viewpoint & Bhagavathy Temple" }
-    };
-
-    function generateCompleteCityData(loc, centerCoords) {
-      if (!loc || loc.name === "All India") return [];
-      const spec = STATE_SPECIALTIES[loc.state] || {
-        dish: "Famous Local Sweets, Chaat & Traditional Thali",
-        craft: "Main City Handloom, Jewellery & Wholesale Bazar",
-        landmark: "Historic City Mandir, Fort & Central Park"
-      };
-      const lat = centerCoords.lat;
-      const lng = centerCoords.lng;
-
+    function getSeededBusinessesForCity(cityObj) {
+      const c = cityObj.name;
+      const s = cityObj.state;
       return [
         {
-          id: `gen-landmark-${loc.name}`,
-          name: `${loc.name} — ${spec.landmark}`,
-          category: "Famous Landmark",
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: lat + 0.004,
-          lng: lng + 0.003,
-          rating: 4.9,
-          reviews: 1540,
-          phone: "District Tourism & Heritage",
-          open: true,
-          isFamous: true,
-          famousTag: `#1 Famous Darshaniya Sthal in ${loc.name}`,
-          desc: `${loc.name} (${loc.state}) ka sabse prasiddh tourist attraction aur historical/spiritual landmark.`,
-          address: `Heritage Zone, ${loc.name}, ${loc.state}`,
-          reviewList: [{ user: "Local Guide", stars: 5, text: `${loc.name} aane par yahan zaroor jayein!` }]
-        },
-        {
-          id: `gen-hospital-${loc.name}`,
-          name: `${loc.name} District Hospital & Apex Super-Specialty Care`,
+          id: `biz-${c}-1`,
+          name: `Apex Super-Specialty Hospital & Trauma Center (${c})`,
           category: "Hospital & Clinic",
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: lat - 0.003,
-          lng: lng + 0.004,
-          rating: 4.7,
-          reviews: 890,
-          phone: "108 / +91 1800-180-1104",
-          open: true,
-          isFamous: true,
-          famousTag: `24x7 Emergency, ICU, Maternity & Trauma Center`,
-          desc: `${loc.name} ka sabse bada सरकारी evam private multi-specialty hospital, pathology lab aur 24 ghante ambulance seva.`,
-          address: `Civil Lines / Hospital Road, ${loc.name}`,
-          reviewList: []
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: true,
+          businessPro: false,
+          searchAppearances: 1420,
+          profileViews: 890,
+          leadClicks: 215,
+          address: `Main Civil Lines Road, ${c}, ${s}`,
+          phone: "+91 98765 11001",
+          offerText: "15% OFF on Full Body Checkup & OPD Consultation",
+          reviews: [
+            { id: 1, user: "Rohan Tiwari", userEmail: "rohan@demo.com", userPhone: "+91 98111 22334", stars: 5, sentiment: "positive", text: "Doctors bahut cooperative hain aur ICU facility top class hai. Cleanliness acchi hai.", verifiedBill: true, helpful: 34, date: "2 days ago" },
+            { id: 2, user: "Priya Dubey", userEmail: "priya@demo.com", userPhone: "+91 98222 33445", stars: 4, sentiment: "positive", text: "Pathology reports time par mil gayi, staff behavior accha tha.", verifiedBill: true, helpful: 19, date: "5 days ago" },
+            { id: 3, user: "Sandeep Yadav", userEmail: "sandeep@demo.com", userPhone: "+91 99333 44556", stars: 2, sentiment: "negative", text: "Raat me billing counter par 45 minute wait karwaya aur pharmacy par dawai mehengi mili. Receptionist rude tha.", verifiedBill: true, helpful: 52, date: "1 day ago" },
+            { id: 4, user: "Ankit Verma", userEmail: "ankit@demo.com", userPhone: "+91 97444 55667", stars: 1, sentiment: "negative", text: "Parking charge bahut jyada hai aur emergency doctor 30 min late aaye.", verifiedBill: false, helpful: 28, date: "3 days ago" }
+          ]
         },
         {
-          id: `gen-hotel-${loc.name}`,
-          name: `Hotel Grand ${loc.name} Palace & Family Residency`,
-          category: "Hotel & Stay",
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: lat + 0.002,
-          lng: lng - 0.004,
-          rating: 4.8,
-          reviews: 640,
-          phone: "+91 98765 11220",
-          open: true,
-          isFamous: true,
-          famousTag: `Best AC Rooms, Banquet Hall & Pure Veg Restaurant`,
-          desc: `${loc.name} railway station aur bus stand ke pass thaharne ke liye sabse surakshit aur shandar family hotel.`,
-          address: `Station Road, Civil Lines, ${loc.name}`,
-          reviewList: []
+          id: `biz-${c}-2`,
+          name: `${c} Royal Motors — Car & Bike Authorized Showroom`,
+          category: "Car & Bike Showroom",
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: false,
+          businessPro: false,
+          searchAppearances: 1180,
+          profileViews: 640,
+          leadClicks: 178,
+          address: `NH Highway Bypass, Industrial Area, ${c}`,
+          phone: "+91 98765 22002",
+          offerText: "Free Teflon Coating + ₹2,000 Accessories Coupon",
+          reviews: [
+            { id: 10, user: "Vikram Singh", userEmail: "vikram@demo.com", userPhone: "+91 91234 56780", stars: 5, sentiment: "positive", text: "Test drive turant mil gayi aur finance process 2 ghante me ho gaya. Best showroom in city!", verifiedBill: true, helpful: 41, date: "3 days ago" },
+            { id: 11, user: "Deepak Maurya", userEmail: "deepak@demo.com", userPhone: "+91 92345 67891", stars: 2, sentiment: "negative", text: "Delivery ke waqt wada kiya hua free seat cover nahi diya aur RC transfer me 1 mahina laga diya.", verifiedBill: true, helpful: 63, date: "Yesterday" }
+          ]
         },
         {
-          id: `gen-coaching-${loc.name}`,
-          name: `${loc.name} Career Point — IIT-JEE, NEET, UPSC & SSC Hub`,
-          category: "Coaching & Institute",
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: lat - 0.004,
-          lng: lng - 0.003,
-          rating: 4.8,
-          reviews: 780,
-          phone: "+91 94152 00991",
-          open: true,
-          isFamous: true,
-          famousTag: `#1 Competitive Exam, Foundation & Computer Institute`,
-          desc: `${loc.name} me NEET, JEE, UPएससी/State PSC, Police, Bank, SSC aur Digital Library ki sabse best coaching.`,
-          address: `College Road / Degree College Chauraha, ${loc.name}`,
-          reviewList: []
+          id: `biz-${c}-3`,
+          name: `SpeedCare Bike & Car Multi-Brand Service Hub (${c})`,
+          category: "Service Center & Repair",
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: false,
+          businessPro: false,
+          searchAppearances: 950,
+          profileViews: 510,
+          leadClicks: 142,
+          address: `Station Road, Near Overbridge, ${c}`,
+          phone: "+91 98765 33003",
+          offerText: "20% OFF on Labor Charges + Free Foam Wash",
+          reviews: [
+            { id: 20, user: "Karan Patel", userEmail: "karan@demo.com", userPhone: "+91 93456 78901", stars: 5, sentiment: "positive", text: "Genuine engine oil daala mere samne aur mileage 5kmpl badh gaya.", verifiedBill: true, helpful: 22, date: "4 days ago" },
+            { id: 21, user: "Mohit Sharma", userEmail: "mohit@demo.com", userPhone: "+91 94567 89012", stars: 1, sentiment: "negative", text: "Bina puche extra clutch plate change kar diya aur ₹1800 faltu bill bana diya.", verifiedBill: true, helpful: 47, date: "2 days ago" }
+          ]
         },
         {
-          id: `gen-food-${loc.name}`,
-          name: `Prasiddh ${loc.name} Mishthan & ${spec.dish.split("&")[0]}`,
-          category: "Famous Food",
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: lat + 0.005,
-          lng: lng - 0.002,
-          rating: 4.9,
-          reviews: 1320,
-          phone: "+91 98765 44556",
-          open: true,
-          isFamous: true,
-          famousTag: `Famous Taste: ${spec.dish}`,
-          desc: `${loc.name} ki sabse mashhoor dukan jahan subah se shaam tak ${spec.dish} ke liye bheed lagti hai.`,
-          address: `Main Sadar Chowk, ${loc.name}`,
-          reviewList: []
+          id: `biz-${c}-4`,
+          name: `Grand ${c} Central Mall & Hypermarket`,
+          category: "Mall & Supermarket",
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: true,
+          businessPro: false,
+          searchAppearances: 2340,
+          profileViews: 1520,
+          leadClicks: 390,
+          address: `City Center Square, ${c}, ${s}`,
+          phone: "+91 98765 44004",
+          offerText: "Flat 10% Cashback on Grocery & Fashion Billing above ₹1,500",
+          reviews: [
+            { id: 30, user: "Neha Gupta", userEmail: "neha@demo.com", userPhone: "+91 95678 90123", stars: 5, sentiment: "positive", text: "Sabhi top clothing brands, multiplex cinema aur food court ek hi chat ke niche!", verifiedBill: true, helpful: 55, date: "1 week ago" },
+            { id: 31, user: "Abhishek Rai", userEmail: "abhi@demo.com", userPhone: "+91 96789 01234", stars: 2, sentiment: "negative", text: "Weekend par AC dhang se kaam nahi karta aur billing counter par sirf 2 staff rehte hain.", verifiedBill: false, helpful: 31, date: "3 days ago" }
+          ]
         },
         {
-          id: `gen-market-${loc.name}`,
-          name: `${loc.name} Sadar Bazar & ${spec.craft}`,
-          category: "Famous Market",
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: lat - 0.002,
-          lng: lng + 0.002,
-          rating: 4.7,
-          reviews: 1100,
-          phone: "Vyapar Mandal Association",
-          open: true,
-          isFamous: true,
-          famousTag: `Wholesale & Retail Shopping Hub`,
-          desc: `${loc.name} ka sabse bada market — Saree, Kapde, Gold Jewellery, Electronics aur Kirana wholesale bazar.`,
-          address: `Bada Bazar, ${loc.name}`,
-          reviewList: []
+          id: `biz-${c}-5`,
+          name: `Shikhar IIT-JEE, NEET & Civil Services Academy (${c})`,
+          category: "Coaching & School",
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: false,
+          businessPro: false,
+          searchAppearances: 1680,
+          profileViews: 1120,
+          leadClicks: 310,
+          address: `Degree College Chauraha, Knowledge Park, ${c}`,
+          phone: "+91 98765 55005",
+          offerText: "Free 5-Day Demo Classes + 25% Scholarship Discount",
+          reviews: [
+            { id: 40, user: "Aarav Mishra", userEmail: "aarav@demo.com", userPhone: "+91 97890 12345", stars: 5, sentiment: "positive", text: "Physics aur Chemistry faculty Kota level ki hai. Doubt counter roz lagta hai.", verifiedBill: true, helpful: 68, date: "2 days ago" },
+            { id: 41, user: "Sneha Singh", userEmail: "sneha@demo.com", userPhone: "+91 98901 23456", stars: 2, sentiment: "negative", text: "Admission ke baad batch me 120 bache bitha diye aur syllabus piche chal raha hai.", verifiedBill: true, helpful: 89, date: "Yesterday" }
+          ]
+        },
+        {
+          id: `biz-${c}-6`,
+          name: `Hotel Royal Heritage & Spice Darbar Restaurant (${c})`,
+          category: "Hotel & Restaurant",
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: false,
+          businessPro: false,
+          searchAppearances: 1320,
+          profileViews: 780,
+          leadClicks: 195,
+          address: `VIP Road, Near Railway Station, ${c}`,
+          phone: "+91 98765 66006",
+          offerText: "15% OFF on Family Dinner & Room Booking",
+          reviews: [
+            { id: 50, user: "Manish Jain", userEmail: "manish@demo.com", userPhone: "+91 99012 34567", stars: 5, sentiment: "positive", text: "Paneer Tikka aur Dal Makhani lajawab hai! Family ke liye best ambiance.", verifiedBill: true, helpful: 29, date: "4 days ago" },
+            { id: 51, user: "Gaurav Kashyap", userEmail: "gaurav@demo.com", userPhone: "+91 90123 45678", stars: 2, sentiment: "negative", text: "Room service bahut slow hai aur Wi-Fi bilkul nahi chal raha tha.", verifiedBill: true, helpful: 37, date: "2 days ago" }
+          ]
+        },
+        {
+          id: `biz-${c}-7`,
+          name: `Digital Tech World — iPhone, Laptop & Gadget Hub (${c})`,
+          category: "Tech & Electronics",
+          city: c,
+          state: s,
+          claimed: false,
+          ownerEmail: null,
+          isSponsored: false,
+          businessPro: false,
+          searchAppearances: 890,
+          profileViews: 460,
+          leadClicks: 112,
+          address: `Main Market Chowk, ${c}`,
+          phone: "+91 98765 77007",
+          offerText: "Free Tempered Glass + ₹1,000 Off on Laptop Repair",
+          reviews: [
+            { id: 60, user: "Harshvardhan", userEmail: "harsh@demo.com", userPhone: "+91 91122 33445", stars: 5, sentiment: "positive", text: "Online Flipkart/Amazon se bhi saste price par laptop mila with official warranty.", verifiedBill: true, helpful: 24, date: "6 days ago" },
+            { id: 61, user: "Pooja Sahu", userEmail: "pooja@demo.com", userPhone: "+91 92233 44556", stars: 1, sentiment: "negative", text: "Mobile screen replacement ke 10 din baad touch kaam karna band kar diya aur warranty mana kar rahe.", verifiedBill: true, helpful: 51, date: "Yesterday" }
+          ]
         }
       ];
     }
 
     // ==========================================
-    // 6. LOCATION AUTOCOMPLETE PICKER
+    // 4. SAHIRANK ALGORITHM & CREATOR LEVEL ENGINE
     // ==========================================
-    function LocationPicker({ value, onSelect, placeholder, allowCustom = false }) {
-      const [query, setQuery] = useState(value);
-      const [open, setOpen] = useState(false);
-      const ref = useRef(null);
+    function calculateSahiRank(biz) {
+      const revs = biz.reviews || [];
+      if (revs.length === 0) return { avgRating: 4.5, trustScore: 78, posCount: 0, negCount: 0, rankScore: 50 };
+      const totalStars = revs.reduce((acc, r) => acc + r.stars, 0);
+      const avgRating = Number((totalStars / revs.length).toFixed(1));
+      const posCount = revs.filter(r => r.stars >= 4).length;
+      const negCount = revs.filter(r => r.stars <= 3).length;
+      const verifiedCount = revs.filter(r => r.verifiedBill).length;
 
-      useEffect(() => { setQuery(value); }, [value]);
+      const posRatio = (posCount / revs.length) * 60;
+      const verBonus = (verifiedCount / revs.length) * 25;
+      const claimBonus = biz.claimed ? 15 : 5;
+      const trustScore = Math.min(99, Math.round(posRatio + verBonus + claimBonus));
 
-      useEffect(() => {
-        const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-      }, []);
+      const sponsorBoost = biz.isSponsored ? 1000 : 0;
+      const rankScore = sponsorBoost + trustScore * 5 + (biz.searchAppearances || 0) * 0.05;
 
-      const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if (!q || q.includes("all india")) return ALL_LOCATIONS.slice(0, 20);
-        return ALL_LOCATIONS.filter(loc =>
-          loc.display.toLowerCase().includes(q) ||
-          loc.name.toLowerCase().includes(q) ||
-          loc.district.toLowerCase().includes(q) ||
-          loc.state.toLowerCase().includes(q)
-        ).sort((a, b) => {
-          if (a.name === "All India") return -1;
-          if (b.name === "All India") return 1;
-          const aStarts = a.name.toLowerCase().startsWith(q) ? -1 : 0;
-          const bStarts = b.name.toLowerCase().startsWith(q) ? -1 : 0;
-          return aStarts - bStarts;
-        }).slice(0, 22);
-      }, [query]);
+      return { avgRating, trustScore, posCount, negCount, rankScore };
+    }
 
-      const canAddCustom = allowCustom && query.trim().length > 2 && !ALL_LOCATIONS.some(l => l.name.toLowerCase() === query.trim().toLowerCase());
-
-      return (
-        <div ref={ref} className="relative w-full">
-          <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border-2 bg-white transition-all ${open ? "border-orange-500 ring-4 ring-orange-500/15" : "border-orange-200"}`}>
-            <span className="text-orange-500 text-base">📍</span>
-            <input
-              value={query}
-              onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-              onFocus={() => {
-                if (query.includes("All India")) setQuery("");
-                setOpen(true);
-              }}
-              placeholder={placeholder}
-              className="flex-1 bg-transparent outline-none text-sm font-medium text-stone-900 placeholder:text-stone-400"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => { setQuery(""); setOpen(true); }}
-                className="text-xs px-1.5 py-0.5 rounded bg-stone-100 hover:bg-stone-200 text-stone-600"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {open && (
-            <div className="absolute z-50 mt-2 w-full bg-white border border-orange-200 rounded-2xl shadow-2xl max-h-72 overflow-auto p-2">
-              {filtered.map((loc, idx) => (
-                <button
-                  type="button"
-                  key={idx + loc.display}
-                  onClick={() => { onSelect(loc); setQuery(loc.display); setOpen(false); }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-orange-50 flex items-start gap-2.5 transition"
-                >
-                  <span className="text-base">{loc.name === "All India" ? "🌍" : "📍"}</span>
-                  <div className="flex-1">
-                    <div className="text-sm font-semibold text-stone-900">{loc.display}</div>
-                    <div className="text-[11px] text-stone-500">
-                      {loc.state} • Famous Places, Hospitals, Hotels & Coaching Available
-                    </div>
-                  </div>
-                </button>
-              ))}
-              {canAddCustom && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const customLoc = { name: query.trim(), district: query.trim(), state: "India", display: `${query.trim()} - India` };
-                    onSelect(customLoc);
-                    setOpen(false);
-                  }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl bg-orange-50 border border-dashed border-orange-400 mt-1 flex items-center gap-2 text-xs font-semibold text-orange-800"
-                >
-                  <span>➕</span>
-                  <span>'{query.trim()}' ko naye shehar/gaon ke roop me kholo</span>
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      );
+    function getCreatorLevelInfo(points) {
+      const levels = [
+        { level: 1, title: "Level 1: Newbie Reviewer", minPoints: 0 },
+        { level: 2, title: "Level 2: Rising Voice", minPoints: 100 },
+        { level: 3, title: "Level 3: Verified Critic", minPoints: 250 },
+        { level: 4, title: "Level 4: City Influencer", minPoints: 400 },
+        { level: 5, title: "Level 5: SahiRank Partner (20% Revenue Share Eligible)", minPoints: 500 }
+      ];
+      let current = levels[0];
+      for (const l of levels) {
+        if (points >= l.minPoints) current = l;
+      }
+      const isMonetized = points >= 500;
+      const progressPct = Math.min(100, Math.round((points / 500) * 100));
+      return { ...current, isMonetized, progressPct };
     }
 
     // ==========================================
-    // 7. MAIN APP COMPONENT
+    // 5. MAIN APP COMPONENT
     // ==========================================
     function App() {
-      // Users & Auth
-      const [users, setUsers] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v18_users")) || []; } catch { return []; }
-      });
-      const [currentUser, setCurrentUser] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v18_current_user")) || null; } catch { return null; }
-      });
-      const [authModal, setAuthModal] = useState(false);
-      const [authMode, setAuthMode] = useState("login");
-      const [authForm, setAuthForm] = useState({ name: "", phoneOrEmail: "", password: "", city: "Varanasi" });
-
-      // Cloud Backend Config (Firebase Realtime DB / Supabase REST Endpoint)
-      const [cloudConfig, setCloudConfig] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v18_cloud")) || { provider: "firebase", url: "", apiKey: "", enabled: false }; }
-        catch { return { provider: "firebase", url: "", apiKey: "", enabled: false }; }
-      });
-      const [cloudModal, setCloudModal] = useState(false);
-      const [syncing, setSyncing] = useState(false);
-
-      // Places & Reviews
-      const [customPlaces, setCustomPlaces] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v18_places")) || []; } catch { return []; }
-      });
-      const [reviewsMap, setReviewsMap] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v18_reviews")) || {}; } catch { return {}; }
-      });
-      const [savedIds, setSavedIds] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("sahirank_v18_saved")) || []; } catch { return []; }
-      });
-
-      // Active Review Modal State
-      const [reviewTarget, setReviewTarget] = useState(null);
-      const [newReview, setNewReview] = useState({ stars: 5, text: "" });
-
-      // Filters & UI State
-      const [selectedLoc, setSelectedLoc] = useState(ALL_LOCATIONS[0]);
+      const [selectedCity, setSelectedCity] = useState(ALL_CITIES[0]);
+      const [citySearch, setCitySearch] = useState("");
+      const [cityDropdown, setCityDropdown] = useState(false);
       const [category, setCategory] = useState("All");
-      const [searchText, setSearchText] = useState("");
-      const [toast, setToast] = useState(null);
-      const [addModal, setAddModal] = useState(false);
+      const [searchQuery, setSearchQuery] = useState("");
 
-      // Live Internet Info (Wikipedia + Nominatim)
-      const [cityWiki, setCityWiki] = useState(null);
-      const [loadingWiki, setLoadingWiki] = useState(false);
-      const [dynamicCoords, setDynamicCoords] = useState({ lat: 22.5937, lng: 78.9629 });
+      // Active View Mode: 'marketplace' | 'creator_studio' | 'business_dashboard' | 'secret_admin'
+      const [activeTab, setActiveTab] = useState("marketplace");
 
-      // New Place / Business Form
-      const [bizForm, setBizForm] = useState({
-        name: "",
-        category: "Hospital & Clinic",
-        cityLoc: ALL_LOCATIONS[1],
-        phone: "",
-        famousTag: "",
-        desc: "",
-        address: ""
+      // Secret Footer Click Counter for Founder
+      const [secretClicks, setSecretClicks] = useState(0);
+      const [pinModal, setPinModal] = useState(false);
+      const [pinInput, setPinInput] = useState("");
+
+      // Current Logged-In User (Null if logged out, or 'individual' / 'business' / 'admin')
+      const [currentUser, setCurrentUser] = useState(() => {
+        try { return JSON.parse(localStorage.getItem("sahirank_v20_user")) || null; } catch { return null; }
       });
 
-      const mapRef = useRef(null);
-      const markersRef = useRef([]);
+      // Secret Founder Revenue Ledger (Hidden from public, only visible when role === 'admin')
+      const [platformLedger, setPlatformLedger] = useState(() => {
+        try {
+          return JSON.parse(localStorage.getItem("sahirank_v20_ledger")) || {
+            totalGrossRevenue: 14850,
+            creatorPayoutPool20Pct: 2970,
+            adminNetProfit80Pct: 11880,
+            transactions: [
+              { id: 1, type: "Business Pro Subscription", from: "Grand Central Mall", amount: 999, creatorShare: 199.8, adminShare: 799.2, time: "2 hours ago" },
+              { id: 2, type: "Sponsored #1 Rank Boost", from: "Apex Super-Specialty Hospital", amount: 1499, creatorShare: 299.8, adminShare: 1199.2, time: "Yesterday" },
+              { id: 3, type: "User Negative Review Unlock Pass", from: "24 Individual Users (₹49x24)", amount: 1176, creatorShare: 235.2, adminShare: 940.8, time: "This Week" },
+              { id: 4, type: "Customer Lead Phone Unlocks", from: "Royal Motors Showroom", amount: 499, creatorShare: 99.8, adminShare: 399.2, time: "3 days ago" }
+            ]
+          };
+        } catch { return null; }
+      });
+
+      const [customBizMap, setCustomBizMap] = useState(() => {
+        try { return JSON.parse(localStorage.getItem("sahirank_v20_bizmap")) || {}; } catch { return {}; }
+      });
+
+      // Modals
+      const [authModal, setAuthModal] = useState(false);
+      const [authMode, setAuthMode] = useState("login"); // 'login' | 'signup'
+      const [authForm, setAuthForm] = useState({ name: "", emailOrPhone: "", password: "", role: "individual", gstOrLicense: "" });
+      const [reviewModalBiz, setReviewModalBiz] = useState(null);
+      const [reviewForm, setReviewForm] = useState({ stars: 5, text: "", verifiedBill: true });
+      const [suggestModal, setSuggestModal] = useState(false);
+      const [suggestForm, setSuggestForm] = useState({ name: "", category: "Hospital & Clinic", address: "", phone: "" });
+      const [claimModalBiz, setClaimModalBiz] = useState(null);
+      const [claimDoc, setClaimDoc] = useState("");
+      const [paymentModal, setPaymentModal] = useState(null);
+      const [toast, setToast] = useState(null);
+      const [unlockedLeads, setUnlockedLeads] = useState({});
 
       const showToast = (msg) => setToast(msg);
-
       useEffect(() => {
         if (!toast) return;
-        const t = setTimeout(() => setToast(null), 3200);
+        const t = setTimeout(() => setToast(null), 3500);
         return () => clearTimeout(t);
       }, [toast]);
 
-      // Cloud Sync Pull on Load (if configured)
       useEffect(() => {
-        if (!cloudConfig.enabled || !cloudConfig.url) return;
-        setSyncing(true);
-        const endpoint = cloudConfig.provider === "firebase"
-          ? `${cloudConfig.url.replace(/\/$/, "")}/sahirank_places.json`
-          : `${cloudConfig.url.replace(/\/$/, "")}/rest/v1/sahirank_places?select=*`;
+        if (currentUser) localStorage.setItem("sahirank_v20_user", JSON.stringify(currentUser));
+        else localStorage.removeItem("sahirank_v20_user");
+      }, [currentUser]);
 
-        const headers = cloudConfig.provider === "supabase" && cloudConfig.apiKey
-          ? { "apikey": cloudConfig.apiKey, "Authorization": `Bearer ${cloudConfig.apiKey}` }
-          : {};
-
-        fetch(endpoint, { headers })
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
-            if (!data) return;
-            const list = Array.isArray(data) ? data : Object.values(data);
-            if (list.length > 0) {
-              setCustomPlaces(list);
-              localStorage.setItem("sahirank_v18_places", JSON.stringify(list));
-              showToast(`☁️ Cloud Database se ${list.length} records sync ho gaye!`);
-            }
-          })
-          .catch(() => {})
-          .finally(() => setSyncing(false));
-      }, [cloudConfig.enabled, cloudConfig.url]);
-
-      // Fetch Wikipedia & Live Coordinates when City changes
       useEffect(() => {
-        const cleanName = selectedLoc.name.replace(/\(.*\)/, "").trim().toLowerCase();
-        const stateName = selectedLoc.state.toLowerCase();
-        const fallback = COORDS_DB[selectedLoc.name.toLowerCase()] || COORDS_DB[cleanName] || COORDS_DB[stateName] || { lat: 25.3176, lng: 82.9739 };
-        setDynamicCoords(fallback);
+        if (platformLedger) localStorage.setItem("sahirank_v20_ledger", JSON.stringify(platformLedger));
+      }, [platformLedger]);
 
-        if (selectedLoc.name === "All India") {
-          setCityWiki(null);
-          return;
-        }
-
-        let active = true;
-        setLoadingWiki(true);
-        const queryCity = selectedLoc.name.replace(/\(.*\)/, "").trim();
-
-        fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(queryCity)}`)
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
-            if (!active) return;
-            if (data && data.extract) {
-              setCityWiki({
-                title: data.title,
-                extract: data.extract,
-                thumbnail: data.thumbnail?.source || null,
-                url: data.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${queryCity}`
-              });
-              if (data.coordinates) {
-                setDynamicCoords({ lat: data.coordinates.lat, lng: data.coordinates.lon });
-              }
-            } else {
-              setCityWiki(null);
-            }
-          })
-          .catch(() => { if (active) setCityWiki(null); })
-          .finally(() => { if (active) setLoadingWiki(false); });
-
-        return () => { active = false; };
-      }, [selectedLoc]);
-
-      // Combine Curated + Cloud/Custom + Smart Generated Places
-      const displayedPlaces = useMemo(() => {
-        const base = [...customPlaces, ...INITIAL_PLACES];
-        let result = base;
-
-        if (selectedLoc.name !== "All India") {
-          const cleanName = selectedLoc.name.replace(/\(.*\)/, "").trim().toLowerCase();
-          const matched = base.filter(p =>
-            p.city.toLowerCase() === cleanName ||
-            p.city.toLowerCase() === selectedLoc.name.toLowerCase() ||
-            p.district.toLowerCase() === cleanName
-          );
-
-          const generated = generateCompleteCityData(selectedLoc, dynamicCoords);
-          // Merge so every city has Landmarks, Hospitals, Hotels, Coaching, Food & Markets!
-          const existingCats = new Set(matched.map(m => m.category));
-          const missingGenerated = generated.filter(g => !existingCats.has(g.category));
-          result = [...matched, ...missingGenerated];
-        }
-
-        if (category !== "All") {
-          result = result.filter(p => p.category === category);
-        }
-
-        if (searchText.trim()) {
-          const q = searchText.trim().toLowerCase();
-          result = result.filter(p =>
-            `${p.name} ${p.category} ${p.city} ${p.state} ${p.famousTag || ""} ${p.desc || ""}`.toLowerCase().includes(q)
-          );
-        }
-
-        return result;
-      }, [customPlaces, selectedLoc, category, searchText, dynamicCoords]);
-
-      // Sync Leaflet Map
       useEffect(() => {
-        if (!window.L) return;
-        const el = document.getElementById("mainMap");
-        if (!el) return;
+        localStorage.setItem("sahirank_v20_bizmap", JSON.stringify(customBizMap));
+      }, [customBizMap]);
 
-        if (!mapRef.current) {
-          mapRef.current = window.L.map("mainMap").setView([dynamicCoords.lat, dynamicCoords.lng], selectedLoc.name === "All India" ? 5 : 13);
-          window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "© OpenStreetMap contributors",
-            maxZoom: 19
-          }).addTo(mapRef.current);
-        } else {
-          mapRef.current.setView([dynamicCoords.lat, dynamicCoords.lng], selectedLoc.name === "All India" ? 5 : 13);
+      const cityBusinesses = useMemo(() => {
+        const key = selectedCity.display;
+        const base = customBizMap[key] || getSeededBusinessesForCity(selectedCity);
+        let list = base.map(b => ({ ...b, metrics: calculateSahiRank(b) }));
+
+        if (category !== "All") list = list.filter(b => b.category === category);
+        if (searchQuery.trim()) {
+          const q = searchQuery.trim().toLowerCase();
+          list = list.filter(b => `${b.name} ${b.category} ${b.address}`.toLowerCase().includes(q));
         }
+        return list.sort((a, b) => b.metrics.rankScore - a.metrics.rankScore);
+      }, [selectedCity, customBizMap, category, searchQuery]);
 
-        markersRef.current.forEach(m => { try { m.remove(); } catch {} });
-        markersRef.current = [];
+      const updateCityBusiness = (bizId, updater) => {
+        const key = selectedCity.display;
+        const currentList = customBizMap[key] || getSeededBusinessesForCity(selectedCity);
+        const updatedList = currentList.map(b => b.id === bizId ? updater(b) : b);
+        setCustomBizMap(prev => ({ ...prev, [key]: updatedList }));
+      };
 
-        displayedPlaces.forEach(p => {
-          const m = window.L.marker([p.lat, p.lng])
-            .addTo(mapRef.current)
-            .bindPopup(`
-              <div style="min-width:190px">
-                <b style="color:#ff6b02;font-size:13px">${p.name}</b><br/>
-                <span style="font-size:11px;font-weight:600;color:#333">${p.category}</span><br/>
-                <span style="font-size:11px;color:#666">${p.famousTag || ""}</span><br/>
-                <span style="font-size:11px">📍 ${p.city} • ⭐ ${p.rating}</span>
-              </div>
-            `);
-          markersRef.current.push(m);
-        });
-      }, [dynamicCoords, displayedPlaces, selectedLoc]);
+      const processRevenueTransaction = (title, amount, fromName) => {
+        const creatorCut = Number((amount * 0.20).toFixed(1));
+        const adminCut = Number((amount * 0.80).toFixed(1));
 
-      // Auth Submit
+        setPlatformLedger(prev => ({
+          totalGrossRevenue: prev.totalGrossRevenue + amount,
+          creatorPayoutPool20Pct: Number((prev.creatorPayoutPool20Pct + creatorCut).toFixed(1)),
+          adminNetProfit80Pct: Number((prev.adminNetProfit80Pct + adminCut).toFixed(1)),
+          transactions: [
+            { id: Date.now(), type: title, from: fromName, amount, creatorShare: creatorCut, adminShare: adminCut, time: "Just now" },
+            ...prev.transactions
+          ]
+        }));
+
+        if (currentUser && currentUser.role === "individual" && currentUser.points >= 500) {
+          setCurrentUser(prev => ({
+            ...prev,
+            walletEarnings: Number(((prev.walletEarnings || 0) + creatorCut * 0.25).toFixed(1))
+          }));
+        }
+      };
+
+      // Handle Login / Sign Up (With Secret Founder Detection)
       const handleAuthSubmit = (e) => {
         e.preventDefault();
-        const { name, phoneOrEmail, password, city } = authForm;
-        if (!phoneOrEmail.trim() || !password.trim()) {
-          showToast("⚠️ Email/Phone aur Password zaroor bharein!");
+        const inputId = authForm.emailOrPhone.trim().toLowerCase();
+        const pass = authForm.password.trim();
+
+        // SECRET ADMIN CHECK: Only triggers if Founder enters secret credentials!
+        if ((inputId === ADMIN_EMAIL || inputId === ADMIN_PHONE) && pass === ADMIN_PASS) {
+          const founderUser = {
+            id: "founder-admin",
+            name: "Founder & Super Admin",
+            email: ADMIN_EMAIL,
+            phone: ADMIN_PHONE,
+            role: "admin",
+            unlockedNegativePass: true
+          };
+          setCurrentUser(founderUser);
+          setAuthModal(false);
+          setActiveTab("secret_admin");
+          showToast("👑 Welcome Boss! Secret Founder Revenue HQ Unlocked.");
           return;
         }
-        if (authMode === "signup") {
-          if (!name.trim()) { showToast("⚠️ Apna Naam bharein!"); return; }
-          if (users.some(u => u.phoneOrEmail.toLowerCase() === phoneOrEmail.trim().toLowerCase())) {
-            showToast("⚠️ Yeh Email/Phone pehle se registered hai. Kripya Login karein.");
-            setAuthMode("login");
-            return;
-          }
-          const newUser = { id: Date.now(), name: name.trim(), phoneOrEmail: phoneOrEmail.trim(), password, city };
-          const nextUsers = [...users, newUser];
-          setUsers(nextUsers);
-          setCurrentUser(newUser);
-          localStorage.setItem("sahirank_v18_users", JSON.stringify(nextUsers));
-          localStorage.setItem("sahirank_v18_current_user", JSON.stringify(newUser));
-          setAuthModal(false);
-          showToast(`🎉 Welcome ${newUser.name}! Account ban gaya.`);
-        } else {
-          const found = users.find(u => u.phoneOrEmail.toLowerCase() === phoneOrEmail.trim().toLowerCase() && u.password === password);
-          if (!found) {
-            showToast("❌ Galat Email/Phone ya Password! Naya account banane ke liye Sign Up chunein.");
-            return;
-          }
-          setCurrentUser(found);
-          localStorage.setItem("sahirank_v18_current_user", JSON.stringify(found));
-          setAuthModal(false);
-          showToast(`✅ Welcome back, ${found.name}!`);
-        }
-      };
 
-      // Push to Cloud Helper
-      const pushPlaceToCloud = async (entry) => {
-        if (!cloudConfig.enabled || !cloudConfig.url) return;
-        try {
-          if (cloudConfig.provider === "firebase") {
-            const url = `${cloudConfig.url.replace(/\/$/, "")}/sahirank_places.json`;
-            await fetch(url, { method: "POST", body: JSON.stringify(entry) });
-          } else if (cloudConfig.provider === "supabase") {
-            const url = `${cloudConfig.url.replace(/\/$/, "")}/rest/v1/sahirank_places`;
-            await fetch(url, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "apikey": cloudConfig.apiKey,
-                "Authorization": `Bearer ${cloudConfig.apiKey}`
-              },
-              body: JSON.stringify(entry)
-            });
-          }
-        } catch (err) {
-          console.warn("Cloud push failed, saved locally", err);
-        }
-      };
-
-      // Add Place / Business Submit
-      const handleAddBusiness = async (e) => {
-        e.preventDefault();
-        if (!bizForm.name.trim() || !bizForm.cityLoc) {
-          showToast("⚠️ Naam aur City select karna zaroori hai!");
-          return;
-        }
-        const loc = bizForm.cityLoc;
-        const cleanName = loc.name.replace(/\(.*\)/, "").trim().toLowerCase();
-        const baseCoord = COORDS_DB[cleanName] || COORDS_DB[loc.state.toLowerCase()] || dynamicCoords;
-
-        const newEntry = {
+        // Standard User or Business Owner Login
+        const newUser = {
           id: Date.now(),
-          name: bizForm.name.trim(),
-          category: bizForm.category,
-          city: loc.name,
-          district: loc.district,
-          state: loc.state,
-          lat: baseCoord.lat + (Math.random() - 0.5) * 0.015,
-          lng: baseCoord.lng + (Math.random() - 0.5) * 0.015,
-          rating: 4.9,
-          reviews: 1,
-          phone: bizForm.phone || "+91 98765 XXXXX",
-          open: true,
-          isFamous: true,
-          famousTag: bizForm.famousTag || `Verified ${bizForm.category} in ${loc.name}`,
-          desc: bizForm.desc || `${loc.name} me sthit pramukh ${bizForm.category} kendra.`,
-          address: bizForm.address || `Main Market Road, ${loc.name}, ${loc.state}`,
-          addedBy: currentUser ? currentUser.name : "Community Member",
-          reviewList: []
+          name: authForm.name.trim() || (authForm.role === "business" ? "Verified Business Partner" : "Verified Reviewer"),
+          email: inputId,
+          phone: inputId,
+          role: authForm.role,
+          points: authForm.role === "individual" ? 450 : 0,
+          reviewsPostedToday: 0,
+          lastReviewDate: new Date().toLocaleDateString(),
+          walletEarnings: authForm.role === "individual" ? 340 : 0,
+          unlockedNegativePass: false,
+          couponsReceived: [
+            { id: "c1", bizName: "Apex Super-Specialty Hospital", code: "CARE15", discount: "15% OFF on OPD & Lab Tests", date: "Today" }
+          ]
         };
-
-        const updated = [newEntry, ...customPlaces];
-        setCustomPlaces(updated);
-        localStorage.setItem("sahirank_v18_places", JSON.stringify(updated));
-        await pushPlaceToCloud(newEntry);
-
-        setSelectedLoc(loc);
-        setAddModal(false);
-        setBizForm({ name: "", category: "Hospital & Clinic", cityLoc: loc, phone: "", famousTag: "", desc: "", address: "" });
-        showToast(`✅ '${newEntry.name}' ab ${loc.name} me live ho gaya!`);
+        setCurrentUser(newUser);
+        setAuthModal(false);
+        setActiveTab(authForm.role === "business" ? "business_dashboard" : "marketplace");
+        showToast(`✅ Welcome ${newUser.name}!`);
       };
 
-      // Submit Review
+      // Handle Secret Footer 5-Click Unlock
+      const handleSecretLogoClick = () => {
+        const next = secretClicks + 1;
+        setSecretClicks(next);
+        if (next >= 5) {
+          setSecretClicks(0);
+          setPinModal(true);
+        }
+      };
+
+      const handlePinVerify = (e) => {
+        e.preventDefault();
+        if (pinInput.trim() === ADMIN_PIN) {
+          const founderUser = {
+            id: "founder-admin",
+            name: "Founder & Super Admin",
+            email: ADMIN_EMAIL,
+            role: "admin",
+            unlockedNegativePass: true
+          };
+          setCurrentUser(founderUser);
+          setPinModal(false);
+          setPinInput("");
+          setActiveTab("secret_admin");
+          showToast("👑 Secret Founder Dashboard Unlocked!");
+        } else {
+          showToast("❌ Invalid PIN!");
+        }
+      };
+
+      // Handle Genuine Review Submit
       const handleReviewSubmit = (e) => {
         e.preventDefault();
         if (!currentUser) {
-          setReviewTarget(null);
-          setAuthMode("login");
+          setReviewModalBiz(null);
           setAuthModal(true);
-          showToast("🔐 Review dene ke liye pehle Login ya Sign Up karein!");
+          showToast("🔐 Review likhne aur Points kamane ke liye pehle Login karein!");
           return;
         }
-        if (!newReview.text.trim()) {
-          showToast("⚠️ Kripya apna review likhein!");
+        if (currentUser.role === "business") {
+          showToast("⚠️ Business Owner account se dusre business par review nahi de sakte!");
           return;
         }
-        const pid = reviewTarget.id;
-        const existing = reviewsMap[pid] || reviewTarget.reviewList || [];
-        const entry = {
+
+        const today = new Date().toLocaleDateString();
+        const countToday = currentUser.lastReviewDate === today ? (currentUser.reviewsPostedToday || 0) : 0;
+
+        if (countToday >= 3) {
+          showToast("🛑 Daily Limit Reached! Spam rokne ke liye 1 user din me maximum 3 genuine reviews hi de sakta hai.");
+          return;
+        }
+
+        if (reviewForm.text.trim().length < 15) {
+          showToast("⚠️ Genuine review me kam se kam 15 letters ka apna asli anubhav likhein!");
+          return;
+        }
+
+        const earnedPts = reviewForm.verifiedBill ? 50 : 25;
+        const newRev = {
+          id: Date.now(),
           user: currentUser.name,
-          stars: Number(newReview.stars),
-          text: newReview.text.trim(),
-          date: new Date().toLocaleDateString("en-IN")
+          userEmail: currentUser.email,
+          userPhone: currentUser.phone || "+91 98765 43210",
+          stars: Number(reviewForm.stars),
+          sentiment: Number(reviewForm.stars) >= 4 ? "positive" : "negative",
+          text: reviewForm.text.trim(),
+          verifiedBill: reviewForm.verifiedBill,
+          helpful: 1,
+          date: "Just now"
         };
-        const updatedList = [entry, ...existing];
-        const nextMap = { ...reviewsMap, [pid]: updatedList };
-        setReviewsMap(nextMap);
-        localStorage.setItem("sahirank_v18_reviews", JSON.stringify(nextMap));
-        setNewReview({ stars: 5, text: "" });
-        showToast(`⭐ Dhanyawad ${currentUser.name}! Aapka review post ho gaya.`);
+
+        updateCityBusiness(reviewModalBiz.id, (b) => ({
+          ...b,
+          searchAppearances: b.searchAppearances + 5,
+          profileViews: b.profileViews + 3,
+          reviews: [newRev, ...(b.reviews || [])]
+        }));
+
+        const nextPoints = (currentUser.points || 0) + earnedPts;
+        setCurrentUser(prev => ({
+          ...prev,
+          points: nextPoints,
+          reviewsPostedToday: countToday + 1,
+          lastReviewDate: today
+        }));
+
+        setReviewModalBiz(null);
+        setReviewForm({ stars: 5, text: "", verifiedBill: true });
+
+        if (nextPoints >= 500 && (currentUser.points || 0) < 500) {
+          showToast("🎉 CONGRATULATIONS! Aapke 500 Points pure ho gaye! Ab aap Level 5 Monetized Partner ban gaye (20% Revenue Share Active)!");
+        } else {
+          showToast(`✅ Review Posted! Aapko +${earnedPts} Trust Points mile (${3 - (countToday + 1)} reviews left today).`);
+        }
       };
 
-      const getCategoryBadgeStyle = (cat) => {
-        if (cat === "Hospital & Clinic") return "bg-red-50 text-red-700 border-red-200";
-        if (cat === "Hotel & Stay") return "bg-blue-50 text-blue-700 border-blue-200";
-        if (cat === "Coaching & Institute") return "bg-purple-50 text-purple-700 border-purple-200";
-        if (cat === "Famous Landmark") return "bg-amber-100 text-amber-900 border-amber-300";
-        return "bg-orange-50 text-orange-800 border-orange-200";
+      // Handle Suggest / Add Listing
+      const handleSuggestSubmit = (e) => {
+        e.preventDefault();
+        if (!suggestForm.name.trim()) return;
+        const isOwner = currentUser?.role === "business";
+        const newBiz = {
+          id: `biz-custom-${Date.now()}`,
+          name: suggestForm.name.trim(),
+          category: suggestForm.category,
+          city: selectedCity.name,
+          state: selectedCity.state,
+          claimed: isOwner,
+          ownerEmail: isOwner ? currentUser.email : null,
+          isSponsored: false,
+          businessPro: false,
+          searchAppearances: 45,
+          profileViews: 18,
+          leadClicks: 4,
+          address: suggestForm.address || `Main Market, ${selectedCity.name}`,
+          phone: suggestForm.phone || "+91 98765 XXXXX",
+          offerText: "10% OFF for SahiRank Verified Reviewers",
+          reviews: []
+        };
+
+        const key = selectedCity.display;
+        const currentList = customBizMap[key] || getSeededBusinessesForCity(selectedCity);
+        setCustomBizMap(prev => ({ ...prev, [key]: [newBiz, ...currentList] }));
+        setSuggestModal(false);
+        setSuggestForm({ name: "", category: "Hospital & Clinic", address: "", phone: "" });
+        showToast(isOwner ? `🏪 Aapka Business '${newBiz.name}' list ho gaya!` : `📍 '${newBiz.name}' Unclaimed add ho gaya!`);
       };
 
-      const getCategoryIcon = (cat) => {
-        if (cat === "Hospital & Clinic") return "🏥";
-        if (cat === "Hotel & Stay") return "🏨";
-        if (cat === "Coaching & Institute") return "🎓";
-        if (cat === "Famous Landmark") return "🏛️";
-        if (cat === "Famous Food") return "🍲";
-        if (cat === "Famous Market") return "🛍️";
-        if (cat === "Medical Store") return "💊";
-        return "📱";
+      // Handle Claim Ownership
+      const handleClaimBusiness = (e) => {
+        e.preventDefault();
+        if (!claimDoc.trim()) {
+          showToast("⚠️ GST Number, Shop License ya Official Phone OTP darj karein!");
+          return;
+        }
+        const ownerUser = {
+          id: "owner-" + Date.now(),
+          name: `${claimModalBiz.name.split(" ")[0]} (Verified Owner)`,
+          email: currentUser?.email || "owner@business.com",
+          phone: claimModalBiz.phone,
+          role: "business"
+        };
+        setCurrentUser(ownerUser);
+        updateCityBusiness(claimModalBiz.id, (b) => ({ ...b, claimed: true, ownerEmail: ownerUser.email }));
+        setClaimModalBiz(null);
+        setClaimDoc("");
+        setActiveTab("business_dashboard");
+        showToast("✅ Ownership Verified! Welcome to your Business Traffic & Leads Portal.");
       };
+
+      const filteredCities = useMemo(() => {
+        const q = citySearch.trim().toLowerCase();
+        if (!q) return ALL_CITIES.slice(0, 25);
+        return ALL_CITIES.filter(c => c.display.toLowerCase().includes(q)).slice(0, 25);
+      }, [citySearch]);
+
+      const creatorInfo = getCreatorLevelInfo(currentUser?.points || 0);
 
       return (
         <div className="min-h-screen flex flex-col">
-          {/* NAVBAR */}
-          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-orange-200 shadow-sm">
-            <div className="max-w-[1380px] mx-auto px-3 sm:px-6 py-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
+          {/* ==========================================
+              CLEAN PUBLIC HEADER (NO PUBLIC ADMIN BUTTON!)
+          ========================================== */}
+          <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+            <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
               {/* Brand */}
               <div className="flex items-center justify-between gap-3 shrink-0">
-                <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setSelectedLoc(ALL_LOCATIONS[0])}>
-                  <div className="w-10 h-10 rounded-xl bg-orange-500 grid place-items-center text-white font-bold text-lg shadow">
+                <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab("marketplace")}>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 grid place-items-center text-white font-extrabold text-xl shadow">
                     S
                   </div>
                   <div>
-                    <div className="font-display font-bold text-lg leading-none">
-                      SahiRank <span className="text-orange-500">V18 Ultimate</span>
+                    <div className="font-display font-bold text-lg leading-none text-slate-900">
+                      SahiRank <span className="text-orange-600">India</span>
                     </div>
-                    <div className="text-[10px] text-stone-500 tracking-wider uppercase font-semibold mt-0.5">
-                      Hospitals • Hotels • Coaching • Landmarks • Cloud DB
+                    <div className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-0.5">
+                      Genuine Reviews • Verified Rankings
                     </div>
                   </div>
                 </div>
-
-                {/* Mobile Auth & Cloud */}
-                <div className="flex lg:hidden items-center gap-1.5">
-                  <button
-                    onClick={() => setCloudModal(true)}
-                    className={`text-xs px-2.5 py-1.5 rounded-xl border font-semibold ${cloudConfig.enabled ? "bg-green-50 text-green-700 border-green-300" : "bg-stone-100 text-stone-700 border-stone-200"}`}
-                  >
-                    ☁️ {cloudConfig.enabled ? "Synced" : "Cloud DB"}
-                  </button>
-                  {currentUser ? (
-                    <button onClick={() => { setCurrentUser(null); localStorage.removeItem("sahirank_v18_current_user"); }} className="text-xs px-2.5 py-1.5 rounded-xl bg-orange-100 text-orange-800 font-semibold">
-                      👤 {currentUser.name.split(" ")[0]}
-                    </button>
-                  ) : (
-                    <button onClick={() => { setAuthMode("login"); setAuthModal(true); }} className="text-xs px-3 py-1.5 rounded-xl bg-stone-900 text-white font-semibold">
-                      🔐 Login
-                    </button>
-                  )}
-                </div>
               </div>
 
-              {/* Search & Location Picker */}
+              {/* City Selector + Search Bar */}
               <div className="flex-1 flex flex-col sm:flex-row gap-2">
-                <div className="flex-1 min-w-0">
-                  <LocationPicker
-                    value={selectedLoc.display}
-                    onSelect={(loc) => {
-                      setSelectedLoc(loc);
-                      showToast(`📍 ${loc.name} ke Hospitals, Hotels, Coaching & Famous Places load ho gaye!`);
-                    }}
-                    placeholder="📍 Koi bhi City/Zila chunein (Varanasi, Kota, Delhi, Gyanpur, Patna...)"
-                    allowCustom={true}
-                  />
-                </div>
-                <div className="flex-1 min-w-0 flex items-center gap-2 px-3.5 py-2.5 rounded-xl border-2 border-orange-200 bg-white">
-                  <span>🔍</span>
-                  <input
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    placeholder="Search Hospital, Coaching, Hotel, Mandir ya Food..."
-                    className="flex-1 bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400"
-                  />
-                  {searchText && (
-                    <button onClick={() => setSearchText("")} className="text-xs text-stone-500">✕</button>
-                  )}
-                </div>
-              </div>
+                <div className="relative sm:w-72 shrink-0">
+                  <div
+                    onClick={() => setCityDropdown(!cityDropdown)}
+                    className="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl border-2 border-slate-200 hover:border-orange-500 bg-white cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="text-orange-500">📍</span>
+                      <span className="text-sm font-bold text-slate-800 truncate">{selectedCity.display}</span>
+                    </div>
+                    <span className="text-xs text-slate-400">▼</span>
+                  </div>
 
-              {/* Desktop Action Buttons */}
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => {
-                    setBizForm(prev => ({ ...prev, cityLoc: selectedLoc.name === "All India" ? ALL_LOCATIONS[1] : selectedLoc }));
-                    setAddModal(true);
-                  }}
-                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-xs sm:text-sm shadow transition"
-                >
-                  <span>➕</span> Add Listing
-                </button>
-
-                <button
-                  onClick={() => setCloudModal(true)}
-                  className={`hidden lg:inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-bold transition ${
-                    cloudConfig.enabled
-                      ? "bg-green-50 text-green-700 border-green-300"
-                      : "bg-white hover:bg-orange-50 text-stone-700 border-orange-200"
-                  }`}
-                >
-                  <span>☁️</span> {cloudConfig.enabled ? "Cloud Connected" : "Cloud DB"}
-                </button>
-
-                <div className="hidden lg:flex items-center">
-                  {currentUser ? (
-                    <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded-xl">
-                      <div className="w-7 h-7 rounded-full bg-orange-500 text-white grid place-items-center text-xs font-bold">
-                        {currentUser.name[0].toUpperCase()}
-                      </div>
-                      <div className="text-xs">
-                        <div className="font-bold text-stone-900 leading-tight">{currentUser.name}</div>
+                  {cityDropdown && (
+                    <div className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 max-h-80 overflow-auto">
+                      <input
+                        type="text"
+                        value={citySearch}
+                        onChange={(e) => setCitySearch(e.target.value)}
+                        placeholder="Search any city (Varanasi, Kota, Patna, Gyanpur...)"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-none focus:border-orange-500 mb-2"
+                        autoFocus
+                      />
+                      {filteredCities.map((c, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setSelectedCity(c);
+                            setCityDropdown(false);
+                            setCitySearch("");
+                            showToast(`📍 ${c.name} ke top Hospitals, Showrooms, Malls & Services load ho gaye!`);
+                          }}
+                          className="w-full text-left px-3 py-2 rounded-xl hover:bg-orange-50 text-xs font-semibold text-slate-700 flex items-center justify-between"
+                        >
+                          <span>📍 {c.display}</span>
+                          <span className="text-[10px] text-emerald-600 font-bold">Verified City</span>
+                        </button>
+                      ))}
+                      {citySearch.trim().length > 2 && filteredCities.length === 0 && (
                         <button
                           onClick={() => {
-                            setCurrentUser(null);
-                            localStorage.removeItem("sahirank_v18_current_user");
-                            showToast("👋 Logged out!");
+                            const custom = { name: citySearch.trim(), state: "India", display: `${citySearch.trim()}, India` };
+                            setSelectedCity(custom);
+                            setCityDropdown(false);
+                            setCitySearch("");
                           }}
-                          className="text-[10px] text-red-600 font-semibold hover:underline"
+                          className="w-full text-left px-3 py-2 rounded-xl bg-orange-50 text-orange-700 text-xs font-bold"
                         >
-                          Logout
+                          ➕ Open '{citySearch.trim()}' Directory
                         </button>
-                      </div>
+                      )}
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => { setAuthMode("login"); setAuthModal(true); }}
-                      className="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-sm transition"
-                    >
-                      🔐 Login / Sign Up
-                    </button>
                   )}
                 </div>
+
+                <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl border-2 border-slate-200 bg-white">
+                  <span>🔍</span>
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={`Search Hospital, Car Showroom, Bike Service, Mall, Coaching in ${selectedCity.name}...`}
+                    className="flex-1 bg-transparent outline-none text-sm text-slate-900"
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery("")} className="text-xs text-slate-400">✕</button>
+                  )}
+                </div>
+              </div>
+
+              {/* ROLE-BASED DYNAMIC NAVIGATION */}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                {/* Individual User sees Creator Rewards */}
+                {(!currentUser || currentUser.role === "individual") && (
+                  <button
+                    onClick={() => {
+                      if (!currentUser) {
+                        setAuthForm({ ...authForm, role: "individual" });
+                        setAuthModal(true);
+                        showToast("🏆 Creator Rewards & 20% Revenue Share dekhne ke liye Login karein!");
+                      } else {
+                        setActiveTab(activeTab === "creator_studio" ? "marketplace" : "creator_studio");
+                      }
+                    }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${
+                      activeTab === "creator_studio"
+                        ? "bg-amber-500 text-slate-950 border-amber-500"
+                        : "bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100"
+                    }`}
+                  >
+                    <span>🏆</span>
+                    <span>{currentUser ? `${currentUser.points} Pts • ₹${currentUser.walletEarnings}` : "Earn from Reviews"}</span>
+                  </button>
+                )}
+
+                {/* Business Owner sees Business Traffic Portal */}
+                {(!currentUser || currentUser.role === "business") && (
+                  <button
+                    onClick={() => {
+                      if (!currentUser) {
+                        setAuthForm({ ...authForm, role: "business" });
+                        setAuthModal(true);
+                        showToast("🏪 Apni Dukan/Hospital ka Traffic aur Leads dekhne ke liye Business Login karein!");
+                      } else {
+                        setActiveTab(activeTab === "business_dashboard" ? "marketplace" : "business_dashboard");
+                      }
+                    }}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold border transition ${
+                      activeTab === "business_dashboard"
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
+                    }`}
+                  >
+                    📊 {currentUser?.role === "business" ? "My Business Traffic & Leads" : "For Business Owners"}
+                  </button>
+                )}
+
+                {/* SECRET ADMIN BUTTON: ONLY VISIBLE WHEN LOGGED IN AS FOUNDER ADMIN */}
+                {currentUser?.role === "admin" && (
+                  <button
+                    onClick={() => setActiveTab(activeTab === "secret_admin" ? "marketplace" : "secret_admin")}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-extrabold shadow-lg animate-pulse"
+                  >
+                    👑 Secret Founder HQ (₹{platformLedger.adminNetProfit80Pct})
+                  </button>
+                )}
+
+                {/* Login / Logout Button */}
+                {currentUser ? (
+                  <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <span className="text-xs font-bold text-slate-800">{currentUser.name.split(" ")[0]}</span>
+                    <button
+                      onClick={() => {
+                        setCurrentUser(null);
+                        setActiveTab("marketplace");
+                        showToast("👋 Logged out successfully.");
+                      }}
+                      className="text-[11px] text-red-600 font-bold hover:underline ml-1"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setAuthModal(true)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow"
+                  >
+                    🔐 Login / Sign Up
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* CATEGORY PILLS */}
-            <div className="border-t border-orange-100 bg-orange-50/60">
-              <div className="max-w-[1380px] mx-auto px-3 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto">
+            {/* Category Bar */}
+            <div className="border-t border-slate-100 bg-slate-50/80">
+              <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto">
                 {CATEGORIES.map(cat => (
                   <button
                     key={cat.id}
-                    onClick={() => setCategory(cat.id)}
+                    onClick={() => { setCategory(cat.id); setActiveTab("marketplace"); }}
                     className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
-                      category === cat.id
-                        ? "bg-orange-500 text-white border-orange-500 shadow-sm"
-                        : "bg-white text-stone-700 border-orange-200 hover:border-orange-400"
+                      category === cat.id && activeTab === "marketplace"
+                        ? "bg-orange-600 text-white border-orange-600 shadow-sm"
+                        : "bg-white text-slate-700 border-slate-200 hover:border-orange-400"
                     }`}
                   >
                     {cat.label}
@@ -949,538 +791,788 @@
             </div>
           </header>
 
-          {/* QUICK CITY CHIPS */}
-          <div className="max-w-[1380px] w-full mx-auto px-3 sm:px-6 pt-3 flex items-center gap-1.5 flex-wrap text-xs">
-            <span className="font-bold text-stone-600 mr-1">⚡ Quick Jump:</span>
-            {["All India", "Varanasi", "Kota", "Delhi", "Patna", "Prayagraj", "Lucknow", "Gyanpur", "Bhadohi", "Mumbai", "Jaipur", "Agra", "Ayodhya", "Indore", "Bengaluru"].map(city => {
-              const locObj = ALL_LOCATIONS.find(l => l.name.toLowerCase() === city.toLowerCase()) || ALL_LOCATIONS[0];
-              const active = selectedLoc.name.toLowerCase() === city.toLowerCase();
-              return (
-                <button
-                  key={city}
-                  onClick={() => setSelectedLoc(locObj)}
-                  className={`px-2.5 py-1 rounded-full border font-semibold transition ${
-                    active ? "bg-stone-900 text-white border-stone-900" : "bg-white border-orange-200 hover:border-orange-500 text-stone-700"
-                  }`}
-                >
-                  {city}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* CITY LIVE WIKIPEDIA & OVERVIEW BANNER */}
-          {selectedLoc.name !== "All India" && (
-            <div className="max-w-[1380px] w-full mx-auto px-3 sm:px-6 mt-3">
-              <div className="bg-gradient-to-r from-stone-900 via-stone-800 to-orange-950 text-white rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                <div className="flex items-start gap-4 flex-1">
-                  {cityWiki?.thumbnail && (
-                    <img
-                      src={cityWiki.thumbnail}
-                      alt={selectedLoc.name}
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border-2 border-orange-400 shrink-0 bg-white"
-                    />
-                  )}
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-500/30 border border-orange-400/40 text-orange-200 text-[11px] font-semibold mb-1">
-                      <span>🌍 {selectedLoc.state}</span> • <span>Verified City Portal</span>
-                    </div>
-                    <h1 className="font-display font-bold text-xl sm:text-2xl text-white">
-                      {selectedLoc.name} — Famous Places, Hospitals, Hotels & Coaching Guide
-                    </h1>
-                    <p className="text-xs sm:text-sm text-stone-300 mt-1 line-clamp-2 max-w-3xl">
-                      {loadingWiki
-                        ? `Internet se ${selectedLoc.name} ka live data aur coordinates load ho rahe hain...`
-                        : cityWiki?.extract || `${selectedLoc.name} (${selectedLoc.state}) ke top Hospitals, Hotels, Coaching Institutes, Famous Landmarks aur Markets ki puri list niche uplabdh hai.`}
-                    </p>
+          {/* ==========================================
+              VIEW 1: PUBLIC MARKETPLACE
+          ========================================== */}
+          {activeTab === "marketplace" && (
+            <main className="max-w-[1400px] w-full mx-auto px-3 sm:px-6 py-5 flex-1 space-y-5">
+              {/* Hero Banner */}
+              <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-orange-950 text-white rounded-3xl p-5 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                <div className="space-y-1.5 max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-xs font-bold">
+                    <span>📍 {selectedCity.display}</span> • <span>Verified Trust & Review Algorithm</span>
                   </div>
+                  <h1 className="font-display font-bold text-xl sm:text-2xl">
+                    Apna Asli Experience Share Karein Aur Rewards Kamayein!
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    Positive reviews sabke liye free hain. Kisi bhi Hospital, Showroom, Coaching ya Hotel ke <b>Negative / Critical Reviews (1★-3★)</b> dekhne ke liye Full Reality Pass chahiye.
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-2 shrink-0">
+
+                <div className="flex flex-wrap gap-2.5 shrink-0">
+                  {!currentUser?.unlockedNegativePass && (
+                    <button
+                      onClick={() => setPaymentModal({
+                        title: "Unlock All Negative Reviews (Full Reality Pass)",
+                        amount: 49,
+                        desc: "Sabhi Hospitals, Showrooms, Coaching aur Hotels ke chhupe hue 1★-3★ negative reviews aur asli sachai dekhein.",
+                        onSuccess: () => {
+                          if (currentUser) setCurrentUser(prev => ({ ...prev, unlockedNegativePass: true }));
+                          processRevenueTransaction("User Full Reality Pass (Negative Reviews Unlock)", 49, currentUser?.name || "Public User");
+                          showToast("🔓 Full Reality Pass Activated! Ab aapko sabhi Negative Reviews bhi dikhenge.");
+                        }
+                      })}
+                      className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg transition"
+                    >
+                      🔒 Unlock Negative Reviews (₹49 Pass)
+                    </button>
+                  )}
                   <button
-                    onClick={() => setCategory("Hospital & Clinic")}
-                    className="px-3 py-1.5 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 hover:bg-red-500/30 text-xs font-semibold"
+                    onClick={() => setSuggestModal(true)}
+                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs shadow transition"
                   >
-                    🏥 Hospitals
-                  </button>
-                  <button
-                    onClick={() => setCategory("Hotel & Stay")}
-                    className="px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-200 hover:bg-blue-500/30 text-xs font-semibold"
-                  >
-                    🏨 Hotels
-                  </button>
-                  <button
-                    onClick={() => setCategory("Coaching & Institute")}
-                    className="px-3 py-1.5 rounded-xl bg-purple-500/20 border border-purple-400/40 text-purple-200 hover:bg-purple-500/30 text-xs font-semibold"
-                  >
-                    🎓 Coaching
+                    ➕ Add / Suggest Business in {selectedCity.name}
                   </button>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* MAIN CONTENT */}
-          <main className="max-w-[1380px] w-full mx-auto px-3 sm:px-6 py-4 flex-1 grid grid-cols-1 lg:grid-cols-[1.25fr_0.75fr] gap-5 items-start">
-            {/* LEFT: LISTINGS */}
-            <section className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-stone-600 px-1">
-                <span>
-                  Showing <b>{displayedPlaces.length}</b> results in <b>{selectedLoc.name}</b> {category !== "All" && `(${category})`}
-                </span>
-                <span>Click on ⭐ Review to add your rating</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {displayedPlaces.map((item) => {
-                  const itemReviews = reviewsMap[item.id] || item.reviewList || [];
-                  const totalRevs = item.reviews + itemReviews.length;
-                  const isSaved = savedIds.includes(item.id);
+              {/* Listings Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {cityBusinesses.map((biz, index) => {
+                  const posReviews = (biz.reviews || []).filter(r => r.stars >= 4);
+                  const negReviews = (biz.reviews || []).filter(r => r.stars <= 3);
+                  const canSeeNegative = currentUser?.unlockedNegativePass || currentUser?.role === "admin" || biz.businessPro;
 
                   return (
                     <div
-                      key={item.id}
-                      className="bg-white rounded-2xl border border-orange-200/90 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between"
+                      key={biz.id}
+                      className={`bg-white rounded-3xl border-2 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between ${
+                        biz.isSponsored ? "border-amber-400 bg-gradient-to-b from-amber-50/30 to-white" : "border-slate-200"
+                      }`}
                     >
                       <div>
-                        {/* Category & Rating Header */}
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${getCategoryBadgeStyle(item.category)}`}>
-                            {getCategoryIcon(item.category)} {item.category}
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              onClick={() => setReviewTarget(item)}
-                              className="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full text-stone-800 transition"
-                              title="Click to read or write reviews"
-                            >
-                              ⭐ {item.rating} <span className="text-[10px] font-normal text-stone-500">({totalRevs})</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                const next = isSaved ? savedIds.filter(x => x !== item.id) : [...savedIds, item.id];
-                                setSavedIds(next);
-                                localStorage.setItem("sahirank_v18_saved", JSON.stringify(next));
-                              }}
-                              className={`text-xs px-1.5 py-0.5 rounded-lg border ${isSaved ? "bg-red-50 border-red-200 text-red-500" : "border-stone-200 text-stone-400"}`}
-                            >
-                              {isSaved ? "❤️" : "🤍"}
-                            </button>
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-extrabold text-xs">
+                              #{index + 1} Rank
+                            </span>
+                            {biz.isSponsored && (
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-extrabold text-[11px]">
+                                ⚡ SPONSORED
+                              </span>
+                            )}
+                            <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px]">
+                              {biz.category}
+                            </span>
+                          </div>
+
+                          <div>
+                            {biz.claimed ? (
+                              <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">
+                                ✅ Owner Verified
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => setClaimModalBiz(biz)}
+                                className="px-2.5 py-1 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-800 font-bold text-[11px] border border-orange-300 transition"
+                              >
+                                🏪 Claim Business (Owners)
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        {/* Name & Tagline */}
-                        <h3 className="font-bold text-[15px] text-stone-900 leading-snug">
-                          {item.name}
-                        </h3>
-                        {item.famousTag && (
-                          <div className="text-xs font-semibold text-orange-600 mt-0.5">
-                            ✨ {item.famousTag}
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <h2 className="font-bold text-lg text-slate-900 leading-snug">{biz.name}</h2>
+                            <p className="text-xs text-slate-500 mt-0.5">📍 {biz.address} • 📞 {biz.phone}</p>
                           </div>
-                        )}
-
-                        {/* Description */}
-                        <p className="text-xs text-stone-600 mt-1.5 line-clamp-2 leading-relaxed">
-                          {item.desc}
-                        </p>
-
-                        {/* Address & Phone */}
-                        <div className="mt-2.5 pt-2 border-t border-orange-100 text-[11px] text-stone-500 space-y-0.5">
-                          <div>📍 <b>Address:</b> {item.address || `${item.city}, ${item.state}`}</div>
-                          <div>📞 <b>Contact:</b> {item.phone}</div>
+                          <div className="text-right shrink-0 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-2xl">
+                            <div className="text-sm font-extrabold text-emerald-800">
+                              ⭐ {biz.metrics.avgRating} <span className="text-[11px] font-normal">({biz.reviews.length})</span>
+                            </div>
+                            <div className="text-[10px] font-bold text-emerald-600">
+                              🛡️ {biz.metrics.trustScore}% SahiTrust
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Latest User Review Snippet */}
-                        {itemReviews.length > 0 && (
-                          <div className="mt-2 p-2 rounded-xl bg-orange-50/70 border border-orange-100 text-[11px] text-stone-700">
-                            💬 <b>{itemReviews[0].user}:</b> "{itemReviews[0].text}"
+                        {/* Traffic Teaser to Attract Business Owners to Pay */}
+                        <div className="mt-3 p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                          <div className="flex items-center gap-3 text-slate-600 font-medium">
+                            <span>🔍 <b>{biz.searchAppearances}</b> People Searched</span>
+                            <span>👁️ <b>{biz.profileViews}</b> Views</span>
+                            <span>📞 <b>{biz.leadClicks}</b> Leads</span>
                           </div>
-                        )}
+                          <button
+                            onClick={() => {
+                              if (currentUser?.role === "business") setActiveTab("business_dashboard");
+                              else setClaimModalBiz(biz);
+                            }}
+                            className="text-[11px] font-bold text-blue-600 hover:underline"
+                          >
+                            Is this your business? Unlock Leads →
+                          </button>
+                        </div>
+
+                        {/* POSITIVE REVIEWS (FREE) */}
+                        <div className="mt-3 space-y-2">
+                          <div className="text-xs font-extrabold text-emerald-700 uppercase tracking-wider">
+                            😊 Positive Experiences ({posReviews.length})
+                          </div>
+                          {posReviews.slice(0, 2).map(r => (
+                            <div key={r.id} className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/70 text-xs">
+                              <div className="flex items-center justify-between font-bold text-slate-800">
+                                <span>👤 {r.user} {r.verifiedBill && <span className="text-[10px] text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded ml-1">🧾 Verified</span>}</span>
+                                <span className="text-amber-600">{"⭐".repeat(r.stars)}</span>
+                              </div>
+                              <p className="text-slate-700 mt-1">{r.text}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* NEGATIVE REVIEWS (LOCKED) */}
+                        <div className="mt-3 space-y-2 relative">
+                          <div className="text-xs font-extrabold text-red-600 uppercase tracking-wider flex items-center justify-between">
+                            <span>⚠️ Critical / Negative Reality ({negReviews.length})</span>
+                            {!canSeeNegative && <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full">🔒 Locked</span>}
+                          </div>
+
+                          {negReviews.length === 0 ? (
+                            <div className="text-xs text-slate-400 italic">Koi negative review nahi hai.</div>
+                          ) : (
+                            <div className="relative">
+                              <div className={canSeeNegative ? "space-y-2" : "space-y-2 blur-lock"}>
+                                {negReviews.map(r => (
+                                  <div key={r.id} className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs">
+                                    <div className="flex items-center justify-between font-bold text-red-900">
+                                      <span>👤 {r.user}</span>
+                                      <span>{"⭐".repeat(r.stars)}</span>
+                                    </div>
+                                    <p className="text-red-800 mt-1">{r.text}</p>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {!canSeeNegative && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/65 backdrop-blur-[2px] rounded-xl p-3 text-center border border-red-200">
+                                  <div className="text-xs font-extrabold text-slate-900">
+                                    🔒 {negReviews.length} Critical Reviews Locked
+                                  </div>
+                                  <div className="flex gap-2 mt-2">
+                                    <button
+                                      onClick={() => setPaymentModal({
+                                        title: "User Full Reality Pass (Unlock All Negative Reviews)",
+                                        amount: 49,
+                                        desc: "Pure India ke sabhi businesses ke negative reviews 30 din tak dekhein.",
+                                        onSuccess: () => {
+                                          if (currentUser) setCurrentUser(prev => ({ ...prev, unlockedNegativePass: true }));
+                                          else setCurrentUser({ id: Date.now(), name: "Premium User", role: "individual", points: 100, walletEarnings: 0, unlockedNegativePass: true });
+                                          processRevenueTransaction("User Negative Review Unlock Pass", 49, currentUser?.name || "User");
+                                          showToast("🔓 Negative Reviews Unlocked!");
+                                        }
+                                      })}
+                                      className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] shadow"
+                                    >
+                                      👤 Unlock Reality (₹49)
+                                    </button>
+                                    <button
+                                      onClick={() => setPaymentModal({
+                                        title: `Business Pro Unlock — ${biz.name}`,
+                                        amount: 999,
+                                        desc: "Apne business ke sabhi negative reviews padhein, customer ka phone number payein aur unhe 10% OFF coupon bhejein.",
+                                        onSuccess: () => {
+                                          updateCityBusiness(biz.id, b => ({ ...b, businessPro: true, claimed: true }));
+                                          processRevenueTransaction(`Business Pro Subscription (${biz.name})`, 999, biz.name);
+                                          showToast("🏪 Business Pro Activated!");
+                                        }
+                                      })}
+                                      className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] shadow"
+                                    >
+                                      🏪 Owner Pro (₹999/mo)
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Footer Buttons */}
-                      <div className="mt-3 pt-2 flex gap-1.5">
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
                         <button
-                          onClick={() => {
-                            if (mapRef.current) {
-                              mapRef.current.setView([item.lat, item.lng], 15);
-                              showToast(`🗺️ Map centered on ${item.name}`);
+                          onClick={() => setReviewModalBiz(biz)}
+                          className="flex-1 py-2.5 px-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow transition"
+                        >
+                          ✍️ Write Experience (+50 Pts)
+                        </button>
+                        <button
+                          onClick={() => setPaymentModal({
+                            title: `Sponsor #1 Rank Boost — ${biz.name}`,
+                            amount: 499,
+                            desc: `${selectedCity.name} me apni category me sabse upar (#1 Sponsored Rank) par dikhein.`,
+                            onSuccess: () => {
+                              updateCityBusiness(biz.id, b => ({ ...b, isSponsored: true }));
+                              processRevenueTransaction(`Sponsored Rank Boost (${biz.name})`, 499, biz.name);
+                              showToast(`⚡ ${biz.name} ab #1 Sponsored Rank par boost ho gaya!`);
                             }
-                          }}
-                          className="flex-1 py-2 px-2 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-800 border border-orange-200 text-xs font-semibold transition"
+                          })}
+                          className="py-2.5 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs transition"
                         >
-                          📍 Map
+                          ⚡ Sponsor #1 (₹499)
                         </button>
-                        <button
-                          onClick={() => setReviewTarget(item)}
-                          className="flex-1 py-2 px-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition"
-                        >
-                          ⭐ Review
-                        </button>
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + " " + item.city + " " + item.state)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex-1 py-2 px-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-center text-xs font-semibold transition"
-                        >
-                          🧭 Direction
-                        </a>
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </section>
-
-            {/* RIGHT: INTERACTIVE MAP */}
-            <aside className="lg:sticky lg:top-28 space-y-3">
-              <div className="bg-white rounded-2xl border border-orange-200 overflow-hidden shadow-sm">
-                <div className="px-4 py-3 border-b border-orange-100 flex items-center justify-between">
-                  <div className="text-sm font-bold text-stone-900">
-                    🗺️ {selectedLoc.name} Live Map ({displayedPlaces.length})
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (mapRef.current) {
-                        mapRef.current.setView([dynamicCoords.lat, dynamicCoords.lng], selectedLoc.name === "All India" ? 5 : 13);
-                      }
-                    }}
-                    className="text-xs px-2.5 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-200 font-semibold"
-                  >
-                    🎯 Center Map
-                  </button>
-                </div>
-                <div id="mainMap" className="w-full h-[420px] bg-orange-50"></div>
-              </div>
-            </aside>
-          </main>
-
-          {/* ==========================================
-              8. REVIEW & RATING MODAL
-          ========================================== */}
-          {reviewTarget && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-orange-200 shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-auto">
-                <button
-                  onClick={() => setReviewTarget(null)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600"
-                >
-                  ✕
-                </button>
-                <span className="text-xs font-bold text-orange-600 uppercase">{reviewTarget.category}</span>
-                <h3 className="font-display font-bold text-lg text-stone-900 mt-0.5">{reviewTarget.name}</h3>
-                <p className="text-xs text-stone-500">📍 {reviewTarget.city}, {reviewTarget.state}</p>
-
-                <form onSubmit={handleReviewSubmit} className="mt-4 space-y-3 bg-orange-50/60 p-3.5 rounded-2xl border border-orange-200">
-                  <div className="text-xs font-bold text-stone-800">Apni Rating aur Review Dein:</div>
-                  <div className="flex items-center gap-2">
-                    {[5, 4, 3, 2, 1].map(num => (
-                      <button
-                        type="button"
-                        key={num}
-                        onClick={() => setNewReview({ ...newReview, stars: num })}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border ${
-                          newReview.stars === num ? "bg-orange-500 text-white border-orange-500" : "bg-white text-stone-700 border-orange-200"
-                        }`}
-                      >
-                        {num} ⭐
-                      </button>
-                    ))}
-                  </div>
-                  <textarea
-                    rows="2"
-                    value={newReview.text}
-                    onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
-                    placeholder="Yahan apna anubhav likhein (Jaise: Doctor bahut acche hain / Best coaching)..."
-                    className="w-full px-3 py-2 rounded-xl border border-orange-200 text-xs outline-none focus:border-orange-500 bg-white"
-                  ></textarea>
-                  <button type="submit" className="w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow">
-                    ✅ Submit Review
-                  </button>
-                </form>
-
-                <div className="mt-4 space-y-2">
-                  <div className="text-xs font-bold text-stone-700">Recent User Reviews:</div>
-                  {(reviewsMap[reviewTarget.id] || reviewTarget.reviewList || []).length === 0 ? (
-                    <div className="text-xs text-stone-400 italic">Abhi tak koi text review nahi hai. Sabse pehle aap review dein!</div>
-                  ) : (
-                    (reviewsMap[reviewTarget.id] || reviewTarget.reviewList || []).map((r, i) => (
-                      <div key={i} className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs">
-                        <div className="flex justify-between font-bold text-stone-800">
-                          <span>👤 {r.user}</span>
-                          <span className="text-amber-600">{"⭐".repeat(r.stars)}</span>
-                        </div>
-                        <p className="text-stone-600 mt-1">{r.text}</p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
+            </main>
           )}
 
           {/* ==========================================
-              9. CLOUD DATABASE CONNECTOR MODAL (FIREBASE / SUPABASE)
+              VIEW 2: CREATOR STUDIO (FOR INDIVIDUAL REVIEWERS)
           ========================================== */}
-          {cloudModal && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-orange-200 shadow-2xl w-full max-w-lg p-6 relative">
-                <button
-                  onClick={() => setCloudModal(false)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600"
-                >
-                  ✕
-                </button>
-                <h2 className="font-display font-bold text-xl text-stone-900">
-                  ☁️ Connect Live Cloud Database (Firebase / Supabase)
-                </h2>
-                <p className="text-xs text-stone-500 mt-1">
-                  Apna Firebase Realtime Database ya Supabase URL yahan dalein taki har user dwara add kiya gaya Hospital, Hotel ya Shop pure India me live dikhe.
-                </p>
-
-                <div className="mt-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-2 p-1 bg-orange-50 rounded-xl border border-orange-200">
-                    <button
-                      type="button"
-                      onClick={() => setCloudConfig({ ...cloudConfig, provider: "firebase" })}
-                      className={`py-2 rounded-lg text-xs font-bold ${cloudConfig.provider === "firebase" ? "bg-orange-500 text-white" : "text-stone-600"}`}
-                    >
-                      🔥 Firebase Realtime DB
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCloudConfig({ ...cloudConfig, provider: "supabase" })}
-                      className={`py-2 rounded-lg text-xs font-bold ${cloudConfig.provider === "supabase" ? "bg-orange-500 text-white" : "text-stone-600"}`}
-                    >
-                      ⚡ Supabase REST API
-                    </button>
-                  </div>
-
+          {activeTab === "creator_studio" && (
+            <main className="max-w-[1200px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
+              <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 text-white rounded-3xl p-6 shadow-xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-stone-700">
-                      {cloudConfig.provider === "firebase"
-                        ? "Firebase Database URL (e.g. https://your-project-default-rtdb.firebaseio.com)"
-                        : "Supabase Project URL (e.g. https://xyzcompany.supabase.co)"}
-                    </label>
-                    <input
-                      type="url"
-                      value={cloudConfig.url}
-                      onChange={(e) => setCloudConfig({ ...cloudConfig, url: e.target.value })}
-                      placeholder="https://..."
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm outline-none focus:border-orange-500"
-                    />
+                    <span className="px-3 py-1 rounded-full bg-black/25 text-xs font-extrabold uppercase">
+                      🎬 SahiRank Partner Program (20% Revenue Share)
+                    </span>
+                    <h1 className="font-display font-bold text-2xl sm:text-3xl mt-2">
+                      {currentUser?.name} — {creatorInfo.title}
+                    </h1>
+                    <p className="text-xs sm:text-sm text-orange-50 mt-1">
+                      Genuine reviews likhein, Level 5 (500 Points) pura karein aur shops/hospitals se aane wale Ad & Premium Revenue ka <b>20% hissa</b> kamayein!
+                    </p>
                   </div>
-
-                  {cloudConfig.provider === "supabase" && (
-                    <div>
-                      <label className="text-xs font-semibold text-stone-700">Supabase Anon Public Key</label>
-                      <input
-                        type="text"
-                        value={cloudConfig.apiKey}
-                        onChange={(e) => setCloudConfig({ ...cloudConfig, apiKey: e.target.value })}
-                        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."
-                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm outline-none focus:border-orange-500"
-                      />
+                  <div className="bg-white text-slate-900 rounded-2xl p-4 min-w-[220px] text-center shadow-lg">
+                    <div className="text-xs font-bold text-slate-500 uppercase">Creator Wallet Balance</div>
+                    <div className="text-3xl font-extrabold text-emerald-600 mt-1">₹{currentUser?.walletEarnings || 0}</div>
+                    <div className="text-[11px] font-semibold text-slate-500 mt-0.5">
+                      {creatorInfo.isMonetized ? "✅ 20% Partner Share ACTIVE" : "🔒 Complete 500 Pts to Withdraw"}
                     </div>
-                  )}
+                  </div>
+                </div>
 
-                  <div className="flex gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = { ...cloudConfig, enabled: Boolean(cloudConfig.url.trim()) };
-                        setCloudConfig(next);
-                        localStorage.setItem("sahirank_v18_cloud", JSON.stringify(next));
-                        setCloudModal(false);
-                        showToast(next.enabled ? "☁️ Cloud Database Connected & Active!" : "💾 LocalStorage Mode Active");
-                      }}
-                      className="flex-1 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow"
-                    >
-                      ✅ Save & Sync Database
-                    </button>
-                    {cloudConfig.enabled && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const reset = { provider: "firebase", url: "", apiKey: "", enabled: false };
-                          setCloudConfig(reset);
-                          localStorage.setItem("sahirank_v18_cloud", JSON.stringify(reset));
-                          setCloudModal(false);
-                          showToast("Cloud Disconnected. Running on LocalStorage.");
-                        }}
-                        className="px-4 py-3 rounded-xl bg-red-50 text-red-600 font-bold text-xs border border-red-200"
-                      >
-                        Disconnect
-                      </button>
-                    )}
+                <div className="mt-5 bg-black/20 rounded-2xl p-4">
+                  <div className="flex justify-between text-xs font-bold mb-1.5">
+                    <span>Partner Level Criteria: {currentUser?.points || 0} / 500 Points</span>
+                    <span>{creatorInfo.progressPct}%</span>
+                  </div>
+                  <div className="w-full h-3 bg-white/25 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-400 transition-all" style={{ width: `${creatorInfo.progressPct}%` }}></div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap justify-between text-[11px] text-orange-100 gap-2">
+                    <span>🛡️ Daily Anti-Spam Limit: <b>{currentUser?.reviewsPostedToday || 0} / 3 Reviews Used Today</b></span>
+                    <span>💡 1 Verified Bill Review = +50 Points</span>
                   </div>
                 </div>
               </div>
-            </div>
+
+              <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+                <h3 className="font-bold text-base text-slate-900 mb-3">
+                  🎁 Exclusive Discount Coupons Offered to You by Businesses
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {(currentUser?.couponsReceived || []).map((cp, idx) => (
+                    <div key={idx} className="p-4 rounded-2xl bg-orange-50 border-2 border-dashed border-orange-300 flex items-center justify-between">
+                      <div>
+                        <div className="text-xs font-bold text-orange-600">{cp.bizName}</div>
+                        <div className="text-sm font-extrabold text-slate-900 mt-0.5">{cp.discount}</div>
+                        <div className="text-[11px] text-slate-500 mt-0.5">{cp.date}</div>
+                      </div>
+                      <div className="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-mono font-bold text-xs">
+                        {cp.code}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </main>
           )}
 
           {/* ==========================================
-              10. LOGIN / SIGN UP MODAL
+              VIEW 3: BUSINESS OWNER DASHBOARD
+          ========================================== */}
+          {activeTab === "business_dashboard" && (
+            <main className="max-w-[1300px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
+              <div className="bg-blue-950 text-white rounded-3xl p-6 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                <div>
+                  <span className="px-3 py-1 rounded-full bg-blue-500/30 border border-blue-400/40 text-blue-200 text-xs font-bold">
+                    🏪 Business Owner Traffic & Lead Intelligence
+                  </span>
+                  <h1 className="font-display font-bold text-2xl mt-2">
+                    Track Your Search Traffic, Customer Leads & Negative Feedback
+                  </h1>
+                  <p className="text-xs sm:text-sm text-blue-200 mt-1 max-w-2xl">
+                    Upgrade to Business Pro (₹999/mo) to unlock customer mobile numbers, view critical feedback, and send 10% OFF coupons.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSuggestModal(true)}
+                  className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow"
+                >
+                  ➕ List Your Business
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {cityBusinesses.map((biz) => {
+                  const negRevs = (biz.reviews || []).filter(r => r.stars <= 3);
+                  return (
+                    <div key={biz.id} className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-lg text-slate-900">{biz.name}</h3>
+                            {biz.businessPro ? (
+                              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
+                                ✅ Business Pro Active
+                              </span>
+                            ) : (
+                              <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 font-bold text-xs">
+                                🔒 Free Basic Plan (Leads Locked)
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">{biz.category} • {biz.city}, {biz.state}</p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {!biz.businessPro && (
+                            <button
+                              onClick={() => setPaymentModal({
+                                title: `Upgrade to Business Pro — ${biz.name}`,
+                                amount: 999,
+                                desc: "Unlock full search analytics, read all negative reviews, view reviewer mobile numbers, and send 10% OFF retention coupons.",
+                                onSuccess: () => {
+                                  updateCityBusiness(biz.id, b => ({ ...b, businessPro: true, claimed: true }));
+                                  processRevenueTransaction(`Business Pro Plan (${biz.name})`, 999, biz.name);
+                                  showToast(`🎉 ${biz.name} Upgraded to Business Pro!`);
+                                }
+                              })}
+                              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow"
+                            >
+                              🔓 Unlock Full Data & Leads (₹999/mo)
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setPaymentModal({
+                              title: `Sponsor #1 Listing — ${biz.name}`,
+                              amount: 499,
+                              desc: `Get #1 Sponsored Placement in ${biz.city} above all competitors.`,
+                              onSuccess: () => {
+                                updateCityBusiness(biz.id, b => ({ ...b, isSponsored: true }));
+                                processRevenueTransaction(`Sponsored Ad Boost (${biz.name})`, 499, biz.name);
+                                showToast(`⚡ ${biz.name} is now Sponsored #1!`);
+                              }
+                            })}
+                            className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs"
+                          >
+                            ⚡ Sponsor #1 Rank (₹499)
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
+                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                          <div className="text-[11px] font-bold text-slate-500">Search Appearances</div>
+                          <div className="text-xl font-extrabold text-slate-900 mt-0.5">{biz.searchAppearances}</div>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                          <div className="text-[11px] font-bold text-slate-500">Profile Views</div>
+                          <div className="text-xl font-extrabold text-slate-900 mt-0.5">{biz.profileViews}</div>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                          <div className="text-[11px] font-bold text-slate-500">Customer Call Leads</div>
+                          <div className="text-xl font-extrabold text-blue-600 mt-0.5">{biz.leadClicks}</div>
+                        </div>
+                        <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200">
+                          <div className="text-[11px] font-bold text-red-700">Negative Reviews</div>
+                          <div className="text-xl font-extrabold text-red-600 mt-0.5">{negRevs.length} Critical</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {(biz.reviews || []).map(r => {
+                          const isLeadUnlocked = biz.businessPro || unlockedLeads[r.id];
+                          return (
+                            <div key={r.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                              <div>
+                                <div className="font-bold text-slate-900 flex items-center gap-2">
+                                  <span>👤 {r.user}</span>
+                                  <span className={r.stars >= 4 ? "text-emerald-600" : "text-red-600"}>({r.stars}★)</span>
+                                  <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono">
+                                    📞 {isLeadUnlocked ? r.userPhone : "+91 98XXX XXXXX (Locked)"}
+                                  </span>
+                                </div>
+                                <p className={`mt-1 ${!biz.businessPro && r.stars <= 3 ? "blur-lock" : "text-slate-600"}`}>"{r.text}"</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {!isLeadUnlocked && (
+                                  <button
+                                    onClick={() => setPaymentModal({
+                                      title: `Unlock Customer Phone Lead (${r.user})`,
+                                      amount: 99,
+                                      desc: "Unlock this customer's verified mobile number.",
+                                      onSuccess: () => {
+                                        setUnlockedLeads(prev => ({ ...prev, [r.id]: true }));
+                                        processRevenueTransaction(`Customer Lead Unlock (${biz.name})`, 99, biz.name);
+                                        showToast(`📞 ${r.user} phone unlocked!`);
+                                      }
+                                    })}
+                                    className="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-[11px]"
+                                  >
+                                    🔓 Unlock Phone (₹99)
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => showToast(`🎁 10% OFF Coupon sent to ${r.user}!`)}
+                                  className="px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-[11px]"
+                                >
+                                  🎁 Send 10% OFF Offer
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </main>
+          )}
+
+          {/* ==========================================
+              VIEW 4: SECRET FOUNDER REVENUE HQ (ONLY VISIBLE WHEN ROLE === 'admin')
+          ========================================== */}
+          {activeTab === "secret_admin" && currentUser?.role === "admin" && (
+            <main className="max-w-[1200px] w-full mx-auto px-3 sm:px-6 py-6 flex-1 space-y-6">
+              <div className="bg-emerald-950 text-white rounded-3xl p-6 shadow-xl border-2 border-emerald-400">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/30 text-emerald-200 text-xs font-extrabold uppercase">
+                    🔒 PRIVATE FOUNDER DASHBOARD (INVISIBLE TO PUBLIC)
+                  </span>
+                  <button
+                    onClick={() => setActiveTab("marketplace")}
+                    className="text-xs px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white"
+                  >
+                    ← Back to Website
+                  </button>
+                </div>
+                <h1 className="font-display font-bold text-2xl sm:text-3xl mt-3">
+                  SahiRank Master Revenue & 80/20 Split Ledger
+                </h1>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
+                  <div className="bg-white/10 border border-white/15 rounded-2xl p-4">
+                    <div className="text-xs text-emerald-200 font-bold">Total Gross Platform Collection</div>
+                    <div className="text-3xl font-extrabold text-white mt-1">₹{platformLedger.totalGrossRevenue}</div>
+                  </div>
+                  <div className="bg-emerald-500 text-slate-950 rounded-2xl p-4 shadow-lg">
+                    <div className="text-xs font-extrabold uppercase">Your Net Founder Profit (80%)</div>
+                    <div className="text-3xl font-extrabold mt-1">₹{platformLedger.adminNetProfit80Pct}</div>
+                  </div>
+                  <div className="bg-white/10 border border-white/15 rounded-2xl p-4">
+                    <div className="text-xs text-amber-300 font-bold">Creator Partner Pool (20%)</div>
+                    <div className="text-3xl font-extrabold text-amber-400 mt-1">₹{platformLedger.creatorPayoutPool20Pct}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+                <h3 className="font-bold text-base text-slate-900 mb-3">💳 All Self-Serve Transactions</h3>
+                <div className="space-y-2.5">
+                  {platformLedger.transactions.map(tx => (
+                    <div key={tx.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div>
+                        <div className="font-bold text-slate-900">{tx.type}</div>
+                        <div className="text-slate-500">Paid by: <b>{tx.from}</b> • {tx.time}</div>
+                      </div>
+                      <div className="flex items-center gap-3 font-bold">
+                        <span className="text-slate-700">Gross: ₹{tx.amount}</span>
+                        <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900">Creator 20%: ₹{tx.creatorShare}</span>
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">Your 80%: ₹{tx.adminShare}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </main>
+          )}
+
+          {/* ==========================================
+              MODALS (AUTH, REVIEW, CLAIM, SUGGEST, PAYMENT, SECRET PIN)
           ========================================== */}
           {authModal && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-orange-200 shadow-2xl w-full max-w-md p-6 relative">
-                <button
-                  onClick={() => setAuthModal(false)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600"
-                >
-                  ✕
-                </button>
-                <h2 className="font-display font-bold text-xl text-stone-900 text-center">
-                  {authMode === "login" ? "🔐 Login to SahiRank" : "✨ Create New Account"}
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
+                <button onClick={() => setAuthModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
+                <h2 className="font-display font-bold text-xl text-slate-900 text-center">
+                  Welcome to SahiRank
                 </h2>
-                <div className="grid grid-cols-2 gap-1 p-1 bg-orange-50 rounded-xl border border-orange-200 my-4">
+                <p className="text-xs text-slate-500 text-center mt-1">
+                  Apna Account Type chunein:
+                </p>
+
+                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl my-4">
                   <button
                     type="button"
-                    onClick={() => setAuthMode("login")}
-                    className={`py-2 rounded-lg text-xs font-bold ${authMode === "login" ? "bg-orange-500 text-white" : "text-stone-600"}`}
+                    onClick={() => setAuthForm({ ...authForm, role: "individual" })}
+                    className={`py-2.5 rounded-xl text-xs font-extrabold transition ${
+                      authForm.role === "individual" ? "bg-orange-600 text-white shadow" : "text-slate-600"
+                    }`}
                   >
-                    Login
+                    👤 Individual User
                   </button>
                   <button
                     type="button"
-                    onClick={() => setAuthMode("signup")}
-                    className={`py-2 rounded-lg text-xs font-bold ${authMode === "signup" ? "bg-orange-500 text-white" : "text-stone-600"}`}
+                    onClick={() => setAuthForm({ ...authForm, role: "business" })}
+                    className={`py-2.5 rounded-xl text-xs font-extrabold transition ${
+                      authForm.role === "business" ? "bg-blue-600 text-white shadow" : "text-slate-600"
+                    }`}
                   >
-                    Sign Up
+                    🏪 Business Owner
                   </button>
                 </div>
 
                 <form onSubmit={handleAuthSubmit} className="space-y-3">
-                  {authMode === "signup" && (
-                    <input
-                      type="text"
-                      required
-                      value={authForm.name}
-                      onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
-                      placeholder="Aapka Pura Naam *"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
-                    />
-                  )}
+                  <input
+                    type="text"
+                    value={authForm.name}
+                    onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
+                    placeholder={authForm.role === "business" ? "Business / Owner Name" : "Your Full Name"}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
+                  />
                   <input
                     type="text"
                     required
-                    value={authForm.phoneOrEmail}
-                    onChange={(e) => setAuthForm({ ...authForm, phoneOrEmail: e.target.value })}
-                    placeholder="Mobile Number ya Email ID *"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
+                    value={authForm.emailOrPhone}
+                    onChange={(e) => setAuthForm({ ...authForm, emailOrPhone: e.target.value })}
+                    placeholder="Email ID or Mobile Number *"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
                   />
+                  {authForm.role === "business" && (
+                    <input
+                      type="text"
+                      required
+                      value={authForm.gstOrLicense}
+                      onChange={(e) => setAuthForm({ ...authForm, gstOrLicense: e.target.value })}
+                      placeholder="GSTIN / Shop License / Reg No. *"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-blue-300 bg-blue-50/40 text-xs"
+                    />
+                  )}
                   <input
                     type="password"
                     required
                     value={authForm.password}
                     onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
                     placeholder="Password *"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
                   />
-                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow">
-                    {authMode === "login" ? "✅ Login Karein" : "🚀 Sign Up Karein"}
+                  <button
+                    type="submit"
+                    className={`w-full py-3 rounded-xl text-white font-bold text-xs shadow-lg ${
+                      authForm.role === "business" ? "bg-blue-600 hover:bg-blue-700" : "bg-orange-600 hover:bg-orange-500"
+                    }`}
+                  >
+                    {authForm.role === "business" ? "🏪 Login to Business Portal" : "👤 Login as Reviewer"}
                   </button>
                 </form>
               </div>
             </div>
           )}
 
-          {/* ==========================================
-              11. ADD HOSPITAL / HOTEL / COACHING / PLACE MODAL
-          ========================================== */}
-          {addModal && (
-            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-3xl border border-orange-200 shadow-2xl w-full max-w-lg p-6 max-h-[92vh] overflow-auto relative">
-                <button
-                  onClick={() => setAddModal(false)}
-                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 grid place-items-center text-stone-600"
-                >
-                  ✕
-                </button>
-                <h2 className="font-display font-bold text-xl text-stone-900 mb-1">
-                  ➕ Add Hospital, Hotel, Coaching ya Shop
-                </h2>
-                <form onSubmit={handleAddBusiness} className="space-y-3 mt-3">
-                  <div>
-                    <label className="text-xs font-semibold text-stone-700">Name (Hospital / Coaching / Hotel / Landmark) *</label>
-                    <input
-                      type="text"
-                      required
-                      value={bizForm.name}
-                      onChange={(e) => setBizForm({ ...bizForm, name: e.target.value })}
-                      placeholder="Jaise: Apex Hospital, Allen Coaching, Hotel Surya..."
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-semibold text-stone-700">Category *</label>
-                      <select
-                        value={bizForm.category}
-                        onChange={(e) => setBizForm({ ...bizForm, category: e.target.value })}
-                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 bg-white text-sm"
-                      >
-                        {CATEGORIES.filter(c => c.id !== "All").map(c => (
-                          <option key={c.id} value={c.id}>{c.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-stone-700">Phone / Helpline</label>
-                      <input
-                        type="text"
-                        value={bizForm.phone}
-                        onChange={(e) => setBizForm({ ...bizForm, phone: e.target.value })}
-                        placeholder="+91 98765 43210"
-                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-stone-700">City / Zila / Gaon *</label>
-                    <div className="mt-1">
-                      <LocationPicker
-                        value={bizForm.cityLoc?.display || ""}
-                        onSelect={(loc) => setBizForm({ ...bizForm, cityLoc: loc })}
-                        placeholder="City ya Gaon chunein..."
-                        allowCustom={true}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-stone-700">Specialty / Famous Tagline</label>
-                    <input
-                      type="text"
-                      value={bizForm.famousTag}
-                      onChange={(e) => setBizForm({ ...bizForm, famousTag: e.target.value })}
-                      placeholder="Jaise: 24x7 ICU & Trauma Center / Best NEET Coaching"
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-stone-700">Address & Details</label>
-                    <input
-                      type="text"
-                      value={bizForm.address}
-                      onChange={(e) => setBizForm({ ...bizForm, address: e.target.value })}
-                      placeholder="Near Station Road, Civil Lines..."
-                      className="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-orange-200 text-sm"
-                    />
-                  </div>
-                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm shadow">
-                    ✅ Publish Listing Now
+          {/* SECRET FOUNDER PIN MODAL (5-Clicks on Footer S Logo) */}
+          {pinModal && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/75 backdrop-blur-sm">
+              <div className="bg-slate-900 text-white rounded-3xl border border-emerald-500 shadow-2xl w-full max-w-xs p-6 text-center relative">
+                <button onClick={() => setPinModal(false)} className="absolute top-3 right-3 text-slate-400">✕</button>
+                <div className="text-2xl mb-2">👑</div>
+                <h3 className="font-bold text-base">Founder Secret Access</h3>
+                <form onSubmit={handlePinVerify} className="mt-3 space-y-3">
+                  <input
+                    type="password"
+                    value={pinInput}
+                    onChange={(e) => setPinInput(e.target.value)}
+                    placeholder="Enter Secret PIN (2026)"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 text-center text-sm text-white outline-none focus:border-emerald-400"
+                    autoFocus
+                  />
+                  <button type="submit" className="w-full py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold text-xs">
+                    Unlock Admin HQ
                   </button>
                 </form>
+              </div>
+            </div>
+          )}
+
+          {/* WRITE REVIEW MODAL */}
+          {reviewModalBiz && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
+                <button onClick={() => setReviewModalBiz(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
+                <span className="text-xs font-bold text-orange-600 uppercase">Earn +50 Trust Points</span>
+                <h3 className="font-display font-bold text-lg text-slate-900 mt-0.5">{reviewModalBiz.name}</h3>
+                <form onSubmit={handleReviewSubmit} className="mt-4 space-y-3">
+                  <div className="flex gap-1.5">
+                    {[5, 4, 3, 2, 1].map(st => (
+                      <button
+                        type="button"
+                        key={st}
+                        onClick={() => setReviewForm({ ...reviewForm, stars: st })}
+                        className={`flex-1 py-2 rounded-xl text-xs font-bold border ${
+                          reviewForm.stars === st ? "bg-orange-600 text-white border-orange-600" : "bg-slate-50 text-slate-700 border-slate-200"
+                        }`}
+                      >
+                        {st} ⭐
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    rows="3"
+                    required
+                    value={reviewForm.text}
+                    onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
+                    placeholder="Apna saccha experience likhein (Min 15 characters)..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
+                  ></textarea>
+                  <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={reviewForm.verifiedBill}
+                      onChange={(e) => setReviewForm({ ...reviewForm, verifiedBill: e.target.checked })}
+                    />
+                    <span>🧾 Mere paas Bill / Receipt hai (+50 Points)</span>
+                  </label>
+                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-600 text-white font-bold text-xs shadow">
+                    ✅ Submit Genuine Review
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* CLAIM MODAL */}
+          {claimModalBiz && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
+                <button onClick={() => setClaimModalBiz(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
+                <h3 className="font-display font-bold text-lg text-slate-900">Claim '{claimModalBiz.name}'</h3>
+                <p className="text-xs text-slate-500 mt-1">Enter GSTIN, Shop Act License or Official Phone OTP to verify ownership.</p>
+                <form onSubmit={handleClaimBusiness} className="mt-4 space-y-3">
+                  <input
+                    type="text"
+                    required
+                    value={claimDoc}
+                    onChange={(e) => setClaimDoc(e.target.value)}
+                    placeholder="GSTIN / License / OTP *"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs"
+                  />
+                  <button type="submit" className="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs shadow">
+                    ✅ Verify & Claim Business
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* SUGGEST MODAL */}
+          {suggestModal && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative">
+                <button onClick={() => setSuggestModal(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
+                <h3 className="font-display font-bold text-lg text-slate-900">Add / Suggest Listing in {selectedCity.name}</h3>
+                <form onSubmit={handleSuggestSubmit} className="mt-4 space-y-3">
+                  <input
+                    type="text"
+                    required
+                    value={suggestForm.name}
+                    onChange={(e) => setSuggestForm({ ...suggestForm, name: e.target.value })}
+                    placeholder="Business / Hospital / Showroom Name *"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
+                  />
+                  <select
+                    value={suggestForm.category}
+                    onChange={(e) => setSuggestForm({ ...suggestForm, category: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs bg-white"
+                  >
+                    {CATEGORIES.filter(c => c.id !== "All").map(c => (
+                      <option key={c.id} value={c.id}>{c.label}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={suggestForm.address}
+                    onChange={(e) => setSuggestForm({ ...suggestForm, address: e.target.value })}
+                    placeholder="Address / Area"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs"
+                  />
+                  <button type="submit" className="w-full py-3 rounded-xl bg-orange-600 text-white font-bold text-xs shadow">
+                    ✅ Add Listing
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* PAYMENT MODAL (CLEAN FOR CUSTOMERS — NO REVENUE SPLIT SHOWN TO PUBLIC!) */}
+          {paymentModal && (
+            <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md p-6 relative text-center">
+                <button onClick={() => setPaymentModal(null)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 grid place-items-center">✕</button>
+                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 grid place-items-center mx-auto text-2xl font-bold">
+                  🔒
+                </div>
+                <h3 className="font-display font-bold text-lg text-slate-900 mt-3">{paymentModal.title}</h3>
+                <p className="text-xs text-slate-500 mt-1">{paymentModal.desc}</p>
+
+                <div className="my-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="text-xs text-slate-500 font-bold">Payable Amount (Incl. GST)</div>
+                  <div className="text-3xl font-extrabold text-slate-900 mt-0.5">₹{paymentModal.amount}</div>
+                  <div className="text-[11px] text-emerald-700 font-semibold mt-1">
+                    ✅ 100% Secure UPI / Card / NetBanking Instant Unlock
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    paymentModal.onSuccess();
+                    setPaymentModal(null);
+                  }}
+                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg"
+                >
+                  ⚡ Pay ₹{paymentModal.amount} & Unlock Instantly
+                </button>
               </div>
             </div>
           )}
 
           {/* TOAST */}
           {toast && (
-            <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full bg-stone-900 text-white text-xs sm:text-sm font-semibold shadow-2xl border border-orange-400">
+            <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-slate-900 text-white text-xs sm:text-sm font-bold shadow-2xl border border-orange-500 max-w-lg text-center">
               {toast}
             </div>
           )}
+
+          {/* ==========================================
+              FOOTER (WITH HIDDEN 5-CLICK ADMIN TRIGGER ON 'S' BADGE)
+          ========================================== */}
+          <footer className="max-w-[1400px] w-full mx-auto px-3 sm:px-6 py-6 text-xs text-slate-500 border-t border-slate-200 mt-8 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span
+                onClick={handleSecretLogoClick}
+                className="w-5 h-5 rounded bg-slate-200 text-slate-600 inline-grid place-items-center font-bold text-[10px] select-none cursor-default"
+              >
+                S
+              </span>
+              <span>© 2026 SahiRank India — Verified Consumer Trust & Business Intelligence Platform.</span>
+            </div>
+            <div>All 28 States & 8 UTs Active • Genuine Review Protection Enabled</div>
+          </footer>
         </div>
       );
     }
