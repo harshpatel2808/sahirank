@@ -549,7 +549,41 @@
             </div>
         </div>
     </div>
-
+<!-- MODAL 4: FAKE OTP LOGIN MODAL -->
+<div id="authModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+            <h3 class="text-lg font-extrabold text-slate-900">Login / SignUp (+10 Pts)</h3>
+            <button onclick="closeModal('authModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <div id="loginStep1" class="space-y-3 text-sm">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Apna Naam</label>
+                <input type="text" id="loginName" placeholder="Ex: Rahul Verma" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl font-semibold">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number</label>
+                <input type="tel" id="loginPhone" placeholder="9876543210" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl font-semibold">
+            </div>
+            <button type="button" onclick="triggerFakeOtp()" class="w-full gradient-brand text-white font-extrabold py-3 rounded-xl transition shadow-md">
+                📱 Send OTP (Instant Demo)
+            </button>
+        </div>
+        <div id="loginStep2" class="hidden space-y-3 text-sm">
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-center">
+                <span class="text-xs font-bold text-amber-900">📲 OTP bhej diya gaya hai! <br><b>(Demo OTP: 7788)</b></span>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">4-Digit OTP Daalein</label>
+                <input type="text" id="enteredOtpValue" maxlength="4" placeholder="7788" class="w-full px-3 py-3 text-center text-xl tracking-widest font-mono font-bold border border-slate-300 rounded-xl">
+            </div>
+            <button type="button" onclick="verifyFakeOtp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl transition shadow-md">
+                ✔️ Verify & Login (+10 Pts)
+            </button>
+        </div>
+    </div>
+</div>
+    
     <!-- MODAL 3: REAL UPI / UTR PAYMENT GATEWAY VERIFICATION -->
     <div id="upiPaymentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
@@ -564,6 +598,10 @@
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center mb-4">
                 <div class="text-xs text-slate-500 font-bold">Payable Amount</div>
                 <div id="upiModalAmount" class="text-3xl font-extrabold text-slate-900 my-1">₹2,499</div>
+                <div class="my-3 bg-white p-3 rounded-2xl border border-slate-200 inline-block shadow-sm">
+    <img id="dynamicUpiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=sahirank@upi&pn=SahiRank" alt="Scan & Pay UPI QR" class="w-40 h-40 object-contain mx-auto">
+    <p class="text-[10px] text-slate-400 font-medium mt-1">GPay / PhonePe / Paytm se scan karein</p>
+                </div>
                 <div class="text-xs font-mono bg-white border border-slate-200 py-1.5 px-3 rounded-lg inline-block mt-1">
                     UPI ID: <b id="displayFounderUpi" class="text-orange-600">sahirank@upi</b>
                 </div>
@@ -1497,6 +1535,8 @@
         // REAL PAYMENT FLOW
         function startRealPaymentFlow(planCode, amountINR, planTitle, shopId = '') {
             closeModal('pricingModal');
+            updateUpiQrCodeDisplay(founderConfig.upiId);
+            
 
             if (founderConfig.razorpayKey && founderConfig.razorpayKey.startsWith('rzp_')) {
                 const rzp = new Razorpay({
@@ -1778,6 +1818,43 @@
             const el = document.getElementById('liveActivityTicker');
             if (el) el.innerHTML = tickerMessages[tickerIdx];
         }, 4500);
+// --- FAKE OTP & QR FUNCTIONS ---
+function triggerFakeOtp() {
+    const phone = document.getElementById('loginPhone').value.trim();
+    if (phone.length < 10) {
+        showToast("⚠️ Kripya sahi 10-ank ka mobile number daalein!");
+        return;
+    }
+    document.getElementById('loginStep1').classList.add('hidden');
+    document.getElementById('loginStep2').classList.remove('hidden');
+    showToast("📩 Demo OTP: 7788");
+}
+
+function verifyFakeOtp() {
+    const otp = document.getElementById('enteredOtpValue').value.trim();
+    if (otp !== "7788") {
+        showToast("❌ Galat OTP! Kripya 7788 daalein.");
+        return;
+    }
+    const name = document.getElementById('loginName').value.trim() || "Mohalla Voter";
+    appUser.name = name;
+    appUser.points += 10;
+    saveLocalBackup();
+    closeModal('authModal');
+    document.getElementById('loginStep2').classList.add('hidden');
+    document.getElementById('loginStep1').classList.remove('hidden');
+    showToast("🎉 Login Successful! +10 Points mile!");
+}
+
+function updateUpiQrCodeDisplay(upiId) {
+    const cleanUpi = upiId || founderConfig.upiId || "sahirank@upi";
+    const qrImg = document.getElementById('dynamicUpiQrImg');
+    const displayUpi = document.getElementById('displayFounderUpi');
+    if (displayUpi) displayUpi.innerText = cleanUpi;
+    if (qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=SahiRank`;
+    }
+}
 
         window.onload = async () => {
             refreshHeaderUI();
