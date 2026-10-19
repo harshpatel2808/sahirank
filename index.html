@@ -1819,32 +1819,52 @@
             if (el) el.innerHTML = tickerMessages[tickerIdx];
         }, 4500);
 // --- FAKE OTP & QR FUNCTIONS ---
+let generatedDynamicOtp = "";
+
 function triggerFakeOtp() {
+    const name = document.getElementById('loginName').value.trim();
     const phone = document.getElementById('loginPhone').value.trim();
+    
+    if (!name) {
+        showToast("⚠️ Kripya apna naam zaroor daalein!");
+        return;
+    }
     if (phone.length < 10) {
         showToast("⚠️ Kripya sahi 10-ank ka mobile number daalein!");
         return;
     }
+    
+    // Har baar naya 4-digit random OTP generate hoga
+    generatedDynamicOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    
     document.getElementById('loginStep1').classList.add('hidden');
     document.getElementById('loginStep2').classList.remove('hidden');
-    showToast("📩 Demo OTP: 7788");
+    showToast(`📩 OTP sent to ${phone}! (Testing OTP: ${generatedDynamicOtp})`);
 }
 
 function verifyFakeOtp() {
     const otp = document.getElementById('enteredOtpValue').value.trim();
-    if (otp !== "7788") {
-        showToast("❌ Galat OTP! Kripya 7788 daalein.");
+    
+    if (!otp || otp !== generatedDynamicOtp) {
+        showToast("❌ Galat OTP! Kripya sahi OTP daalein.");
         return;
     }
-    const name = document.getElementById('loginName').value.trim() || "Mohalla Voter";
+    
+    const name = document.getElementById('loginName').value.trim();
     appUser.name = name;
     appUser.points += 10;
     saveLocalBackup();
     closeModal('authModal');
+    
     document.getElementById('loginStep2').classList.add('hidden');
     document.getElementById('loginStep1').classList.remove('hidden');
-    showToast("🎉 Login Successful! +10 Points mile!");
+    document.getElementById('loginName').value = '';
+    document.getElementById('loginPhone').value = '';
+    document.getElementById('enteredOtpValue').value = '';
+    
+    showToast(`🎉 Login Successful, ${name}! +10 Points mile!`);
 }
+        
 
 function updateUpiQrCodeDisplay(upiId) {
     const cleanUpi = upiId || founderConfig.upiId || "sahirank@upi";
