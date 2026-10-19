@@ -82,7 +82,7 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center gap-2">
-                <div onclick="openModal('formulaModal')" class="cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 hover:bg-amber-100 transition" title="Aapke SahiRank Points">
+                <div onclick="openModal('authModal')" class="cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 hover:bg-amber-100 transition" title="Login / Points">
                     <i class="fa-solid fa-coins text-amber-500 text-sm"></i>
                     <div>
                         <div class="text-xs font-extrabold text-slate-900 leading-none"><span id="headerUserPoints">10</span> Pts</div>
@@ -142,7 +142,7 @@
         </div>
     </section>
 
-    <!-- MAIN PUBLIC NAVIGATION (NO PUBLIC ADMIN TAB!) -->
+    <!-- MAIN PUBLIC NAVIGATION -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
             <div class="flex items-center gap-1.5 bg-slate-200/80 p-1.5 rounded-2xl">
@@ -173,7 +173,7 @@
             <button onclick="filterByCategory('All')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-extrabold bg-slate-900 text-white shadow-sm" data-cat="All">🌟 Sabhi Categories</button>
             <button onclick="filterByCategory('Chai Stall')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Chai Stall">☕ Chai Stall</button>
             <button onclick="filterByCategory('Lassi & Sweets')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Lassi & Sweets">🥛 Lassi & Mithai</button>
-            <button onclick="filterByCategory('Food & Dhaba')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Food & Dhaba">🍛 Famous Dhaba/Food</button>
+            <button onclick="filterByCategory('Food & Dhaba')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Food & Dhaba">🍛 Famous Food / Dhaba</button>
             <button onclick="filterByCategory('Mobile Shop')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Mobile Shop">📱 Mobile & Repair</button>
             <button onclick="filterByCategory('Medical')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Medical">💊 Medical & Clinic</button>
             <button onclick="filterByCategory('Kirana')" class="cat-chip shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-orange-500" data-cat="Kirana">🛒 Kirana & Wholesale</button>
@@ -272,7 +272,7 @@
             </div>
         </div>
 
-        <!-- VIEW 3: SECRET FOUNDER ADMIN PANEL (WITH SUPABASE CLOUD CONFIG!) -->
+        <!-- VIEW 3: SECRET FOUNDER ADMIN PANEL -->
         <div id="viewFounderAdmin" class="hidden space-y-6 mt-4">
             <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-emerald-500/40 shadow-2xl">
                 <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
@@ -350,7 +350,7 @@
                 <!-- Manual Shop Verification & Control Table -->
                 <div class="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
                     <div class="px-5 py-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-                        <h3 class="text-xs font-extrabold uppercase text-slate-300">Live Shops Database Control (Updates Supabase Directly)</h3>
+                        <h3 class="text-xs font-extrabold uppercase text-slate-300">Live Shops Database Control</h3>
                         <span class="text-[11px] text-emerald-400">1-Click Verify / Spotlight / Delete</span>
                     </div>
                     <div class="overflow-x-auto">
@@ -564,11 +564,14 @@
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center mb-4">
                 <div class="text-xs text-slate-500 font-bold">Payable Amount</div>
                 <div id="upiModalAmount" class="text-3xl font-extrabold text-slate-900 my-1">₹2,499</div>
+                
+                <!-- Dynamic QR Code Box -->
                 <div class="my-3 bg-white p-3 rounded-2xl border border-slate-200 inline-block shadow-sm">
-    <img id="dynamicUpiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=sahirank@upi&pn=SahiRank" alt="Scan & Pay UPI QR" class="w-40 h-40 object-contain mx-auto">
-    <p class="text-[10px] text-slate-400 font-medium mt-1">GPay / PhonePe / Paytm se scan karein</p>
+                    <img id="dynamicUpiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=sahirank@upi&pn=SahiRank" alt="Scan & Pay UPI QR" class="w-40 h-40 object-contain mx-auto">
+                    <p class="text-[10px] text-slate-400 font-medium mt-1">GPay / PhonePe / Paytm se scan karein</p>
                 </div>
-                <div class="text-xs font-mono bg-white border border-slate-200 py-1.5 px-3 rounded-lg inline-block mt-1">
+
+                <div class="text-xs font-mono bg-white border border-slate-200 py-1.5 px-3 rounded-lg inline-block">
                     UPI ID: <b id="displayFounderUpi" class="text-orange-600">sahirank@upi</b>
                 </div>
                 <div class="mt-3">
@@ -596,7 +599,43 @@
         </div>
     </div>
 
-    <!-- MODAL 4: SECRET FOUNDER PIN LOGIN MODAL -->
+    <!-- MODAL 4: FAKE OTP LOGIN MODAL -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h3 class="text-lg font-extrabold text-slate-900">Login / SignUp (+10 Pts)</h3>
+                <button onclick="closeModal('authModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="loginStep1" class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Apna Naam</label>
+                    <input type="text" id="loginName" placeholder="Ex: Rahul Verma" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Mobile Number</label>
+                    <input type="tel" id="loginPhone" placeholder="9876543210" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl font-semibold">
+                </div>
+                <button type="button" onclick="triggerFakeOtp()" class="w-full gradient-brand text-white font-extrabold py-3 rounded-xl transition shadow-md">
+                    📱 Send OTP (Instant Demo)
+                </button>
+            </div>
+            <!-- Fake OTP Step 2 -->
+            <div id="loginStep2" class="hidden space-y-3 text-sm">
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-center">
+                    <span class="text-xs font-bold text-amber-900">📲 OTP bhej diya gaya hai! <br><b>(Demo OTP: 7788)</b></span>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">4-Digit OTP Daalein</label>
+                    <input type="text" id="enteredOtpValue" maxlength="4" placeholder="7788" class="w-full px-3 py-3 text-center text-xl tracking-widest font-mono font-bold border border-slate-300 rounded-xl">
+                </div>
+                <button type="button" onclick="verifyFakeOtp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl transition shadow-md">
+                    ✔️ Verify & Login (+10 Pts)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: SECRET FOUNDER PIN LOGIN MODAL -->
     <div id="founderLoginModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-slate-900 text-white border border-slate-700 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -615,7 +654,7 @@
         </div>
     </div>
 
-    <!-- MODAL 5: VOTE / REVIEW MODAL -->
+    <!-- MODAL 6: VOTE / REVIEW MODAL -->
     <div id="voteModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -651,7 +690,7 @@
         </div>
     </div>
 
-    <!-- MODAL 6: SAHIRANK FORMULA MODAL -->
+    <!-- MODAL 7: SAHIRANK FORMULA MODAL -->
     <div id="formulaModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -681,11 +720,8 @@
 
     <!-- JAVASCRIPT & SUPABASE CLOUD ENGINE -->
     <script>
-        // ============================================================================
-        // OPTIONAL HARDCODED SUPABASE CONFIG (Ya Founder Admin Panel PIN 7788 se daalein)
-        // ============================================================================
-        const DEFAULT_SUPABASE_URL = ""; // Ex: "https://xyzcompany.supabase.co"
-        const DEFAULT_SUPABASE_ANON_KEY = ""; // Ex: "eyJhbGciOiJIUzI1NiIsInR5..."
+        const DEFAULT_SUPABASE_URL = "";
+        const DEFAULT_SUPABASE_ANON_KEY = "";
 
         const INDIA_GAZETTEER = [
             "All India", "Varanasi, UP", "Assi Ghat, Varanasi", "Ramnagar Kasba, Varanasi", "Chiraigaon Village, Varanasi",
@@ -694,15 +730,7 @@
             "Mumbai, Maharashtra", "Colaba, Mumbai", "Dadar, Mumbai", "Andheri, Mumbai",
             "Jaipur, Rajasthan", "MI Road, Jaipur", "Sanganer Kasba, Jaipur",
             "Patna, Bihar", "Gandhi Maidan, Patna", "Danapur, Patna", "Bihta Village, Patna",
-            "Prayagraj, UP", "Gorakhpur, UP", "Kanpur, UP", "Agra, UP", "Ayodhya, UP", "Mathura, UP",
-            "Azamgarh, UP", "Ballia, UP", "Jaunpur, UP", "Mirzapur, UP", "Ghazipur, UP", "Chandauli, UP", "Bhadohi, UP",
-            "Muzaffarpur, Bihar", "Gaya, Bihar", "Bhagalpur, Bihar", "Darbhanga, Bihar", "Siwan, Bihar", "Chapra, Bihar",
-            "Bhopal, MP", "Indore, MP", "Ujjain, MP", "Gwalior, MP", "Jabalpur, MP",
-            "Ranchi, Jharkhand", "Jamshedpur, Jharkhand", "Dhanbad, Jharkhand", "Deoghar, Jharkhand",
-            "Raipur, Chhattisgarh", "Kolkata, WB", "Siliguri, WB", "Ahmedabad, Gujarat", "Surat, Gujarat",
-            "Pune, Maharashtra", "Nagpur, Maharashtra", "Nashik, Maharashtra", "Bengaluru, Karnataka",
-            "Chennai, TN", "Hyderabad, Telangana", "Chandigarh", "Ludhiana, Punjab", "Amritsar, Punjab",
-            "Gurugram, Haryana", "Dehradun, Uttarakhand", "Haridwar, Uttarakhand", "Guwahati, Assam"
+            "Prayagraj, UP", "Gorakhpur, UP", "Kanpur, UP", "Agra, UP", "Ayodhya, UP", "Mathura, UP"
         ];
 
         const INITIAL_SHOPS = [
@@ -726,7 +754,7 @@
                 calls: 215,
                 secretOffer: "🎁 SahiRank VIP ko Dry-Fruit Rabri Lassi par ₹20 Instant Off!",
                 image: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?auto=format&fit=crop&w=600&q=80",
-                lastReview: "Banaras ki sabse gaadhi malai aur rabri wali kulhad lassi. Bina yaha aaye Kashi yatra adhuri hai!"
+                lastReview: "Banaras ki sabse gaadhi malai aur rabri wali kulhad lassi!"
             },
             {
                 id: "s2",
@@ -748,130 +776,19 @@
                 calls: 140,
                 secretOffer: "🎁 VIP Member ko Tamatar Chaat ke sath 1 Kulfi Falooda 20% Off!",
                 image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80",
-                lastReview: "Garama-garam tamatar chaat aur palak patta chaat ka swad poore Purvanchal me #1 hai."
-            },
-            {
-                id: "s3",
-                name: "Baba Vishwanath Kulhad Chai & Malai Toast",
-                category: "Chai Stall",
-                city: "Varanasi",
-                address: "Assi Ghat Morning Chauraha, Near Subah-e-Banaras",
-                phone: "9935123456",
-                lat: 25.2891,
-                lng: 83.0063,
-                rating: 4.9,
-                reviews: 22,
-                verified: false,
-                mapPin: true,
-                recent: true,
-                featured: false,
-                views: 1540,
-                directions: 380,
-                calls: 88,
-                secretOffer: "🎁 2 Kulhad Chai ke sath 1 Makkhan Malai Toast Bilkul Free!",
-                image: "https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?auto=format&fit=crop&w=600&q=80",
-                lastReview: "Subah 5 baje gulab aur elaichi wali kadak kulhad chai!"
-            },
-            {
-                id: "s4",
-                name: "Purvanchal Mobile Care & iPhone Hub",
-                category: "Mobile Shop",
-                city: "Varanasi",
-                address: "Lanka Market, Opposite BHU Gate",
-                phone: "9793001122",
-                lat: 25.2820,
-                lng: 82.9995,
-                rating: 4.8,
-                reviews: 19,
-                verified: false,
-                mapPin: true,
-                recent: true,
-                featured: false,
-                views: 1120,
-                directions: 270,
-                calls: 195,
-                secretOffer: "🎁 SahiRank VIP ko Free Original 9H Tempered Glass + 30% Off Repair!",
-                image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80",
-                lastReview: "BHU students ke liye sabse sasta aur bharosemand mobile repair store."
-            },
-            {
-                id: "s5",
-                name: "Karim's Royal Mughlai Darbar",
-                category: "Food & Dhaba",
-                city: "Delhi",
-                address: "Gali Kababian, Jama Masjid Gate No. 1, Old Delhi",
-                phone: "9811009988",
-                lat: 28.6494,
-                lng: 77.2334,
-                rating: 4.9,
-                reviews: 45,
-                verified: true,
-                mapPin: true,
-                recent: true,
-                featured: true,
-                views: 3420,
-                directions: 820,
-                calls: 310,
-                secretOffer: "🎁 VIP Pass par Khamiri Roti + Shahi Kheer Complimentary!",
-                image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
-                lastReview: "1913 se Purani Dilli ka asli swad."
-            },
-            {
-                id: "s6",
-                name: "Sharma Ji Ki Mashhoor Chai",
-                category: "Chai Stall",
-                city: "Lucknow",
-                address: "34, Trilok Nath Road, Lalbagh, Hazratganj",
-                phone: "9415098765",
-                lat: 26.8467,
-                lng: 80.9462,
-                rating: 4.9,
-                reviews: 38,
-                verified: true,
-                mapPin: true,
-                recent: true,
-                featured: true,
-                views: 2650,
-                directions: 610,
-                calls: 165,
-                secretOffer: "🎁 Bun Makkhan + Gol Samosa Combo par ₹30 VIP Cashback!",
-                image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80",
-                lastReview: "Lucknow ki subah Sharma Ji ke bun-makkhan aur gol samose ke bina adhuri hai."
-            },
-            {
-                id: "s7",
-                name: "Tunday Kababi (Aminabad Original)",
-                category: "Food & Dhaba",
-                city: "Lucknow",
-                address: "Naaz Cinema Road, Aminabad Market",
-                phone: "9415112233",
-                lat: 26.8489,
-                lng: 80.9267,
-                rating: 4.9,
-                reviews: 42,
-                verified: false,
-                mapPin: true,
-                recent: true,
-                featured: false,
-                views: 2490,
-                directions: 590,
-                calls: 210,
-                secretOffer: "🎁 SahiRank VIP ko Ulte Tawe ka Paratha + Cold Drink Free!",
-                image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
-                lastReview: "Muh me ghul jane wale galouti kabab!"
+                lastReview: "Garama-garam tamatar chaat aur palak patta chaat ka swad."
             }
         ];
 
         const INITIAL_LEADS = [
             { customer: "Rohit Mishra", phone: "+91 98392-48102", shop: "Blue Lassi Shop", action: "🧭 Took Google Map Direction", dist: "1.2 km away" },
-            { customer: "Priya Srivastav", phone: "+91 94158-77319", shop: "Kashi Chat Bhandar", action: "📞 Clicked Direct Call", dist: "0.8 km away" },
-            { customer: "Aman Verma", phone: "+91 79851-33901", shop: "Purvanchal Mobile Care", action: "🧭 Took Google Map Direction", dist: "2.4 km away" },
-            { customer: "Vikash Yadav", phone: "+91 88401-66512", shop: "Baba Vishwanath Kulhad Chai", action: "🎁 Claimed VIP Offer", dist: "0.5 km away" }
+            { customer: "Priya Srivastav", phone: "+91 94158-77319", shop: "Kashi Chat Bhandar", action: "📞 Clicked Direct Call", dist: "0.8 km away" }
         ];
 
         let shops = JSON.parse(localStorage.getItem('sahirank_v24_shops')) || INITIAL_SHOPS;
         let customerLeads = JSON.parse(localStorage.getItem('sahirank_v24_leads')) || INITIAL_LEADS;
         let appUser = JSON.parse(localStorage.getItem('sahirank_v24_user')) || {
+            name: "Mohalla Voter",
             points: 10,
             isUserVIP: false,
             isOwnerPro: false,
@@ -894,9 +811,6 @@
         let secretTapCount = 0;
         let isFounderLoggedIn = false;
 
-        // ============================================================================
-        // SUPABASE REAL-TIME CLOUD ENGINE (READ / INSERT / UPDATE / DELETE)
-        // ============================================================================
         function mapDbRowToShop(row) {
             return {
                 id: row.id,
@@ -954,33 +868,15 @@
             if (url && key && window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(url, key);
-                    
-                    // Fetch live shops from Supabase
-                    const { data: shopRows, error: sErr } = await supabaseClient
-                        .from('shops')
-                        .select('*')
-                        .order('created_at', { ascending: false });
+                    const { data: shopRows, error: sErr } = await supabaseClient.from('shops').select('*').order('created_at', { ascending: false });
+                    if (!sErr && shopRows && shopRows.length > 0) shops = shopRows.map(mapDbRowToShop);
 
-                    if (!sErr && shopRows && shopRows.length > 0) {
-                        shops = shopRows.map(mapDbRowToShop);
-                    }
+                    const { data: leadRows, error: lErr } = await supabaseClient.from('leads').select('*').order('created_at', { ascending: false }).limit(25);
+                    if (!lErr && leadRows && leadRows.length > 0) customerLeads = leadRows;
 
-                    // Fetch live customer leads from Supabase
-                    const { data: leadRows, error: lErr } = await supabaseClient
-                        .from('leads')
-                        .select('*')
-                        .order('created_at', { ascending: false })
-                        .limit(25);
-
-                    if (!lErr && leadRows && leadRows.length > 0) {
-                        customerLeads = leadRows;
-                    }
-
-                    // Update UI Cloud Badge
                     const badge = document.getElementById('cloudConnectionBadge');
-                    if (badge) {
-                        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> SUPABASE CLOUD LIVE`;
-                    }
+                    if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> SUPABASE CLOUD LIVE`;
+                    
                     const adminStatus = document.getElementById('adminSupabaseStatus');
                     if (adminStatus) {
                         adminStatus.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300";
@@ -991,7 +887,7 @@
                     renderShopCards();
                     renderOwnerHub();
                 } catch (err) {
-                    console.warn("Supabase fallback to local:", err);
+                    console.warn("Supabase fallback:", err);
                 }
             }
         }
@@ -1024,11 +920,8 @@
             }
             const payload = shops.map(mapShopToDbRow);
             const { error } = await supabaseClient.from('shops').upsert(payload);
-            if (!error) {
-                showToast("☁️ Sabhi Dukaane Supabase Cloud Table me upload ho gayi!");
-            } else {
-                showToast("⚠️ Error: Pehle SQL Editor me `shops` table create karein.");
-            }
+            if (!error) showToast("☁️ Sabhi Dukaane Supabase Cloud Table me upload ho gayi!");
+            else showToast("⚠️ Error: Pehle SQL Editor me `shops` table create karein.");
         }
 
         function computeSahiRank(shop) {
@@ -1069,7 +962,6 @@
             }
         }
 
-        // RENDER SHOP CARDS
         function renderShopCards() {
             const container = document.getElementById('shopsGridContainer');
             const comboQuery = document.getElementById('smartComboSearch').value.trim().toLowerCase();
@@ -1122,7 +1014,6 @@
 
                 return `
                 <div class="relative bg-white rounded-3xl border ${shop.featured ? 'border-amber-400 ring-2 ring-amber-400/25' : 'border-slate-200'} overflow-hidden shadow-sm card-elevate flex flex-col justify-between">
-                    
                     ${isLockedSecretGem ? `
                     <div class="absolute inset-0 z-20 bg-slate-950/70 backdrop-blur-[5px] flex flex-col items-center justify-center p-6 text-center text-white">
                         <div class="w-12 h-12 rounded-2xl gradient-gold flex items-center justify-center text-xl mb-3 shadow-lg">
@@ -1133,13 +1024,12 @@
                         </span>
                         <h4 class="text-lg font-extrabold">${shop.city} Ki Famous${shop.category}</h4>
                         <p class="text-xs text-slate-200 mt-1 mb-4">
-                            SahiRank Score: <b class="text-amber-300">${shop.scoreObj.total}/100</b> •${shop.reviews} Mohalla Votes • VIP Coupon Inside!
+                            SahiRank Score: <b class="text-amber-300">${shop.scoreObj.total}/100</b> •${shop.reviews} Mohalla Votes
                         </p>
                         <button onclick="openModal('pricingModal')" class="gradient-gold text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition">
                             🔓 Unlock All Ranks & Deals (₹499/yr)
                         </button>
-                    </div>
-                    ` : ''}
+                    </div>` : ''}
 
                     <div>
                         <div class="relative h-44 bg-slate-200 overflow-hidden">
@@ -1153,16 +1043,12 @@
                                 ${shop.featured ? `<span class="gradient-gold text-white text-[10px] font-extrabold px-2.5 py-1 rounded-xl shadow">⭐ #1 SPOTLIGHT</span>` : ''}
                             </div>
 
-                            <div class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-sm text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold">
-                                📍 ${shop.lat.toFixed(3)}°N, ${shop.lng.toFixed(3)}°E
-                            </div>
-
                             <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white gap-2">
                                 <div>
                                     <span class="bg-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">${shop.category}</span>
                                     <h3 class="font-extrabold text-base sm:text-lg leading-snug mt-1 flex items-center gap-1.5">
                                         ${shop.name}
-                                        ${shop.verified ? `<i class="fa-solid fa-circle-check text-blue-400 text-sm" title="KYC & GPS Verified Business"></i>` : ''}
+                                        ${shop.verified ? `<i class="fa-solid fa-circle-check text-blue-400 text-sm" title="Verified Business"></i>` : ''}
                                     </h3>
                                 </div>
                                 <div class="bg-slate-900/95 border border-amber-400/50 rounded-xl px-2.5 py-1 text-center shrink-0">
@@ -1179,17 +1065,13 @@
                             </div>
 
                             <div class="flex flex-wrap items-center gap-1.5 my-2 text-[11px]">
-                                <span class="bg-amber-50 text-amber-900 border border-amber-200 font-bold px-2 py-0.5 rounded-md">⭐ ${shop.rating} (${shop.scoreObj.ratingPts}pt)</span>
+                                <span class="bg-amber-50 text-amber-900 border border-amber-200 font-bold px-2 py-0.5 rounded-md">⭐ ${shop.rating}</span>
                                 <span class="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-md">🗳️ ${shop.reviews} Votes</span>
-                                ${shop.verified 
-                                    ? `<span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md">✔️ Verified (+20)</span>` 
-                                    : `<button onclick="openModal('pricingModal')" class="bg-red-50 text-red-600 font-bold px-2 py-0.5 rounded-md hover:underline">⚠️ Unverified Shop</button>`}
+                                ${shop.verified ? `<span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md">✔️ Verified</span>` : ''}
                             </div>
 
-                            <div onclick="handleSecretCouponClick('${shop.id}')" class="cursor-pointer mt-2.5 p-2.5 rounded-xl border ${appUser.isUserVIP ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50/80 border-amber-200 text-amber-900'} text-xs flex items-center justify-between gap-2">
-                                <div class="truncate font-bold">
-                                    ${appUser.isUserVIP ? shop.secretOffer : `🔒 Secret Mohalla Coupon: Tap to Unlock`}
-                                </div>
+                            <div onclick="handleSecretCouponClick()" class="cursor-pointer mt-2.5 p-2.5 rounded-xl border ${appUser.isUserVIP ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50/80 border-amber-200 text-amber-900'} text-xs flex items-center justify-between gap-2">
+                                <div class="truncate font-bold">${appUser.isUserVIP ? shop.secretOffer : `🔒 Secret Coupon: Tap to Unlock`}</div>
                                 <span class="text-[10px] font-extrabold underline shrink-0">${appUser.isUserVIP ? 'CODE: SAHIVIP' : 'Unlock'}</span>
                             </div>
 
@@ -1197,17 +1079,17 @@
 
                             <div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold mt-3 pt-2.5 border-t border-slate-100">
                                 <span>📞 ${displayPhone}</span>
-                                <span>🧭 ${shop.directions} लोगों ने रास्ता लिया</span>
+                                <span>🧭 ${shop.directions} directions</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="px-4 pb-4 pt-1 grid grid-cols-3 gap-2 text-xs font-extrabold">
                         <button onclick="handleGetDirectionRedirect('${shop.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm transition">
-                            <i class="fa-solid fa-diamond-turn-right"></i> Get Direction
+                            <i class="fa-solid fa-diamond-turn-right"></i> Direction
                         </button>
                         <button onclick="openVoteModal('${shop.id}')" class="bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 py-2.5 rounded-xl flex items-center justify-center gap-1 transition">
-                            <i class="fa-solid fa-star"></i> Vote (+20)
+                            <i class="fa-solid fa-star"></i> Vote
                         </button>
                         <button onclick="handleDirectCallClick('${shop.id}')" class="bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-xl flex items-center justify-center gap-1 transition">
                             <i class="fa-solid fa-phone"></i> Call
@@ -1217,24 +1099,22 @@
             }).join('');
         }
 
-        // DIRECTION REDIRECT + SUPABASE CLOUD LEAD LOGGING
         async function handleGetDirectionRedirect(shopId) {
             const shop = shops.find(s => s.id === shopId);
             if (!shop) return;
 
             if (!appUser.isUserVIP && appUser.freeDirectionsUsed >= 1) {
                 openModal('pricingModal');
-                showToast("🔒 Aapka aaj ka 1 Free Direction Quota pura ho gaya! Unlimited Google Map Directions ke liye User VIP Pass (₹499/yr) lein.");
+                showToast("🔒 Aaj ka 1 Free Direction quota pura ho gaya! VIP Pass lein.");
                 return;
             }
 
             if (!appUser.isUserVIP) appUser.freeDirectionsUsed += 1;
-
             shop.directions += 1;
             shop.views += 1;
             
             const newLead = {
-                customer: "Local Visitor #" + Math.floor(100 + Math.random() * 900),
+                customer: appUser.name || "Local Visitor",
                 phone: "+91 9839" + Math.floor(100000 + Math.random() * 900000),
                 shop: shop.name,
                 action: "🧭 Took Google Map Direction",
@@ -1252,13 +1132,6 @@
         async function handleDirectCallClick(shopId) {
             const shop = shops.find(s => s.id === shopId);
             if (!shop) return;
-
-            if (!appUser.isUserVIP && !shop.verified && !appUser.isOwnerPro) {
-                openModal('pricingModal');
-                showToast("🔒 Direct Call ke liye User VIP Pass (₹499) lein ya Dukaan Malik ko Business Pro lene bole.");
-                return;
-            }
-
             shop.calls += 1;
             await cloudUpsertShop(shop);
             renderShopCards();
@@ -1269,13 +1142,12 @@
         function handleSecretCouponClick() {
             if (!appUser.isUserVIP) {
                 openModal('pricingModal');
-                showToast("🎁 Secret Discount Coupons unlock karne ke liye User VIP Pass (₹499/yr) chunein!");
+                showToast("🎁 Secret coupons ke liye User VIP Pass (₹499) chunein!");
             } else {
-                showToast("✅ Coupon Code 'SAHIVIP' Copied!");
+                showToast("✅ Coupon Code 'SAHIVIP' Active!");
             }
         }
 
-        // INTERACTIVE MAP PICKER
         function openAddShopModal() {
             openModal('addShopModal');
             setTimeout(() => initInteractiveMapPicker(), 150);
@@ -1305,7 +1177,6 @@
             const cleanLng = parseFloat(lng).toFixed(4);
             leafletMarker.setLatLng([cleanLat, cleanLng]);
             leafletMap.panTo([cleanLat, cleanLng]);
-
             document.getElementById('pinnedLat').value = cleanLat;
             document.getElementById('pinnedLng').value = cleanLng;
             document.getElementById('uiFormattedLatLng').innerText = `Lat: ${cleanLat}° N | Lng: ${cleanLng}° E`;
@@ -1314,7 +1185,7 @@
         async function findVillageOnMap() {
             const q = document.getElementById('mapVillageSearchInput').value.trim();
             if (!q) return;
-            showToast(`🔍 Searching "${q}" across All-India Map...`);
+            showToast(`🔍 Searching "${q}"...`);
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ', India')}&limit=1`);
                 const data = await res.json();
@@ -1323,11 +1194,7 @@
                     const lon = parseFloat(data[0].lon);
                     leafletMap.setView([lat, lon], 16);
                     updatePinnedCoordinates(lat, lon);
-                    const placeParts = data[0].display_name.split(',');
-                    document.getElementById('newShopCity').value = placeParts[0].trim();
-                    showToast(`📍 Mil gaya: ${placeParts[0]}! Map par click karke exact dukaan pin karein.`);
-                } else {
-                    showToast("⚠️ Jagah nahi mili, zila/tehsil ka naam sath me likhein.");
+                    showToast(`📍 Location mil gayi! Map par click karke pin karein.`);
                 }
             } catch (err) {
                 showToast("📍 Map ko drag karke apni jagah chunein.");
@@ -1339,12 +1206,11 @@
                 navigator.geolocation.getCurrentPosition(pos => {
                     leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
                     updatePinnedCoordinates(pos.coords.latitude, pos.coords.longitude);
-                    showToast("📍 Aapki Live GPS Location Map Par Pin Ho Gayi!");
-                }, () => showToast("⚠️ Browser GPS permission allow karein."));
+                    showToast("📍 Live GPS Location Pinned!");
+                });
             }
         }
 
-        // ADD NEW SHOP -> SAVES TO SUPABASE CLOUD IMMEDIATELY
         async function saveNewShopWithMapPin(e) {
             e.preventDefault();
             const name = document.getElementById('newShopName').value.trim();
@@ -1352,7 +1218,7 @@
             const city = document.getElementById('newShopCity').value.trim();
             const phone = document.getElementById('newShopPhone').value.trim();
             const address = document.getElementById('newShopAddress').value.trim();
-            const secretOffer = document.getElementById('newShopSecretOffer').value.trim() || "🎁 SahiRank VIP ko Special 10% Mohalla Discount!";
+            const secretOffer = document.getElementById('newShopSecretOffer').value.trim() || "🎁 SahiRank VIP ko Special Discount!";
             const lat = parseFloat(document.getElementById('pinnedLat').value);
             const lng = parseFloat(document.getElementById('pinnedLng').value);
 
@@ -1364,7 +1230,7 @@
                 mapPin: true, recent: true, featured: false,
                 views: 18, directions: 4, calls: 2, secretOffer,
                 image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-                lastReview: "Map par exact GPS pin ke sath mohalle walo dwara add ki gayi dukaan!"
+                lastReview: "Mohalle walo dwara add ki gayi dukaan!"
             };
 
             shops.unshift(newShopObj);
@@ -1375,10 +1241,9 @@
             selectLocation(city);
             renderOwnerHub();
             await cloudUpsertShop(newShopObj);
-            showToast(`🎉 ${name} Cloud Database me Save & Live ho gayi! (+70 Points)`);
+            showToast(`🎉 Dukaan Cloud Database me Save ho gayi! (+70 Pts)`);
         }
 
-        // ALL-INDIA LIVE LOCATION SEARCH
         function searchIndiaLocationsLive(val) {
             const box = document.getElementById('locationSuggestionsBox');
             const q = val.trim();
@@ -1390,42 +1255,10 @@
             let html = localMatches.map(loc => `
                 <div onclick="selectLocation('${loc.replace(/'/g, "")}')" class="px-3.5 py-2.5 hover:bg-orange-50 cursor-pointer flex items-center justify-between">
                     <span><i class="fa-solid fa-location-dot text-orange-600 mr-2"></i><b>${loc}</b></span>
-                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Instant</span>
                 </div>
             `).join('');
-
-            html += `
-                <div onclick="fetchLiveVillageFromOSM('${q.replace(/'/g, "")}')" class="px-3.5 py-2.5 bg-amber-50/70 hover:bg-amber-100 cursor-pointer text-orange-800 font-bold flex items-center justify-between">
-                    <span>🔍 Search "${q}" in All-India 6.4 Lakh Villages</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>`;
             box.innerHTML = html;
             box.classList.remove('hidden');
-        }
-
-        async function fetchLiveVillageFromOSM(query) {
-            document.getElementById('locationSuggestionsBox').classList.add('hidden');
-            showToast(`🇮🇳 Searching "${query}" across All-India Directory...`);
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', India')}&limit=4`);
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    const box = document.getElementById('locationSuggestionsBox');
-                    box.innerHTML = data.map(place => {
-                        const shortName = place.display_name.split(',').slice(0, 2).join(', ');
-                        return `
-                        <div onclick="selectLocation('${shortName.replace(/'/g, "")}')" class="px-3.5 py-2.5 hover:bg-emerald-50 cursor-pointer flex items-center justify-between">
-                            <span>📍 <b>${shortName}</b> <span class="text-slate-400 text-[10px]">(${place.display_name})</span></span>
-                            <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Verified GPS</span>
-                        </div>`;
-                    }).join('');
-                    box.classList.remove('hidden');
-                } else {
-                    selectLocation(query);
-                }
-            } catch (e) {
-                selectLocation(query);
-            }
         }
 
         function selectLocation(loc) {
@@ -1442,22 +1275,21 @@
             renderShopCards();
         }
 
-        // SHOP OWNER DASHBOARD
         function renderOwnerHub() {
             const statusBadge = document.getElementById('ownerPlanStatusBadge');
             if (appUser.isOwnerPro) {
                 statusBadge.className = "bg-emerald-100 text-emerald-800 font-extrabold text-xs px-3 py-1 rounded-lg";
-                statusBadge.innerText = "✔️ BUSINESS PRO ACTIVE: All Customer Leads Unlocked";
+                statusBadge.innerText = "✔️ BUSINESS PRO ACTIVE: Leads Unlocked";
             } else {
                 statusBadge.className = "bg-red-100 text-red-700 font-extrabold text-xs px-3 py-1 rounded-lg";
-                statusBadge.innerText = "🔒 FREE MODE: Upgrade to ₹2,499/yr to Unmask Customer Mobile Numbers";
+                statusBadge.innerText = "🔒 FREE MODE: Upgrade to ₹2,499/yr";
             }
 
             const leadsBody = document.getElementById('customerLeadsTableBody');
             leadsBody.innerHTML = customerLeads.map(lead => {
                 const phoneDisplay = appUser.isOwnerPro 
                     ? `<span class="font-mono font-bold text-emerald-700">${lead.phone}</span>` 
-                    : `<span class="font-mono font-bold text-slate-400">${(lead.phone || '+91 98390').slice(0, 8)}XXXXX</span> <button onclick="openModal('pricingModal')" class="ml-1 text-[10px] bg-orange-600 text-white font-bold px-2 py-0.5 rounded">Unlock</button>`;
+                    : `<span class="font-mono font-bold text-slate-400">98390XXXXX</span> <button onclick="openModal('pricingModal')" class="ml-1 text-[10px] bg-orange-600 text-white font-bold px-2 py-0.5 rounded">Unlock</button>`;
                 
                 return `
                 <tr class="hover:bg-slate-50">
@@ -1467,7 +1299,7 @@
                     <td class="py-3 px-4"><span class="bg-blue-50 text-blue-700 font-bold px-2 py-1 rounded-md text-xs">${lead.action}</span></td>
                     <td class="py-3 px-4 text-slate-500 font-medium">${lead.dist}</td>
                     <td class="py-3 px-4 text-right">
-                        <button onclick="${appUser.isOwnerPro ? `showToast('💬 Opening WhatsApp chat with ${lead.customer}...')` : `openModal('pricingModal')`}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+                        <button onclick="${appUser.isOwnerPro ? `showToast('💬 Opening WhatsApp...')` : `openModal('pricingModal')`}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
                             <i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp
                         </button>
                     </td>
@@ -1481,27 +1313,36 @@
                 <tr class="hover:bg-slate-50">
                     <td class="py-3 px-4">
                         <div class="font-extrabold text-slate-900">${shop.name}</div>
-                        <div class="text-[11px] font-mono text-slate-500">📍 ${shop.city} (${shop.lat.toFixed(4)}°N, ${shop.lng.toFixed(4)}°E)</div>
+                        <div class="text-[11px] font-mono text-slate-500">${shop.city}</div>
                     </td>
                     <td class="py-3 px-4"><span class="bg-slate-900 text-white font-extrabold text-xs px-2.5 py-1 rounded-lg">${sc}/100</span></td>
                     <td class="py-3 px-4 font-semibold text-slate-700">👁️ ${shop.views} • 🧭 ${shop.directions} • 📞 ${shop.calls}</td>
                     <td class="py-3 px-4">
-                        ${shop.verified 
-                            ? `<span class="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md">✔️ Verified Pro</span>` 
-                            : `<span class="bg-red-50 text-red-600 font-bold text-xs px-2.5 py-1 rounded-md">Unverified (-20 Pts)</span>`}
+                        ${shop.verified ? `<span class="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-1 rounded-md">✔️ Verified</span>` : `<span class="bg-red-50 text-red-600 font-bold text-xs px-2.5 py-1 rounded-md">Unverified</span>`}
                     </td>
                     <td class="py-3 px-4 text-right space-x-1">
-                        ${!shop.verified ? `<button onclick="startRealPaymentFlow('OWNER_PRO_2499', 2499, 'Shop Owner Business Pro', '${shop.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Verify ✔️ (₹2,499)</button>` : ''}
-                        ${!shop.featured ? `<button onclick="startRealPaymentFlow('SPOTLIGHT_499', 499, '7-Day #1 Spotlight', '${shop.id}')" class="gradient-gold text-white text-xs font-bold px-3 py-1.5 rounded-lg">Boost #1 (₹499)</button>` : ''}
+                        ${!shop.verified ? `<button onclick="startRealPaymentFlow('OWNER_PRO_2499', 2499, 'Shop Owner Business Pro', '${shop.id}')" class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Verify (₹2,499)</button>` : ''}
+                        ${!shop.featured ? `<button onclick="startRealPaymentFlow('SPOTLIGHT_499', 499, '7-Day Spotlight', '${shop.id}')" class="gradient-gold text-white text-xs font-bold px-3 py-1.5 rounded-lg">Boost (₹499)</button>` : ''}
                     </td>
                 </tr>`;
             }).join('');
         }
 
-        // REAL PAYMENT FLOW
+        // PAYMENT & DYNAMIC QR LOGIC
+        function updateUpiQrCodeDisplay(upiId) {
+            const cleanUpi = upiId || founderConfig.upiId || "sahirank@upi";
+            const qrImg = document.getElementById('dynamicUpiQrImg');
+            const displayUpi = document.getElementById('displayFounderUpi');
+            if(displayUpi) displayUpi.innerText = cleanUpi;
+            if(qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=SahiRank`;
+            }
+        }
+
         function startRealPaymentFlow(planCode, amountINR, planTitle, shopId = '') {
             closeModal('pricingModal');
-                updateUpiQrCodeDisplay(founderConfig.upiId);
+            updateUpiQrCodeDisplay(founderConfig.upiId);
+            
             if (founderConfig.razorpayKey && founderConfig.razorpayKey.startsWith('rzp_')) {
                 const rzp = new Razorpay({
                     key: founderConfig.razorpayKey,
@@ -1543,7 +1384,7 @@
         function sendPaymentOnWhatsApp() {
             const planTitle = document.getElementById('upiModalPlanTitle').innerText;
             const amount = document.getElementById('upiModalAmount').innerText;
-            const msg = encodeURIComponent(`Namaste SahiRank Team! Mujhe *${planTitle} (${amount})* activate karna hai. Main payment screenshot bhej raha hu.`);
+            const msg = encodeURIComponent(`Namaste SahiRank Team! Mujhe *${planTitle} (${amount})* activate karna hai.`);
             window.open(`https://wa.me/${founderConfig.whatsapp}?text=${msg}`, '_blank');
         }
 
@@ -1554,19 +1395,19 @@
                 showToast(`👑 User VIP Pass Activated (Ref: ${refId})!`);
             } else if (planCode === 'OWNER_PRO_2499') {
                 appUser.isOwnerPro = true;
-                const target = shopId ? shops.find(s => s.id === shopId) : shops.find(s => !s.verified) || shops[0];
+                const target = shopId ? shops.find(s => s.id === shopId) : shops[0];
                 if (target) {
                     target.verified = true;
                     await cloudUpsertShop(target);
                 }
-                showToast(`✔️ Business Pro Activated (Ref: ${refId})! Verified Badge Synced to Cloud!`);
+                showToast(`✔️ Business Pro Activated (Ref: ${refId})!`);
             } else if (planCode === 'SPOTLIGHT_499') {
                 const target = shopId ? shops.find(s => s.id === shopId) : shops[0];
                 if (target) {
                     target.featured = true;
                     await cloudUpsertShop(target);
                 }
-                showToast(`⚡ 7-Day #1 Spotlight Activated (Ref: ${refId})!`);
+                showToast(`⚡ Spotlight Boost Activated (Ref: ${refId})!`);
             }
             saveLocalBackup();
             renderShopCards();
@@ -1574,7 +1415,35 @@
             if (isFounderLoggedIn) renderFounderAdminPanel();
         }
 
-        // SECRET FOUNDER ADMIN ACCESS (PIN: 7788)
+        // FAKE OTP FLOW FUNCTIONS
+        function triggerFakeOtp() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            if (phone.length < 10) {
+                showToast("⚠️ Kripya sahi 10-ank ka mobile number daalein!");
+                return;
+            }
+            document.getElementById('loginStep1').classList.add('hidden');
+            document.getElementById('loginStep2').classList.remove('hidden');
+            showToast("📩 OTP Sent! (Demo OTP: 7788)");
+        }
+
+        function verifyFakeOtp() {
+            const otp = document.getElementById('enteredOtpValue').value.trim();
+            if (otp !== "7788") {
+                showToast("❌ Galat OTP! Kripya 7788 daalein.");
+                return;
+            }
+            const name = document.getElementById('loginName').value.trim() || "Mohalla Voter";
+            appUser.name = name;
+            appUser.points += 10;
+            saveLocalBackup();
+            closeModal('authModal');
+            document.getElementById('loginStep2').classList.add('hidden');
+            document.getElementById('loginStep1').classList.remove('hidden');
+            showToast(`🎉 Login Successful! +10 Points mile!`);
+        }
+
+        // FOUNDER ADMIN PIN (7788)
         function handleSecretFooterTap() {
             secretTapCount += 1;
             if (secretTapCount >= 5) {
@@ -1593,9 +1462,9 @@
                 document.getElementById('navTabFounderSecret').classList.remove('hidden');
                 switchView('founderAdmin');
                 renderFounderAdminPanel();
-                showToast("🔓 Welcome Founder! Secret Admin Control Room Unlocked.");
+                showToast("🔓 Welcome Founder! Admin Room Unlocked.");
             } else {
-                showToast("❌ Galat PIN! Default Founder PIN 7788 hai.");
+                showToast("❌ Galat PIN! Default PIN 7788 hai.");
             }
         }
 
@@ -1617,13 +1486,11 @@
                     </td>
                     <td class="py-3 px-4">
                         <button onclick="adminToggleShopFeatured('${shop.id}')" class="px-2.5 py-1 rounded text-xs font-bold ${shop.featured ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
-                            ${shop.featured ? '⭐ #1 Spotlight (ON)' : 'Standard (OFF)'}
+                            ${shop.featured ? '⭐ Spotlight (ON)' : 'Standard (OFF)'}
                         </button>
                     </td>
                     <td class="py-3 px-4 text-right">
-                        <button onclick="adminDeleteShop('${shop.id}')" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">
-                            <i class="fa-solid fa-trash"></i> Delete
-                        </button>
+                        <button onclick="adminDeleteShop('${shop.id}')" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">Delete</button>
                     </td>
                 </tr>
             `).join('');
@@ -1637,15 +1504,12 @@
             founderConfig.whatsapp = document.getElementById('adminWhatsappInput').value.trim() || "919876543210";
             saveLocalBackup();
             await initSupabaseCloud();
-            showToast("✅ Supabase Cloud & Payment Settings Saved!");
+            showToast("✅ Settings Saved Successfully!");
         }
 
         async function adminToggleShopVerified(shopId) {
             const s = shops.find(x => x.id === shopId);
-            if (s) {
-                s.verified = !s.verified;
-                await cloudUpsertShop(s);
-            }
+            if (s) { s.verified = !s.verified; await cloudUpsertShop(s); }
             renderFounderAdminPanel();
             renderShopCards();
             renderOwnerHub();
@@ -1653,10 +1517,7 @@
 
         async function adminToggleShopFeatured(shopId) {
             const s = shops.find(x => x.id === shopId);
-            if (s) {
-                s.featured = !s.featured;
-                await cloudUpsertShop(s);
-            }
+            if (s) { s.featured = !s.featured; await cloudUpsertShop(s); }
             renderFounderAdminPanel();
             renderShopCards();
             renderOwnerHub();
@@ -1665,13 +1526,11 @@
         async function adminDeleteShop(shopId) {
             shops = shops.filter(x => x.id !== shopId);
             saveLocalBackup();
-            if (supabaseClient) {
-                await supabaseClient.from('shops').delete().eq('id', shopId);
-            }
+            if (supabaseClient) await supabaseClient.from('shops').delete().eq('id', shopId);
             renderFounderAdminPanel();
             renderShopCards();
             renderOwnerHub();
-            showToast("🗑️ Dukaan Cloud Database se delete kar di gayi.");
+            showToast("🗑️ Dukaan delete kar di gayi.");
         }
 
         function adminToggleUserVIP() {
@@ -1692,10 +1551,9 @@
             isFounderLoggedIn = false;
             document.getElementById('navTabFounderSecret').classList.add('hidden');
             switchView('rankings');
-            showToast("🔒 Admin Panel Locked & Hidden from Public.");
+            showToast("🔒 Admin Panel Locked.");
         }
 
-        // VOTE SUBMISSION -> SAVES TO SUPABASE CLOUD IMMEDIATELY
         function openVoteModal(shopId) {
             const shop = shops.find(s => s.id === shopId);
             if (!shop) return;
@@ -1725,7 +1583,7 @@
             closeModal('voteModal');
             renderShopCards();
             await cloudUpsertShop(shop);
-            showToast(`🗳️ Vote Cloud Database me jud gaya! +${pts} SahiRank Points mile!`);
+            showToast(`🗳️ Vote saved! +${pts} Points mile!`);
         }
 
         function filterByCategory(cat) {
@@ -1773,8 +1631,7 @@
         const tickerMessages = [
             "🔥 <b>Ramesh Tiwary (Varanasi)</b> ne abhi Blue Lassi Shop ka Google Map Direction liya!",
             "👑 <b>Ankit Gupta (Lucknow)</b> ne ₹499 User VIP Pass unlock kiya!",
-            "✔️ <b>Kashi Chat Bhandar</b> ne ₹2,499 Business Pro Plan se Customer Leads unlock kiye!",
-            "📍 <b>Suresh Yadav (Chiraigaon Village)</b> ne Interactive Map par nayi Kirana Dukaan Pin ki (+70 Pts)!"
+            "✔️ <b>Kashi Chat Bhandar</b> ne ₹2,499 Business Pro Plan se Customer Leads unlock kiye!"
         ];
         let tickerIdx = 0;
         setInterval(() => {
@@ -1791,43 +1648,6 @@
             if (window.location.search.includes('admin=1')) {
                 openModal('founderLoginModal');
             }
-            // --- FAKE OTP & LIVE UPI QR CODE FUNCTIONS ---
-function triggerFakeOtp() {
-    const phone = document.getElementById('loginPhone').value.trim();
-    if (phone.length < 10) {
-        showToast("⚠️ Kripya sahi 10-ank ka mobile number daalein!");
-        return;
-    }
-    document.getElementById('loginStep1').classList.add('hidden');
-    document.getElementById('loginStep2').classList.remove('hidden');
-    showToast("📩 OTP Sent! (Demo OTP: 7788)");
-}
-
-function verifyFakeOtp() {
-    const otp = document.getElementById('enteredOtpValue').value.trim();
-    if (otp !== "7788") {
-        showToast("❌ Galat OTP! Kripya 7788 daalein.");
-        return;
-    }
-    const name = document.getElementById('loginName').value.trim() || "Mohalla Voter";
-    appUser.name = name;
-    appUser.points += 10;
-    saveAllData();
-    closeModal('authModal');
-    document.getElementById('loginStep2').classList.add('hidden');
-    document.getElementById('loginStep1').classList.remove('hidden');
-    showToast(`🎉 Login Successful! +10 Points mile!`);
-}
-
-function updateUpiQrCodeDisplay(upiId) {
-    const cleanUpi = upiId || founderConfig.upiId || "sahirank@upi";
-    const qrImg = document.getElementById('dynamicUpiQrImg');
-    const displayUpi = document.getElementById('displayFounderUpi');
-    if(displayUpi) displayUpi.innerText = cleanUpi;
-    if(qrImg) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=SahiRank`;
-    }
-}       
         };
     </script>
 </body>
