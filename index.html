@@ -564,6 +564,10 @@
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center mb-4">
                 <div class="text-xs text-slate-500 font-bold">Payable Amount</div>
                 <div id="upiModalAmount" class="text-3xl font-extrabold text-slate-900 my-1">₹2,499</div>
+                <div class="my-3 bg-white p-3 rounded-2xl border border-slate-200 inline-block shadow-sm">
+    <img id="dynamicUpiQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=sahirank@upi&pn=SahiRank" alt="Scan & Pay UPI QR" class="w-40 h-40 object-contain mx-auto">
+    <p class="text-[10px] text-slate-400 font-medium mt-1">GPay / PhonePe / Paytm se scan karein</p>
+                </div>
                 <div class="text-xs font-mono bg-white border border-slate-200 py-1.5 px-3 rounded-lg inline-block mt-1">
                     UPI ID: <b id="displayFounderUpi" class="text-orange-600">sahirank@upi</b>
                 </div>
@@ -1497,7 +1501,7 @@
         // REAL PAYMENT FLOW
         function startRealPaymentFlow(planCode, amountINR, planTitle, shopId = '') {
             closeModal('pricingModal');
-
+                updateUpiQrCodeDisplay(founderConfig.upiId);
             if (founderConfig.razorpayKey && founderConfig.razorpayKey.startsWith('rzp_')) {
                 const rzp = new Razorpay({
                     key: founderConfig.razorpayKey,
@@ -1787,6 +1791,43 @@
             if (window.location.search.includes('admin=1')) {
                 openModal('founderLoginModal');
             }
+            // --- FAKE OTP & LIVE UPI QR CODE FUNCTIONS ---
+function triggerFakeOtp() {
+    const phone = document.getElementById('loginPhone').value.trim();
+    if (phone.length < 10) {
+        showToast("⚠️ Kripya sahi 10-ank ka mobile number daalein!");
+        return;
+    }
+    document.getElementById('loginStep1').classList.add('hidden');
+    document.getElementById('loginStep2').classList.remove('hidden');
+    showToast("📩 OTP Sent! (Demo OTP: 7788)");
+}
+
+function verifyFakeOtp() {
+    const otp = document.getElementById('enteredOtpValue').value.trim();
+    if (otp !== "7788") {
+        showToast("❌ Galat OTP! Kripya 7788 daalein.");
+        return;
+    }
+    const name = document.getElementById('loginName').value.trim() || "Mohalla Voter";
+    appUser.name = name;
+    appUser.points += 10;
+    saveAllData();
+    closeModal('authModal');
+    document.getElementById('loginStep2').classList.add('hidden');
+    document.getElementById('loginStep1').classList.remove('hidden');
+    showToast(`🎉 Login Successful! +10 Points mile!`);
+}
+
+function updateUpiQrCodeDisplay(upiId) {
+    const cleanUpi = upiId || founderConfig.upiId || "sahirank@upi";
+    const qrImg = document.getElementById('dynamicUpiQrImg');
+    const displayUpi = document.getElementById('displayFounderUpi');
+    if(displayUpi) displayUpi.innerText = cleanUpi;
+    if(qrImg) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=SahiRank`;
+    }
+}       
         };
     </script>
 </body>
