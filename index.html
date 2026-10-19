@@ -27,6 +27,13 @@
         #InteractiveMapPicker { height: 240px; width: 100%; border-radius: 0.75rem; z-index: 10; }
         .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+                .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        @media (max-width: 640px) {
+            body { padding-bottom: 2rem; overflow-x: hidden; }
+            .max-w-7xl { padding-left: 1rem; padding-right: 1rem; }
+        }
+    
     </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-orange-600 selection:text-white flex flex-col min-h-screen">
@@ -1841,14 +1848,16 @@ function triggerFakeOtp() {
         return;
     }
     
-    // Har baar naya 4-digit random OTP generate hoga
+    // Naya 4-digit random OTP generate hoga
     generatedDynamicOtp = Math.floor(1000 + Math.random() * 9000).toString();
     
     document.getElementById('loginStep1').classList.add('hidden');
     document.getElementById('loginStep2').classList.remove('hidden');
-    showToast(`📩 OTP sent to ${phone}! (Testing OTP: ${generatedDynamicOtp})`);
+    
+    // Toast notification me saaf-saaf OTP dikhega taaki aap bina kisi pareshani ke test kar sakein
+    showToast(`📩 OTP sent to ${phone}! (Aapka OTP hai: ${generatedDynamicOtp})`);
 }
-
+        
 function verifyFakeOtp() {
     const otp = document.getElementById('enteredOtpValue').value.trim();
     
