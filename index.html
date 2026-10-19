@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SahiRank Pro — India's #1 Verified Local Business & Ranking Network</title>
+    <title>SahiRank — Sahi Dukaan Ki Sahi Rank | Cloud Powered Local Business SaaS</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Leaflet Interactive Map CSS & JS (100% Free Real Map) -->
+    <!-- Leaflet Interactive Map CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Razorpay SDK -->
+    <!-- Official Supabase JS SDK (Live Cloud Database) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Razorpay Checkout SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,20 +24,19 @@
         .gradient-dark { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .card-elevate { transition: all 0.25s ease; }
         .card-elevate:hover { transform: translateY(-4px); box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12); }
-        .blur-paywall { filter: blur(6px); user-select: none; pointer-events: none; }
-        #InteractiveMapPicker { height: 250px; width: 100%; border-radius: 0.75rem; z-index: 10; }
+        #InteractiveMapPicker { height: 240px; width: 100%; border-radius: 0.75rem; z-index: 10; }
         .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
     </style>
 </head>
-<body class="text-slate-800 antialiased selection:bg-orange-600 selection:text-white">
+<body class="text-slate-800 antialiased selection:bg-orange-600 selection:text-white flex flex-col min-h-screen">
 
-    <!-- LIVE TRUST TICKER & SPONSORED AD BAR (Hides for VIP Users) -->
+    <!-- LIVE TRUST & CLOUD STATUS BAR -->
     <div id="topPromoBar" class="bg-slate-950 text-white text-xs py-2 px-4 border-b border-slate-800">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
             <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> LIVE VERIFIED
+                <span id="cloudConnectionBadge" class="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> LIVE NETWORK
                 </span>
                 <span id="liveActivityTicker" class="text-slate-300 font-medium truncate">
                     🔥 <b>Ramesh Tiwary (Varanasi)</b> ne abhi Blue Lassi Shop ka Google Map Direction liya!
@@ -50,7 +51,7 @@
         </div>
     </div>
 
-    <!-- STICKY TRUSTWORTHY HEADER -->
+    <!-- STICKY HEADER -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
             <!-- Brand Identity -->
@@ -71,18 +72,16 @@
             <div class="relative flex-1 max-w-xs sm:max-w-md">
                 <div class="flex items-center bg-slate-100 hover:bg-slate-200/60 focus-within:bg-white focus-within:ring-2 focus-within:ring-orange-500 transition rounded-xl px-3 py-1.5 border border-slate-200">
                     <i class="fa-solid fa-location-dot text-orange-600 mr-2 text-sm"></i>
-                    <input type="text" id="globalLocationInput" oninput="searchIndiaLocationsLive(this.value)" placeholder="Koi bhi Gaon, Kasba, Pin Code ya City likhein..." class="bg-transparent text-xs sm:text-sm font-bold text-slate-800 focus:outline-none w-full" value="All India">
+                    <input type="text" id="globalLocationInput" oninput="searchIndiaLocationsLive(this.value)" placeholder="Koi bhi Gaon, Kasba, Pin Code ya City..." class="bg-transparent text-xs sm:text-sm font-bold text-slate-800 focus:outline-none w-full" value="All India">
                     <button onclick="clearLocationFilter()" title="Clear Location" class="text-slate-400 hover:text-slate-600 ml-1">
                         <i class="fa-solid fa-xmark text-xs"></i>
                     </button>
                 </div>
-                <!-- Live All-India Village/District Suggestions Dropdown -->
                 <div id="locationSuggestionsBox" class="hidden absolute left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-slate-200 max-h-64 overflow-y-auto z-50 divide-y divide-slate-100 text-xs"></div>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex items-center gap-2">
-                <!-- User Points & Local Guide Status -->
                 <div onclick="openModal('formulaModal')" class="cursor-pointer bg-amber-50 border border-amber-200 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5 hover:bg-amber-100 transition" title="Aapke SahiRank Points">
                     <i class="fa-solid fa-coins text-amber-500 text-sm"></i>
                     <div>
@@ -91,22 +90,20 @@
                     </div>
                 </div>
 
-                <!-- Add Shop with Interactive Map Pin -->
                 <button onclick="openAddShopModal()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm px-3 py-2 rounded-xl shadow-sm flex items-center gap-1.5 transition">
                     <i class="fa-solid fa-map-location-dot"></i>
                     <span class="hidden md:inline">Dukaan Jodein</span>
                 </button>
 
-                <!-- Profitable Plans Button -->
                 <button onclick="openModal('pricingModal')" class="gradient-gold text-white font-bold text-xs sm:text-sm px-3 py-2 rounded-xl shadow-sm flex items-center gap-1.5 hover:opacity-95 transition">
                     <i class="fa-solid fa-crown"></i>
-                    <span id="headerPlanText" class="hidden sm:inline">VIP & Owner Plans</span>
+                    <span id="headerPlanText" class="hidden sm:inline">VIP & Business Plans</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- HERO SECTION WITH SMART SEARCH & TRUST METRICS -->
+    <!-- HERO SECTION -->
     <section class="gradient-brand text-white py-8 sm:py-10 px-4 relative overflow-hidden">
         <div class="max-w-4xl mx-auto text-center relative z-10">
             <div class="inline-flex flex-wrap justify-center items-center gap-2 bg-black/25 backdrop-blur-sm px-3.5 py-1 rounded-full text-xs font-semibold mb-3 border border-white/15">
@@ -131,7 +128,7 @@
                 </button>
             </div>
 
-            <!-- Instant City/Village Quick Switcher -->
+            <!-- Instant Locality Pills -->
             <div class="flex flex-wrap justify-center items-center gap-1.5 mt-4 text-xs">
                 <span class="text-orange-200 font-semibold mr-1">Top Localities:</span>
                 <button onclick="selectLocation('All India')" class="bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg font-medium transition">🇮🇳 All India</button>
@@ -145,25 +142,25 @@
         </div>
     </section>
 
-    <!-- MAIN TABS & CATEGORY FILTERS -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <!-- MAIN PUBLIC NAVIGATION (NO PUBLIC ADMIN TAB!) -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
             <div class="flex items-center gap-1.5 bg-slate-200/80 p-1.5 rounded-2xl">
                 <button id="navTabRankings" onclick="switchView('rankings')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-slate-900 shadow-sm transition">
                     🏆 City Rankings
                 </button>
                 <button id="navTabOwner" onclick="switchView('owner')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 hover:text-slate-900 transition flex items-center gap-1.5">
-                    💼 Dukaan Malik Hub <span class="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">19 Leads Locked</span>
+                    💼 Dukaan Malik Hub <span class="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">Customer Leads</span>
                 </button>
-                <button id="navTabRevenue" onclick="switchView('revenue')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 hover:text-slate-900 transition">
-                    💰 Aapki SaaS Kamai (Admin)
+                <!-- Secret Founder Tab: Hidden from public -->
+                <button id="navTabFounderSecret" onclick="switchView('founderAdmin')" class="hidden px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-emerald-600 text-white shadow-sm transition">
+                    🔐 Founder Control Room
                 </button>
             </div>
 
-            <!-- Trust & Algorithm Pill -->
             <div class="flex items-center gap-3 text-xs">
                 <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-xl font-bold">
-                    <i class="fa-solid fa-shield-check mr-1"></i> GPS Lat/Long Verified
+                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Real-Time Cloud Sync
                 </span>
                 <button onclick="openModal('formulaModal')" class="text-orange-600 font-extrabold hover:underline">
                     100-Pt SahiRank Formula ⓘ
@@ -185,35 +182,33 @@
     </div>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1 w-full">
 
-        <!-- VIEW 1: PUBLIC RANKINGS WITH SMART PAYWALL -->
+        <!-- VIEW 1: PUBLIC RANKINGS WITH PAYWALL -->
         <div id="viewRankings">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                 <div>
                     <h2 id="rankingHeaderTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">
                         🇮🇳 All India Ki Top Ranked Dukaane
                     </h2>
-                    <p class="text-xs text-slate-500">Top 2 Dukaane sabke liye khuli hain • Rank #3+ Secret Gems & Unlimited Directions VIP me khulenge</p>
+                    <p class="text-xs text-slate-500">Mohalle ke asli votes aur GPS location par aadharit live ranking</p>
                 </div>
                 <span id="shopsCountBadge" class="text-xs font-extrabold text-orange-700 bg-orange-100 px-3 py-1 rounded-xl">0 Verified Shops</span>
             </div>
 
-            <!-- Shop Cards Grid -->
             <div id="shopsGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
 
-        <!-- VIEW 2: SHOP OWNER DASHBOARD (WITH BLURRED CUSTOMER LEADS PAYWALL) -->
+        <!-- VIEW 2: SHOP OWNER BUSINESS HUB -->
         <div id="viewOwner" class="hidden space-y-6 mt-4">
-            <!-- High-Converting Upgrade Banner for Shop Owners -->
             <div class="gradient-dark rounded-3xl p-6 sm:p-8 text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-xl border border-slate-700">
                 <div>
                     <div class="inline-flex items-center gap-2 bg-red-500/20 text-red-300 border border-red-400/30 px-3 py-1 rounded-full text-xs font-extrabold mb-3">
-                        ⚠️ AAPKE GRAHAK DUSRI DUKAAN PAR JA RAHE HAIN!
+                        📈 GROW YOUR LOCAL FOOTFALL 5X
                     </div>
                     <h2 class="text-2xl sm:text-3xl font-extrabold">Apni Dukaan Ko #1 Rank & Verified ✔️ Banayein</h2>
                     <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl">
-                        Pichle 7 din me <b class="text-amber-400">142 grahakon</b> ne aapke mohalle me dukaan search ki. Unka **Naam, Mobile Number aur WhatsApp Enquiry** unlock karne ke liye **Shop Owner Business Pro (₹2,499/yr)** chunein.
+                        Pichle 7 din me <b class="text-amber-400">142+ local grahakon</b> ne aapke mohalle me dukaan search ki. Unka **Naam, Mobile Number aur Direct WhatsApp Enquiry** unlock karne ke liye **Shop Owner Business Pro (₹2,499/yr)** active karein.
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3 shrink-0">
@@ -221,20 +216,20 @@
                         + Nayi Dukaan Map Pe Pin Karein
                     </button>
                     <button onclick="openModal('pricingModal')" class="gradient-gold text-white font-extrabold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-lg hover:opacity-95 transition">
-                        🔓 Unlock All Customer Leads (₹2,499/yr)
+                        🔓 Unlock Customer Leads (₹2,499/yr)
                     </button>
                 </div>
             </div>
 
-            <!-- Live Customer Lead Table (Blurred until Shop Owner pays ₹2,499) -->
+            <!-- Customer Leads Table -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
                     <div>
-                        <h3 class="font-extrabold text-slate-900">📞 Recent Customer Enquiries & Map Leads (Live Feed)</h3>
-                        <p class="text-xs text-slate-500">Jin grahakon ne "Get Direction" ya "Call" dabaya unki list</p>
+                        <h3 class="font-extrabold text-slate-900">📞 Recent Customer Enquiries & Map Leads</h3>
+                        <p class="text-xs text-slate-500">Jin grahakon ne aapki dukaan ka "Get Direction" ya "Call" dabaya</p>
                     </div>
                     <span id="ownerPlanStatusBadge" class="bg-red-100 text-red-700 font-extrabold text-xs px-3 py-1 rounded-lg">
-                        🔒 FREE PLAN: Customer Numbers Masked
+                        🔒 FREE MODE: Customer Mobile Numbers Masked
                     </span>
                 </div>
                 <div class="overflow-x-auto">
@@ -242,11 +237,11 @@
                         <thead>
                             <tr class="bg-slate-100/70 text-slate-500 text-[11px] uppercase font-bold border-b border-slate-200">
                                 <th class="py-3 px-4">Grahak Ka Naam</th>
-                                <th class="py-3 px-4">Grahak Mobile No.</th>
-                                <th class="py-3 px-4">Kis Dukaan Ke Liye?</th>
-                                <th class="py-3 px-4">Action Taken</th>
+                                <th class="py-3 px-4">Mobile Number</th>
+                                <th class="py-3 px-4">Dukaan</th>
+                                <th class="py-3 px-4">Customer Action</th>
                                 <th class="py-3 px-4">GPS Distance</th>
-                                <th class="py-3 px-4 text-right">WhatsApp Retarget</th>
+                                <th class="py-3 px-4 text-right">Follow-Up</th>
                             </tr>
                         </thead>
                         <tbody id="customerLeadsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -254,21 +249,21 @@
                 </div>
             </div>
 
-            <!-- Shop Performance & 1-Click Boost Table -->
+            <!-- Shop Performance Table -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                    <h3 class="font-extrabold text-slate-900">🏪 Aapki Dukaano Ka Rank & Verification Control</h3>
-                    <span class="text-xs text-slate-500">Verified Badge se +20 SahiRank Score turant badhta hai</span>
+                    <h3 class="font-extrabold text-slate-900">🏪 Listed Dukaano Ka Rank & Verification Status</h3>
+                    <span class="text-xs text-slate-500">Verified ✔️ Badge se +20 SahiRank Score milta hai</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs sm:text-sm">
                         <thead>
                             <tr class="bg-slate-50 text-slate-500 text-[11px] uppercase font-bold border-b border-slate-200">
-                                <th class="py-3 px-4">Dukaan & Exact Lat/Long</th>
+                                <th class="py-3 px-4">Dukaan & GPS Coordinates</th>
                                 <th class="py-3 px-4">SahiRank Score</th>
                                 <th class="py-3 px-4">Views / Directions / Calls</th>
-                                <th class="py-3 px-4">Verification</th>
-                                <th class="py-3 px-4 text-right">Upgrade Rank</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Promote / Verify</th>
                             </tr>
                         </thead>
                         <tbody id="ownerShopsTableBody" class="divide-y divide-slate-200"></tbody>
@@ -277,35 +272,99 @@
             </div>
         </div>
 
-        <!-- VIEW 3: YOUR SAAS PROFIT & REVENUE CALCULATOR (FOR YOU AS FOUNDER) -->
-        <div id="viewRevenue" class="hidden space-y-6 mt-4">
-            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full">FOUNDER ZERO-COST PROFIT MODEL</span>
-                <h2 class="text-2xl font-extrabold text-slate-900 mt-2">Aapki SahiRank SaaS Se Kitni Kamai Hogi? (Realistic Breakdown)</h2>
-                <p class="text-xs sm:text-sm text-slate-600 mt-1 mb-6">
-                    Hosting: **₹0 (Netlify/Vercel)** • Map API: **₹0 (Leaflet + OpenStreetMap)** • Payment Gateway: **Direct Razorpay Bank Settlement**
-                </p>
+        <!-- VIEW 3: SECRET FOUNDER ADMIN PANEL (WITH SUPABASE CLOUD CONFIG!) -->
+        <div id="viewFounderAdmin" class="hidden space-y-6 mt-4">
+            <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-emerald-500/40 shadow-2xl">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-6">
+                    <div>
+                        <span class="bg-emerald-500 text-slate-950 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase">
+                            🔒 PRIVATE FOUNDER DASHBOARD (ONLY VISIBLE TO YOU)
+                        </span>
+                        <h2 class="text-2xl font-extrabold mt-2">SahiRank Super-Admin, Supabase Cloud & Payment Control</h2>
+                        <p class="text-xs text-slate-400">Yaha se aap apna Supabase Cloud Database, Razorpay Key aur UPI ID connect kar sakte hain.</p>
+                    </div>
+                    <button onclick="logoutFounderAdmin()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl">
+                        🔒 Lock & Hide Admin Panel
+                    </button>
+                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="p-4 rounded-2xl bg-orange-50 border border-orange-200">
-                        <div class="text-xs font-bold text-orange-800">1. Shop Owner Pro (₹2,499/yr)</div>
-                        <div class="text-2xl font-extrabold text-slate-900 mt-1">₹24,99,000</div>
-                        <p class="text-[11px] text-slate-600 mt-1">Sirf 1,000 Dukaane poore India me verify hone par salana kamai</p>
+                <!-- SUPABASE CLOUD DATABASE CONFIGURATION -->
+                <div class="bg-slate-950/90 p-5 rounded-2xl border border-emerald-500/40 mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 class="text-sm font-extrabold text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-database"></i> Supabase Cloud Database Connection (Free Tier)
+                        </h3>
+                        <span id="adminSupabaseStatus" class="text-xs font-bold px-2.5 py-0.5 rounded bg-slate-800 text-amber-400">
+                            Mode: Local Hybrid (Enter Keys for Cloud Sync)
+                        </span>
                     </div>
-                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
-                        <div class="text-xs font-bold text-amber-800">2. Weekly Spotlight (₹499/wk)</div>
-                        <div class="text-2xl font-extrabold text-slate-900 mt-1">₹4,99,000</div>
-                        <p class="text-[11px] text-slate-600 mt-1">1,000 Festival/Offer 7-Day Boosts se kamai</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Supabase Project URL</label>
+                            <input type="url" id="adminSupabaseUrlInput" placeholder="https://xxxxxxxxxxxx.supabase.co" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Supabase Anon Public Key</label>
+                            <input type="text" id="adminSupabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-mono">
+                        </div>
                     </div>
-                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">
-                        <div class="text-xs font-bold text-blue-800">3. User VIP Pass (₹499/yr)</div>
-                        <div class="text-2xl font-extrabold text-slate-900 mt-1">₹9,98,000</div>
-                        <p class="text-[11px] text-slate-600 mt-1">2,000 VIP Users (Unlimited Directions & Secret Deals)</p>
+                    <div class="flex flex-wrap gap-3 mt-3">
+                        <button onclick="saveFounderConfig()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs px-4 py-2 rounded-xl">
+                            🔗 Connect & Sync Supabase Cloud
+                        </button>
+                        <button onclick="pushInitialSeedToSupabase()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl">
+                            ☁️ Push All Current Shops to Supabase Table
+                        </button>
                     </div>
-                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
-                        <div class="text-xs font-bold text-emerald-800">Net Yearly Profit (100% Margin)</div>
-                        <div class="text-2xl font-extrabold text-emerald-700 mt-1">~₹39.96 Lakh/Yr</div>
-                        <p class="text-[11px] text-emerald-800 mt-1">Zero server bill, seedha Razorpay se bank account me!</p>
+                </div>
+
+                <!-- Founder Payment Gateway & UPI Settings -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-xs font-bold text-amber-400 mb-1">1. Aapki Live Razorpay Key ID</label>
+                        <input type="text" id="adminRazorpayKeyInput" placeholder="rzp_live_xxxxxxxxxxxx" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white font-mono">
+                    </div>
+                    <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-xs font-bold text-emerald-400 mb-1">2. Aapki Business UPI ID</label>
+                        <input type="text" id="adminUpiIdInput" placeholder="sahirank@upi" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white font-mono">
+                    </div>
+                    <div class="bg-slate-800/90 p-4 rounded-2xl border border-slate-700">
+                        <label class="block text-xs font-bold text-blue-400 mb-1">3. Admin WhatsApp Number</label>
+                        <input type="text" id="adminWhatsappInput" placeholder="919876543210" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white font-mono">
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
+                    <button onclick="saveFounderConfig()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs px-5 py-2.5 rounded-xl">
+                        💾 Save All Settings
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="adminToggleUserVIP()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-bold px-3.5 py-2 rounded-xl">
+                            👑 Toggle My VIP Preview
+                        </button>
+                        <button onclick="adminToggleOwnerPro()" class="bg-slate-800 hover:bg-slate-700 text-blue-300 border border-blue-500/30 text-xs font-bold px-3.5 py-2 rounded-xl">
+                            ✔️ Toggle My Owner Pro Preview
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Manual Shop Verification & Control Table -->
+                <div class="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden">
+                    <div class="px-5 py-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+                        <h3 class="text-xs font-extrabold uppercase text-slate-300">Live Shops Database Control (Updates Supabase Directly)</h3>
+                        <span class="text-[11px] text-emerald-400">1-Click Verify / Spotlight / Delete</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-800">
+                                    <th class="py-2.5 px-4">Shop & City</th>
+                                    <th class="py-2.5 px-4">Verified (₹2,499)</th>
+                                    <th class="py-2.5 px-4">Featured #1 (₹499)</th>
+                                    <th class="py-2.5 px-4 text-right">Admin Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminShopsControlList" class="divide-y divide-slate-800/70"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -313,7 +372,21 @@
 
     </main>
 
-    <!-- MODAL 1: ADD SHOP WITH INTERACTIVE CLICK-TO-PIN MAP (NO MANUAL LAT/LONG NEEDED!) -->
+    <!-- FOOTER WITH SECRET 5-TAP FOUNDER LOGIN TRIGGER -->
+    <footer class="bg-slate-950 text-slate-400 text-xs py-8 px-4 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg gradient-brand flex items-center justify-center text-white font-bold">S</div>
+                <span class="font-bold text-white">SahiRank India</span>
+                <span>— Local ka Vote, Local ki Rank.</span>
+            </div>
+            <div onclick="handleSecretFooterTap()" class="cursor-pointer select-none text-slate-500 hover:text-slate-400 transition">
+                © 2026 SahiRank Technologies India • All-India Verified Directory
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: ADD SHOP WITH INTERACTIVE CLICK-TO-PIN MAP -->
     <div id="addShopModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-6 shadow-2xl max-h-[94vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -344,7 +417,7 @@
                     </div>
                 </div>
 
-                <!-- Search Any Village / Town / City to Move Map Automatically -->
+                <!-- Interactive Map Box -->
                 <div class="bg-orange-50/70 p-3 rounded-2xl border border-orange-200">
                     <label class="block text-xs font-extrabold text-orange-950 mb-1">
                         1. Apna Gaon, Kasba, Mohalla ya City Search Karein (All India):
@@ -352,26 +425,24 @@
                     <div class="flex gap-2">
                         <input type="text" id="mapVillageSearchInput" placeholder="Ex: Assi Ghat Varanasi, Rampur Gaon, Connaught Place..." class="flex-1 px-3 py-2 bg-white border border-orange-300 rounded-xl text-xs font-semibold focus:outline-none">
                         <button type="button" onclick="findVillageOnMap()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3.5 py-2 rounded-xl text-xs shrink-0 transition">
-                            🔍 Map Par Dhoondhein
+                            🔍 Search Map
                         </button>
-                        <button type="button" onclick="useMyLiveGPSOnMap()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2 rounded-xl text-xs shrink-0 transition" title="Apni Live GPS Location Pakdein">
+                        <button type="button" onclick="useMyLiveGPSOnMap()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2 rounded-xl text-xs shrink-0 transition">
                             📍 Live GPS
                         </button>
                     </div>
                     <p class="text-[11px] text-slate-600 mt-1.5">
-                        👆 Niche Map par apni dukaan ki sahi jagah par <b>Touch / Click karein</b> — Red Pin apne aap Lat/Long nikal lega!
+                        👆 Map par apni dukaan ki jagah par <b>Touch / Click karein</b> — Pin apne aap exact Lat/Long set kar dega!
                     </p>
 
-                    <!-- Interactive Map Container -->
                     <div id="InteractiveMapPicker" class="mt-2 border-2 border-white shadow-md"></div>
 
-                    <!-- Auto-Generated Lat/Long UI Display (Read-Only so User Never Gets Confused) -->
                     <div class="mt-2.5 bg-slate-900 text-white px-3 py-2 rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs">
                         <div class="flex items-center gap-2">
-                            <span class="bg-emerald-500 text-slate-950 font-extrabold px-2 py-0.5 rounded text-[10px]">AUTO-PINNED</span>
+                            <span class="bg-emerald-500 text-slate-950 font-extrabold px-2 py-0.5 rounded text-[10px]">GPS PINNED</span>
                             <span id="uiFormattedLatLng" class="font-mono font-bold text-amber-300">Lat: 25.3109° N | Lng: 83.0107° E</span>
                         </div>
-                        <span class="text-[10px] text-emerald-400 font-semibold">✔️ +10 Accuracy Points Ready</span>
+                        <span class="text-[10px] text-emerald-400 font-semibold">✔️ +10 Accuracy Score</span>
                     </div>
                     <input type="hidden" id="pinnedLat" value="25.3109">
                     <input type="hidden" id="pinnedLng" value="83.0107">
@@ -394,103 +465,153 @@
                         <input type="text" id="newShopAddress" required placeholder="Ex: Near Hanuman Mandir, Main Bazar" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Secret VIP Offer (Grahakon ko lubhane ke liye)</label>
-                        <input type="text" id="newShopSecretOffer" placeholder="Ex: SahiRank VIP ko 1 Kulhad Chai Free!" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">VIP Customer Offer</label>
+                        <input type="text" id="newShopSecretOffer" placeholder="Ex: SahiRank VIP ko 10% Instant Discount!" class="w-full px-3 py-2 border border-slate-300 rounded-xl">
                     </div>
                 </div>
 
                 <button type="submit" class="w-full gradient-brand text-white font-extrabold py-3.5 rounded-xl shadow-lg hover:opacity-95 transition">
-                    ✅ Map Pin Lock Karein & Dukaan Live Karein (+70 Points)
+                    ✅ Save to Cloud & Live Karein (+70 Points)
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 2: HIGH-PROFIT PRICING & RAZORPAY CHECKOUT -->
+    <!-- MODAL 2: PRICING MODAL -->
     <div id="pricingModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl max-h-[94vh] overflow-y-auto">
             <div class="flex justify-between items-start mb-6">
                 <div>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full">100% SECURE RAZORPAY CHECKOUT</span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">Unlock Full SahiRank Power</h2>
-                    <p class="text-xs sm:text-sm text-slate-500">Chaahe aap Grahak hon ya Dukaan Malik — apne fayde ka plan chunein</p>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-extrabold px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-lock mr-1"></i> 100% SECURE VERIFIED PAYMENT
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">Choose Your SahiRank Plan</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Instant Activation via Razorpay / UPI Verification</p>
                 </div>
                 <button onclick="closeModal('pricingModal')" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Plan 1: User VIP Explorer Pass (₹499/yr) -->
                 <div class="border-2 border-slate-200 rounded-2xl p-6 flex flex-col justify-between bg-slate-50/60">
                     <div>
-                        <span class="bg-slate-900 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase">For Smart Customers</span>
+                        <span class="bg-slate-900 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase">For Customers</span>
                         <h3 class="text-xl font-extrabold text-slate-900 mt-2">User VIP Pass</h3>
-                        <div class="text-3xl font-extrabold text-slate-900 my-3">₹499 <span class="text-xs font-normal text-slate-500">/ Year (₹41/mo)</span></div>
+                        <div class="text-3xl font-extrabold text-slate-900 my-3">₹499 <span class="text-xs font-normal text-slate-500">/ Year</span></div>
                         <p class="text-xs text-slate-600 mb-4">Ek baar dukaan par milne wale VIP Discount se hi ₹499 vasool ho jayega!</p>
                         <ul class="space-y-2.5 text-xs text-slate-700 font-semibold mb-6">
-                            <li><i class="fa-solid fa-unlock text-emerald-600 mr-2"></i><b>Unlock Rank #3 to #100+</b> Secret Hidden Gems</li>
-                            <li><i class="fa-solid fa-diamond-turn-right text-emerald-600 mr-2"></i><b>Unlimited Google Map Directions</b> (No Daily Limit)</li>
-                            <li><i class="fa-solid fa-phone text-emerald-600 mr-2"></i><b>Unlock Direct Shop Owner Phone Numbers</b></li>
-                            <li><i class="fa-solid fa-ticket text-emerald-600 mr-2"></i><b>VIP Secret Coupons</b> (10%–25% Off at Verified Shops)</li>
-                            <li><i class="fa-solid fa-ban text-emerald-600 mr-2"></i>100% Ad-Free Experience</li>
+                            <li><i class="fa-solid fa-unlock text-emerald-600 mr-2"></i><b>Unlock All Rank #3 to #100+</b> Secret Gems</li>
+                            <li><i class="fa-solid fa-diamond-turn-right text-emerald-600 mr-2"></i><b>Unlimited Google Map Directions</b></li>
+                            <li><i class="fa-solid fa-phone text-emerald-600 mr-2"></i><b>Unlock Direct Shop Phone Numbers</b></li>
+                            <li><i class="fa-solid fa-ticket text-emerald-600 mr-2"></i><b>VIP Secret Coupons</b> at Verified Shops</li>
                         </ul>
                     </div>
-                    <button onclick="startRazorpayCheckout('USER_VIP_499', 499, 'SahiRank User VIP Pass (1 Year)')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 rounded-xl text-xs sm:text-sm transition">
-                        Unlock User VIP (₹499/yr)
+                    <button onclick="startRealPaymentFlow('USER_VIP_499', 499, 'SahiRank User VIP Pass (1 Year)')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3 rounded-xl text-xs sm:text-sm transition">
+                        Get User VIP Pass (₹499)
                     </button>
                 </div>
 
-                <!-- Plan 2: Shop Owner Business Pro (₹2,499/yr - High Profit Core) -->
                 <div class="border-2 border-orange-600 rounded-2xl p-6 flex flex-col justify-between relative bg-white shadow-2xl scale-[1.02]">
-                    <span class="absolute -top-3.5 right-4 gradient-brand text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase shadow">Best Seller • High ROI</span>
+                    <span class="absolute -top-3.5 right-4 gradient-brand text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase shadow">Most Popular • For Shops</span>
                     <div>
                         <span class="bg-orange-100 text-orange-800 text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase">For Dukaan Maliks</span>
                         <h3 class="text-xl font-extrabold text-slate-900 mt-2">Shop Owner Business Pro</h3>
-                        <div class="text-3xl font-extrabold text-orange-600 my-3">₹2,499 <span class="text-xs font-normal text-slate-500">/ Year (Sirf ₹6.8/din)</span></div>
+                        <div class="text-3xl font-extrabold text-orange-600 my-3">₹2,499 <span class="text-xs font-normal text-slate-500">/ Year (₹6.8/day)</span></div>
                         <p class="text-xs text-slate-600 mb-4">Rozana naye grahak aur seedha Google Map se dukaan tak footfall badhayein!</p>
                         <ul class="space-y-2.5 text-xs text-slate-800 font-semibold mb-6">
-                            <li><i class="fa-solid fa-circle-check text-blue-600 mr-2"></i><b>Official Verified ✔️ Blue Badge</b> (+20 Rank Score)</li>
+                            <li><i class="fa-solid fa-circle-check text-blue-600 mr-2"></i><b>Official Verified ✔️ Blue Badge</b> (+20 Score)</li>
                             <li><i class="fa-solid fa-users text-blue-600 mr-2"></i><b>Unlock All Customer Names & Mobile Numbers</b></li>
-                            <li><i class="fa-solid fa-phone-volume text-blue-600 mr-2"></i><b>Enable Direct Call & WhatsApp Button</b> on Your Card</li>
-                            <li><i class="fa-solid fa-store text-blue-600 mr-2"></i>Add & Manage up to <b>3 Branches / Shops</b></li>
-                            <li><i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i>Competitor Ad-Blocker on Your Shop Profile</li>
+                            <li><i class="fa-solid fa-phone-volume text-blue-600 mr-2"></i><b>Enable Direct Call & WhatsApp Button</b></li>
+                            <li><i class="fa-solid fa-store text-blue-600 mr-2"></i>Add & Verify up to <b>3 Shops / Branches</b></li>
                         </ul>
                     </div>
-                    <button onclick="startRazorpayCheckout('OWNER_PRO_2499', 2499, 'SahiRank Shop Owner Business Pro (1 Year)')" class="w-full gradient-brand text-white font-extrabold py-3.5 rounded-xl text-xs sm:text-sm shadow-lg hover:opacity-95 transition">
+                    <button onclick="startRealPaymentFlow('OWNER_PRO_2499', 2499, 'SahiRank Shop Owner Business Pro (1 Year)')" class="w-full gradient-brand text-white font-extrabold py-3.5 rounded-xl text-xs sm:text-sm shadow-lg hover:opacity-95 transition">
                         Verify Shop & Unlock Leads (₹2,499)
                     </button>
                 </div>
 
-                <!-- Plan 3: 7-Day City #1 Spotlight Boost (₹499 / 7 Days) -->
                 <div class="border-2 border-amber-300 rounded-2xl p-6 flex flex-col justify-between bg-amber-50/40">
                     <div>
-                        <span class="bg-amber-200 text-amber-900 text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase">Instant Footfall Booster</span>
+                        <span class="bg-amber-200 text-amber-900 text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase">Instant Spotlight</span>
                         <h3 class="text-xl font-extrabold text-slate-900 mt-2">7-Day City #1 Spotlight</h3>
                         <div class="text-3xl font-extrabold text-amber-600 my-3">₹499 <span class="text-xs font-normal text-slate-500">/ 7 Days</span></div>
-                        <p class="text-xs text-slate-600 mb-4">Tyohar, Wedding Season ya Nayi Dukaan Opening ke liye best!</p>
+                        <p class="text-xs text-slate-600 mb-4">Tyohar, Wedding Season ya Special Sale ke liye best!</p>
                         <ul class="space-y-2.5 text-xs text-slate-700 font-semibold mb-6">
                             <li><i class="fa-solid fa-bolt text-amber-500 mr-2"></i><b>Guaranteed #1 Top Slot</b> in Your City</li>
-                            <li><i class="fa-solid fa-crown text-amber-500 mr-2"></i><b>"SPONSORED #1 ⭐"</b> Golden Border & Ribbon</li>
-                            <li><i class="fa-solid fa-Unlock text-amber-500 mr-2"></i>Visible to 100% Free & VIP Users Without Blur</li>
-                            <li><i class="fa-solid fa-chart-line text-amber-500 mr-2"></i>5X More Google Map Directions in 7 Days</li>
+                            <li><i class="fa-solid fa-crown text-amber-500 mr-2"></i><b>"SPONSORED #1 ⭐"</b> Golden Highlight</li>
+                            <li><i class="fa-solid fa-eye text-amber-500 mr-2"></i>Visible to 100% Free & VIP Users</li>
+                            <li><i class="fa-solid fa-chart-line text-amber-500 mr-2"></i>5X More Map Directions in 7 Days</li>
                         </ul>
                     </div>
-                    <button onclick="startRazorpayCheckout('SPOTLIGHT_499', 499, '7-Day City #1 Spotlight Boost')" class="w-full gradient-gold text-white font-extrabold py-3 rounded-xl text-xs sm:text-sm shadow-md transition">
+                    <button onclick="startRealPaymentFlow('SPOTLIGHT_499', 499, '7-Day City #1 Spotlight Boost')" class="w-full gradient-gold text-white font-extrabold py-3 rounded-xl text-xs sm:text-sm shadow-md transition">
                         Boost to #1 for 7 Days (₹499)
                     </button>
                 </div>
             </div>
-
-            <!-- Live Razorpay Key Input for Founder -->
-            <div class="mt-6 bg-slate-100 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
-                <div>
-                    <i class="fa-solid fa-building-columns text-emerald-600 mr-1"></i> <b>Direct Bank Settlement:</b> Apni `rzp_live_...` key daal kar real Razorpay popup kholein, ya bina key ke 1-Click Instant Activation test karein.
-                </div>
-                <input type="text" id="founderRazorpayKey" placeholder="Optional: rzp_live_xxxxxxxx" class="px-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs w-full sm:w-60 font-mono">
-            </div>
         </div>
     </div>
 
-    <!-- MODAL 3: VOTE / REVIEW MODAL (+20 Points) -->
+    <!-- MODAL 3: REAL UPI / UTR PAYMENT GATEWAY VERIFICATION -->
+    <div id="upiPaymentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <div>
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded">DIRECT BANK UPI CHECKOUT</span>
+                    <h3 id="upiModalPlanTitle" class="text-lg font-extrabold text-slate-900 mt-1">Complete Payment</h3>
+                </div>
+                <button onclick="closeModal('upiPaymentModal')" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center mb-4">
+                <div class="text-xs text-slate-500 font-bold">Payable Amount</div>
+                <div id="upiModalAmount" class="text-3xl font-extrabold text-slate-900 my-1">₹2,499</div>
+                <div class="text-xs font-mono bg-white border border-slate-200 py-1.5 px-3 rounded-lg inline-block mt-1">
+                    UPI ID: <b id="displayFounderUpi" class="text-orange-600">sahirank@upi</b>
+                </div>
+                <div class="mt-3">
+                    <a id="upiDeepLinkBtn" href="#" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow">
+                        📱 Pay via GPay / PhonePe / Paytm
+                    </a>
+                </div>
+            </div>
+
+            <form onsubmit="verifyUtrAndActivate(event)" class="space-y-3 text-xs sm:text-sm">
+                <input type="hidden" id="pendingPlanCode">
+                <input type="hidden" id="pendingTargetShopId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">12-Digit UPI Reference / UTR Number *</label>
+                    <input type="text" id="utrNumberInput" required pattern="[0-9]{12}" title="Please enter valid 12-digit UPI UTR number" placeholder="Ex: 412890123456 (12 Digits)" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl font-mono font-bold focus:outline-none focus:border-orange-500">
+                    <p class="text-[11px] text-slate-500 mt-1">Payment karne ke baad PhonePe/GPay me dikhne wala 12-ank ka UTR number daalein.</p>
+                </div>
+                <button type="submit" class="w-full gradient-brand text-white font-extrabold py-3 rounded-xl shadow-md">
+                    ✔️ Verify 12-Digit UTR & Activate Plan
+                </button>
+                <button type="button" onclick="sendPaymentOnWhatsApp()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                    <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i> Send Screenshot on WhatsApp for Instant Activation
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: SECRET FOUNDER PIN LOGIN MODAL -->
+    <div id="founderLoginModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 text-white border border-slate-700 rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                <h3 class="text-base font-extrabold text-emerald-400">🔐 Founder Super-Admin Access</h3>
+                <button onclick="closeModal('founderLoginModal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="verifyFounderPin(event)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Enter Secret Founder PIN</label>
+                    <input type="password" id="founderPinInput" required placeholder="••••" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-center text-lg tracking-widest font-mono text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 rounded-xl">
+                    Unlock Admin Control Room
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 5: VOTE / REVIEW MODAL -->
     <div id="voteModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -506,7 +627,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Aapka Vote (Rating) *</label>
                     <select id="voteStars" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl font-bold text-amber-600">
                         <option value="5">⭐⭐⭐⭐⭐ (5.0 - Mohalle Ki Shaan / #1)</option>
-                        <option value="4.8">⭐⭐⭐⭐⭐ (4.8 - EkdumAsli Swad/Service)</option>
+                        <option value="4.8">⭐⭐⭐⭐⭐ (4.8 - Ekdum Asli Swad/Service)</option>
                         <option value="4.5">⭐⭐⭐⭐ (4.5 - Bahut Badhiya)</option>
                         <option value="4">⭐⭐⭐⭐ (4.0 - Achha Hai)</option>
                     </select>
@@ -526,7 +647,7 @@
         </div>
     </div>
 
-    <!-- MODAL 4: SAHIRANK 100-POINT FORMULA EXPLAINER -->
+    <!-- MODAL 6: SAHIRANK FORMULA MODAL -->
     <div id="formulaModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
@@ -534,7 +655,7 @@
                 <button onclick="closeModal('formulaModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="space-y-3 text-xs sm:text-sm text-slate-700">
-                <p class="font-semibold text-slate-900">Google par koi bhi nakli ID se 5-star de sakta hai, par SahiRank ka 100-Point Score 5 asli cheezon se banta hai:</p>
+                <p class="font-semibold text-slate-900">SahiRank ka 100-Point Score 5 asli factors se banta hai:</p>
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 font-medium">
                     <div>⭐ <b>1. Mohalla Rating (40 Points):</b> 5 Star = 40 Pts, 4.8 Star = 38 Pts</div>
                     <div>💬 <b>2. Total Local Votes (20 Points):</b> Har verified review par 2 Pts (Max 20 Pts)</div>
@@ -543,7 +664,7 @@
                     <div>🔥 <b>5. Recent Customer Activity (10 Points):</b> Naya vote/direction = 10 Pts</div>
                 </div>
                 <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 text-xs font-bold text-amber-900">
-                    🏅 <b>User Gamification:</b> Dukaan Add (+50), Photo (+30), Vote (+20), Map Pin (+20). Jaise hi aapke 100 Points hote hain, aapko <b>"Official Local Guide"</b> badge milta hai!
+                    🏅 <b>User Points:</b> Dukaan Add (+50), Photo (+30), Vote (+20), Map Pin (+20). 100 Points = <b>"Official Local Guide"</b> Badge!
                 </div>
             </div>
         </div>
@@ -554,31 +675,32 @@
         <span id="toastText">Action Successful</span>
     </div>
 
-    <!-- JAVASCRIPT ENGINE -->
+    <!-- JAVASCRIPT & SUPABASE CLOUD ENGINE -->
     <script>
-        // 1. MASSIVE ALL-INDIA CITIES, DISTRICTS, TEHSILS & VILLAGES GAZETTEER + LIVE OSM API
+        // ============================================================================
+        // OPTIONAL HARDCODED SUPABASE CONFIG (Ya Founder Admin Panel PIN 7788 se daalein)
+        // ============================================================================
+        const DEFAULT_SUPABASE_URL = ""; // Ex: "https://xyzcompany.supabase.co"
+        const DEFAULT_SUPABASE_ANON_KEY = ""; // Ex: "eyJhbGciOiJIUzI1NiIsInR5..."
+
         const INDIA_GAZETTEER = [
             "All India", "Varanasi, UP", "Assi Ghat, Varanasi", "Ramnagar Kasba, Varanasi", "Chiraigaon Village, Varanasi",
             "Delhi NCR", "Chandni Chowk, Old Delhi", "Connaught Place, New Delhi", "Najafgarh Kasba, Delhi",
-            "Lucknow, UP", "Hazratganj, Lucknow", "Aminabad, Lucknow", "Malihabad Village, Lucknow", "Mohanlalganj, Lucknow",
-            "Mumbai, Maharashtra", "Colaba, Mumbai", "Dadar, Mumbai", "Andheri, Mumbai", "Kalyan, Thane",
-            "Jaipur, Rajasthan", "MI Road, Jaipur", "Sanganer Kasba, Jaipur", "Chomu Village, Jaipur",
-            "Patna, Bihar", "Gandhi Maidan, Patna", "Danapur, Patna", "Phulwari Sharif, Patna", "Bihta Village, Patna",
-            "Prayagraj, UP", "Civil Lines, Prayagraj", "Jhusi Kasba, Prayagraj", "Phulpur, Prayagraj",
-            "Gorakhpur, UP", "Kanpur, UP", "Agra, UP", "Ayodhya, UP", "Mathura, UP", "Vrindavan, UP",
+            "Lucknow, UP", "Hazratganj, Lucknow", "Aminabad, Lucknow", "Malihabad Village, Lucknow",
+            "Mumbai, Maharashtra", "Colaba, Mumbai", "Dadar, Mumbai", "Andheri, Mumbai",
+            "Jaipur, Rajasthan", "MI Road, Jaipur", "Sanganer Kasba, Jaipur",
+            "Patna, Bihar", "Gandhi Maidan, Patna", "Danapur, Patna", "Bihta Village, Patna",
+            "Prayagraj, UP", "Gorakhpur, UP", "Kanpur, UP", "Agra, UP", "Ayodhya, UP", "Mathura, UP",
             "Azamgarh, UP", "Ballia, UP", "Jaunpur, UP", "Mirzapur, UP", "Ghazipur, UP", "Chandauli, UP", "Bhadohi, UP",
             "Muzaffarpur, Bihar", "Gaya, Bihar", "Bhagalpur, Bihar", "Darbhanga, Bihar", "Siwan, Bihar", "Chapra, Bihar",
-            "Bhopal, MP", "Indore, MP", "Ujjain, MP", "Gwalior, MP", "Jabalpur, MP", "Rewa, MP",
+            "Bhopal, MP", "Indore, MP", "Ujjain, MP", "Gwalior, MP", "Jabalpur, MP",
             "Ranchi, Jharkhand", "Jamshedpur, Jharkhand", "Dhanbad, Jharkhand", "Deoghar, Jharkhand",
-            "Raipur, Chhattisgarh", "Bilaspur, Chhattisgarh", "Kolkata, WB", "Siliguri, WB", "Howrah, WB",
-            "Ahmedabad, Gujarat", "Surat, Gujarat", "Vadodara, Gujarat", "Rajkot, Gujarat",
-            "Pune, Maharashtra", "Nagpur, Maharashtra", "Nashik, Maharashtra", "Aurangabad, Maharashtra",
-            "Bengaluru, Karnataka", "Mysuru, Karnataka", "Chennai, TN", "Coimbatore, TN", "Hyderabad, Telangana",
-            "Chandigarh", "Ludhiana, Punjab", "Amritsar, Punjab", "Gurugram, Haryana", "Panipat, Haryana",
-            "Dehradun, Uttarakhand", "Haridwar, Uttarakhand", "Rishikesh, Uttarakhand", "Haldwani, Uttarakhand", "Guwahati, Assam"
+            "Raipur, Chhattisgarh", "Kolkata, WB", "Siliguri, WB", "Ahmedabad, Gujarat", "Surat, Gujarat",
+            "Pune, Maharashtra", "Nagpur, Maharashtra", "Nashik, Maharashtra", "Bengaluru, Karnataka",
+            "Chennai, TN", "Hyderabad, Telangana", "Chandigarh", "Ludhiana, Punjab", "Amritsar, Punjab",
+            "Gurugram, Haryana", "Dehradun, Uttarakhand", "Haridwar, Uttarakhand", "Guwahati, Assam"
         ];
 
-        // 2. PRE-LOADED SHOPS WITH SECRET OFFERS & REAL COORDINATES
         const INITIAL_SHOPS = [
             {
                 id: "s1",
@@ -657,7 +779,7 @@
                 lng: 82.9995,
                 rating: 4.8,
                 reviews: 19,
-                verified: true,
+                verified: false,
                 mapPin: true,
                 recent: true,
                 featured: false,
@@ -723,7 +845,7 @@
                 lng: 80.9267,
                 rating: 4.9,
                 reviews: 42,
-                verified: true,
+                verified: false,
                 mapPin: true,
                 recent: true,
                 featured: false,
@@ -736,7 +858,6 @@
             }
         ];
 
-        // 3. SAMPLE LIVE CUSTOMER LEADS FOR SHOP OWNER PAYWALL
         const INITIAL_LEADS = [
             { customer: "Rohit Mishra", phone: "+91 98392-48102", shop: "Blue Lassi Shop", action: "🧭 Took Google Map Direction", dist: "1.2 km away" },
             { customer: "Priya Srivastav", phone: "+91 94158-77319", shop: "Kashi Chat Bhandar", action: "📞 Clicked Direct Call", dist: "0.8 km away" },
@@ -744,22 +865,168 @@
             { customer: "Vikash Yadav", phone: "+91 88401-66512", shop: "Baba Vishwanath Kulhad Chai", action: "🎁 Claimed VIP Offer", dist: "0.5 km away" }
         ];
 
-        // 4. STATE INITIALIZATION
-        let shops = JSON.parse(localStorage.getItem('sahirank_v22_shops')) || INITIAL_SHOPS;
-        let customerLeads = JSON.parse(localStorage.getItem('sahirank_v22_leads')) || INITIAL_LEADS;
-        let appUser = JSON.parse(localStorage.getItem('sahirank_v22_user')) || {
+        let shops = JSON.parse(localStorage.getItem('sahirank_v24_shops')) || INITIAL_SHOPS;
+        let customerLeads = JSON.parse(localStorage.getItem('sahirank_v24_leads')) || INITIAL_LEADS;
+        let appUser = JSON.parse(localStorage.getItem('sahirank_v24_user')) || {
             points: 10,
-            isUserVIP: false,        // Unlocks Rank #3+, Unlimited Directions, Unmasked Phones (₹499/yr)
-            isOwnerPro: false,       // Unlocks Customer Lead Numbers & Verified Badge (₹2,499/yr)
-            freeDirectionsUsed: 0    // Free users get 1 free direction to experience magic, then Paywall!
+            isUserVIP: false,
+            isOwnerPro: false,
+            freeDirectionsUsed: 0
+        };
+        let founderConfig = JSON.parse(localStorage.getItem('sahirank_v24_founder')) || {
+            supabaseUrl: DEFAULT_SUPABASE_URL,
+            supabaseKey: DEFAULT_SUPABASE_ANON_KEY,
+            razorpayKey: "",
+            upiId: "sahirank@upi",
+            whatsapp: "919876543210",
+            secretPin: "7788"
         };
 
+        let supabaseClient = null;
         let selectedLocation = "All India";
         let selectedCategory = "All";
         let leafletMap = null;
         let leafletMarker = null;
+        let secretTapCount = 0;
+        let isFounderLoggedIn = false;
 
-        // 5. EXACT 100-POINT SAHIRANK FORMULA
+        // ============================================================================
+        // SUPABASE REAL-TIME CLOUD ENGINE (READ / INSERT / UPDATE / DELETE)
+        // ============================================================================
+        function mapDbRowToShop(row) {
+            return {
+                id: row.id,
+                name: row.name,
+                category: row.category,
+                city: row.city,
+                address: row.address,
+                phone: row.phone || "9876543210",
+                lat: parseFloat(row.lat) || 25.3109,
+                lng: parseFloat(row.lng) || 83.0107,
+                rating: parseFloat(row.rating) || 4.8,
+                reviews: parseInt(row.reviews) || 5,
+                verified: Boolean(row.verified),
+                mapPin: row.map_pin !== false,
+                recent: row.recent !== false,
+                featured: Boolean(row.featured),
+                views: parseInt(row.views) || 10,
+                directions: parseInt(row.directions) || 1,
+                calls: parseInt(row.calls) || 1,
+                secretOffer: row.secret_offer || "🎁 SahiRank VIP ko Special 10% Mohalla Discount!",
+                image: row.image || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
+                lastReview: row.last_review || "Verified Mohalla Shop"
+            };
+        }
+
+        function mapShopToDbRow(shop) {
+            return {
+                id: shop.id,
+                name: shop.name,
+                category: shop.category,
+                city: shop.city,
+                address: shop.address,
+                phone: shop.phone,
+                lat: shop.lat,
+                lng: shop.lng,
+                rating: shop.rating,
+                reviews: shop.reviews,
+                verified: shop.verified,
+                map_pin: shop.mapPin,
+                recent: shop.recent,
+                featured: shop.featured,
+                views: shop.views,
+                directions: shop.directions,
+                calls: shop.calls,
+                secret_offer: shop.secretOffer,
+                image: shop.image,
+                last_review: shop.lastReview
+            };
+        }
+
+        async function initSupabaseCloud() {
+            const url = founderConfig.supabaseUrl || DEFAULT_SUPABASE_URL;
+            const key = founderConfig.supabaseKey || DEFAULT_SUPABASE_ANON_KEY;
+
+            if (url && key && window.supabase) {
+                try {
+                    supabaseClient = window.supabase.createClient(url, key);
+                    
+                    // Fetch live shops from Supabase
+                    const { data: shopRows, error: sErr } = await supabaseClient
+                        .from('shops')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (!sErr && shopRows && shopRows.length > 0) {
+                        shops = shopRows.map(mapDbRowToShop);
+                    }
+
+                    // Fetch live customer leads from Supabase
+                    const { data: leadRows, error: lErr } = await supabaseClient
+                        .from('leads')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(25);
+
+                    if (!lErr && leadRows && leadRows.length > 0) {
+                        customerLeads = leadRows;
+                    }
+
+                    // Update UI Cloud Badge
+                    const badge = document.getElementById('cloudConnectionBadge');
+                    if (badge) {
+                        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> SUPABASE CLOUD LIVE`;
+                    }
+                    const adminStatus = document.getElementById('adminSupabaseStatus');
+                    if (adminStatus) {
+                        adminStatus.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300";
+                        adminStatus.innerText = "✔️ Connected to Supabase Cloud";
+                    }
+
+                    saveLocalBackup();
+                    renderShopCards();
+                    renderOwnerHub();
+                } catch (err) {
+                    console.warn("Supabase fallback to local:", err);
+                }
+            }
+        }
+
+        async function cloudUpsertShop(shop) {
+            saveLocalBackup();
+            if (supabaseClient) {
+                await supabaseClient.from('shops').upsert([mapShopToDbRow(shop)]);
+            }
+        }
+
+        async function cloudInsertLead(leadObj) {
+            customerLeads.unshift(leadObj);
+            saveLocalBackup();
+            if (supabaseClient) {
+                await supabaseClient.from('leads').insert([{
+                    customer: leadObj.customer,
+                    phone: leadObj.phone,
+                    shop: leadObj.shop,
+                    action: leadObj.action,
+                    dist: leadObj.dist
+                }]);
+            }
+        }
+
+        async function pushInitialSeedToSupabase() {
+            if (!supabaseClient) {
+                showToast("⚠️ Pehle Supabase URL aur Anon Key save karein!");
+                return;
+            }
+            const payload = shops.map(mapShopToDbRow);
+            const { error } = await supabaseClient.from('shops').upsert(payload);
+            if (!error) {
+                showToast("☁️ Sabhi Dukaane Supabase Cloud Table me upload ho gayi!");
+            } else {
+                showToast("⚠️ Error: Pehle SQL Editor me `shops` table create karein.");
+            }
+        }
+
         function computeSahiRank(shop) {
             const ratingPts = Math.round((shop.rating / 5) * 40);
             const reviewPts = Math.min(shop.reviews * 2, 20);
@@ -772,10 +1039,11 @@
             };
         }
 
-        function saveAllData() {
-            localStorage.setItem('sahirank_v22_shops', JSON.stringify(shops));
-            localStorage.setItem('sahirank_v22_leads', JSON.stringify(customerLeads));
-            localStorage.setItem('sahirank_v22_user', JSON.stringify(appUser));
+        function saveLocalBackup() {
+            localStorage.setItem('sahirank_v24_shops', JSON.stringify(shops));
+            localStorage.setItem('sahirank_v24_leads', JSON.stringify(customerLeads));
+            localStorage.setItem('sahirank_v24_user', JSON.stringify(appUser));
+            localStorage.setItem('sahirank_v24_founder', JSON.stringify(founderConfig));
             refreshHeaderUI();
         }
 
@@ -787,33 +1055,32 @@
             document.getElementById('freeQuotaBadge').innerText = appUser.isUserVIP ? "UNLIMITED VIP 👑" : `${remainingFree}/1 Free Left`;
 
             if (appUser.isUserVIP && appUser.isOwnerPro) {
-                document.getElementById('headerPlanText').innerText = "VIP + Owner Pro Active";
+                document.getElementById('headerPlanText').innerText = "VIP + Business Pro";
             } else if (appUser.isUserVIP) {
-                document.getElementById('headerPlanText').innerText = "👑 VIP Member";
+                document.getElementById('headerPlanText').innerText = "👑 VIP Active";
             } else if (appUser.isOwnerPro) {
-                document.getElementById('headerPlanText').innerText = "✔️ Owner Pro";
+                document.getElementById('headerPlanText').innerText = "✔️ Business Pro";
+            } else {
+                document.getElementById('headerPlanText').innerText = "VIP & Business Plans";
             }
         }
 
-        // 6. RENDER SHOP CARDS WITH SMART PROFIT PAYWALL
+        // RENDER SHOP CARDS
         function renderShopCards() {
             const container = document.getElementById('shopsGridContainer');
             const comboQuery = document.getElementById('smartComboSearch').value.trim().toLowerCase();
 
             let list = shops.map(s => ({ ...s, scoreObj: computeSahiRank(s) }));
 
-            // Filter by Location (Matches City or Address)
             if (selectedLocation && selectedLocation !== "All India") {
                 const locClean = selectedLocation.split(',')[0].trim().toLowerCase();
                 list = list.filter(s => s.city.toLowerCase().includes(locClean) || s.address.toLowerCase().includes(locClean));
             }
 
-            // Filter by Category
             if (selectedCategory !== "All") {
                 list = list.filter(s => s.category === selectedCategory);
             }
 
-            // Smart Combo Search ("Lucknow me chai")
             if (comboQuery) {
                 const words = comboQuery.split(/\s+/).filter(w => !['me', 'mein', 'ki', 'ka', 'ke', 'in', 'best'].includes(w));
                 list = list.filter(s => {
@@ -822,7 +1089,6 @@
                 });
             }
 
-            // Sort: Featured first, then SahiRank Score descending
             list.sort((a, b) => {
                 if (a.featured !== b.featured) return b.featured ? 1 : -1;
                 return b.scoreObj.total - a.scoreObj.total;
@@ -835,8 +1101,8 @@
                 container.innerHTML = `
                     <div class="col-span-full bg-white rounded-3xl p-10 text-center border border-slate-200 shadow-sm">
                         <div class="text-4xl mb-3">📍</div>
-                        <h3 class="text-lg font-extrabold text-slate-900">Is Gaon / Mohalle me abhi pehli dukaan add hone ka intezar hai!</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-5">Apne area ki pehli dukaan Interactive Map par Pin karein aur seedha +70 Points paakar Local Guide banein.</p>
+                        <h3 class="text-lg font-extrabold text-slate-900">Is Gaon / Mohalle me pehli dukaan add karein!</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-5">Apne area ki pehli dukaan Interactive Map par Pin karein aur seedha +70 Points paayein.</p>
                         <button onclick="openAddShopModal()" class="gradient-brand text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-md">
                             + Map Par Pehli Dukaan Pin Karein
                         </button>
@@ -846,36 +1112,32 @@
 
             container.innerHTML = list.map((shop, idx) => {
                 const rank = idx + 1;
-                // PAYWALL RULE: Rank #3 and below are partially locked for non-VIP users (unless shop bought 7-Day Featured Spotlight!)
                 const isLockedSecretGem = !appUser.isUserVIP && rank >= 3 && !shop.featured;
-                // PHONE MASKING: Masked unless User is VIP OR Shop is Verified Pro
                 const canSeeFullPhone = appUser.isUserVIP || shop.verified || appUser.isOwnerPro;
                 const displayPhone = canSeeFullPhone ? shop.phone : `${shop.phone.slice(0, 5)}-XXXXX 🔒`;
 
                 return `
                 <div class="relative bg-white rounded-3xl border ${shop.featured ? 'border-amber-400 ring-2 ring-amber-400/25' : 'border-slate-200'} overflow-hidden shadow-sm card-elevate flex flex-col justify-between">
                     
-                    <!-- PAYWALL OVERLAY FOR RANK #3+ SECRET GEMS -->
                     ${isLockedSecretGem ? `
-                    <div class="absolute inset-0 z-20 bg-slate-950/65 backdrop-blur-[4px] flex flex-col items-center justify-center p-6 text-center text-white">
+                    <div class="absolute inset-0 z-20 bg-slate-950/70 backdrop-blur-[5px] flex flex-col items-center justify-center p-6 text-center text-white">
                         <div class="w-12 h-12 rounded-2xl gradient-gold flex items-center justify-center text-xl mb-3 shadow-lg">
                             <i class="fa-solid fa-lock"></i>
                         </div>
                         <span class="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase mb-1">
                             Rank #${rank} Hidden Local Gem
                         </span>
-                        <h4 class="text-lg font-extrabold">${shop.city} Ki Secret Famous${shop.category}</h4>
+                        <h4 class="text-lg font-extrabold">${shop.city} Ki Famous${shop.category}</h4>
                         <p class="text-xs text-slate-200 mt-1 mb-4">
-                            SahiRank Score: <b class="text-amber-300">${shop.scoreObj.total}/100</b> •${shop.reviews} Mohalla Votes • VIP Secret Coupon Inside!
+                            SahiRank Score: <b class="text-amber-300">${shop.scoreObj.total}/100</b> •${shop.reviews} Mohalla Votes • VIP Coupon Inside!
                         </p>
                         <button onclick="openModal('pricingModal')" class="gradient-gold text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-lg hover:scale-105 transition">
-                            🔓 Unlock All Ranks & Secret Deals (₹499/yr)
+                            🔓 Unlock All Ranks & Deals (₹499/yr)
                         </button>
                     </div>
                     ` : ''}
 
                     <div>
-                        <!-- Top Image & Badges -->
                         <div class="relative h-44 bg-slate-200 overflow-hidden">
                             <img src="${shop.image}" alt="${shop.name}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent"></div>
@@ -887,12 +1149,10 @@
                                 ${shop.featured ? `<span class="gradient-gold text-white text-[10px] font-extrabold px-2.5 py-1 rounded-xl shadow">⭐ #1 SPOTLIGHT</span>` : ''}
                             </div>
 
-                            <!-- Formatted Lat/Long Trust Badge on Top Right -->
                             <div class="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-sm text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold">
                                 📍 ${shop.lat.toFixed(3)}°N, ${shop.lng.toFixed(3)}°E
                             </div>
 
-                            <!-- Shop Name & SahiRank Score Box -->
                             <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white gap-2">
                                 <div>
                                     <span class="bg-orange-600 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">${shop.category}</span>
@@ -908,36 +1168,29 @@
                             </div>
                         </div>
 
-                        <!-- Card Body -->
                         <div class="p-4">
                             <div class="text-xs font-bold text-slate-800 mb-2 flex items-start gap-1.5">
                                 <i class="fa-solid fa-map-pin text-orange-600 mt-0.5"></i>
                                 <span>${shop.city} — <span class="font-medium text-slate-500">${shop.address}</span></span>
                             </div>
 
-                            <!-- Score Pills -->
                             <div class="flex flex-wrap items-center gap-1.5 my-2 text-[11px]">
                                 <span class="bg-amber-50 text-amber-900 border border-amber-200 font-bold px-2 py-0.5 rounded-md">⭐ ${shop.rating} (${shop.scoreObj.ratingPts}pt)</span>
                                 <span class="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-md">🗳️ ${shop.reviews} Votes</span>
                                 ${shop.verified 
                                     ? `<span class="bg-blue-50 text-blue-700 font-bold px-2 py-0.5 rounded-md">✔️ Verified (+20)</span>` 
-                                    : `<button onclick="openModal('pricingModal')" class="bg-red-50 text-red-600 font-bold px-2 py-0.5 rounded-md hover:underline">⚠️ Unverified Owner</button>`}
+                                    : `<button onclick="openModal('pricingModal')" class="bg-red-50 text-red-600 font-bold px-2 py-0.5 rounded-md hover:underline">⚠️ Unverified Shop</button>`}
                             </div>
 
-                            <!-- VIP Secret Offer Box (Creates Massive Desire for User VIP ₹499) -->
                             <div onclick="handleSecretCouponClick('${shop.id}')" class="cursor-pointer mt-2.5 p-2.5 rounded-xl border ${appUser.isUserVIP ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50/80 border-amber-200 text-amber-900'} text-xs flex items-center justify-between gap-2">
                                 <div class="truncate font-bold">
-                                    ${appUser.isUserVIP ? shop.secretOffer : `🔒 Secret Mohalla Coupon: Tap to Unlock (Save ₹50+)`}
+                                    ${appUser.isUserVIP ? shop.secretOffer : `🔒 Secret Mohalla Coupon: Tap to Unlock`}
                                 </div>
                                 <span class="text-[10px] font-extrabold underline shrink-0">${appUser.isUserVIP ? 'CODE: SAHIVIP' : 'Unlock'}</span>
                             </div>
 
-                            <!-- Review Quote -->
-                            <p class="text-xs text-slate-600 italic mt-2.5 line-clamp-2">
-                                "${shop.lastReview}"
-                            </p>
+                            <p class="text-xs text-slate-600 italic mt-2.5 line-clamp-2">"${shop.lastReview}"</p>
 
-                            <!-- Masked/Unmasked Phone & Analytics Bar -->
                             <div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold mt-3 pt-2.5 border-t border-slate-100">
                                 <span>📞 ${displayPhone}</span>
                                 <span>🧭 ${shop.directions} लोगों ने रास्ता लिया</span>
@@ -945,7 +1198,6 @@
                         </div>
                     </div>
 
-                    <!-- 3 Action Buttons: Get Direction (Redirects to Google Maps), Vote, Call -->
                     <div class="px-4 pb-4 pt-1 grid grid-cols-3 gap-2 text-xs font-extrabold">
                         <button onclick="handleGetDirectionRedirect('${shop.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm transition">
                             <i class="fa-solid fa-diamond-turn-right"></i> Get Direction
@@ -961,75 +1213,68 @@
             }).join('');
         }
 
-        // 7. GET DIRECTION REDIRECT + FREE QUOTA GATE (DRIVES ₹499 USER VIP SALES)
-        function handleGetDirectionRedirect(shopId) {
+        // DIRECTION REDIRECT + SUPABASE CLOUD LEAD LOGGING
+        async function handleGetDirectionRedirect(shopId) {
             const shop = shops.find(s => s.id === shopId);
             if (!shop) return;
 
-            // Check Free User Quota (1 Free Direction to experience magic, then require VIP Pass)
             if (!appUser.isUserVIP && appUser.freeDirectionsUsed >= 1) {
                 openModal('pricingModal');
-                showToast("🔒 Aapka 1 Free Direction Quota pura ho gaya! Unlimited Google Maps Directions ke liye User VIP (₹499/yr) lein.");
+                showToast("🔒 Aapka aaj ka 1 Free Direction Quota pura ho gaya! Unlimited Google Map Directions ke liye User VIP Pass (₹499/yr) lein.");
                 return;
             }
 
-            if (!appUser.isUserVIP) {
-                appUser.freeDirectionsUsed += 1;
-            }
+            if (!appUser.isUserVIP) appUser.freeDirectionsUsed += 1;
 
-            // Record Lead for Shop Owner
             shop.directions += 1;
             shop.views += 1;
-            customerLeads.unshift({
+            
+            const newLead = {
                 customer: "Local Visitor #" + Math.floor(100 + Math.random() * 900),
                 phone: "+91 9839" + Math.floor(100000 + Math.random() * 900000),
                 shop: shop.name,
                 action: "🧭 Took Google Map Direction",
                 dist: "1.1 km away"
-            });
+            };
 
-            saveAllData();
             renderShopCards();
             renderOwnerHub();
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`, '_blank');
 
-            showToast(`🧭 Google Maps par ${shop.name} (${shop.lat}, ${shop.lng}) ka exact rasta khul raha hai...`);
-            // Direct Google Maps Navigation with exact Lat/Long
-            const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`;
-            window.open(googleMapsUrl, '_blank');
+            await cloudUpsertShop(shop);
+            await cloudInsertLead(newLead);
         }
 
-        function handleDirectCallClick(shopId) {
+        async function handleDirectCallClick(shopId) {
             const shop = shops.find(s => s.id === shopId);
             if (!shop) return;
 
             if (!appUser.isUserVIP && !shop.verified && !appUser.isOwnerPro) {
                 openModal('pricingModal');
-                showToast("🔒 Unverified dukaan ka number locked hai! VIP Pass (₹499) lein ya Dukaan Malik ko Pro lene bole.");
+                showToast("🔒 Direct Call ke liye User VIP Pass (₹499) lein ya Dukaan Malik ko Business Pro lene bole.");
                 return;
             }
 
             shop.calls += 1;
-            saveAllData();
+            await cloudUpsertShop(shop);
             renderShopCards();
             renderOwnerHub();
-            showToast(`📞 Calling ${shop.name}: +91-${shop.phone}`);
+            window.location.href = `tel:+91${shop.phone}`;
         }
 
-        function handleSecretCouponClick(shopId) {
+        function handleSecretCouponClick() {
             if (!appUser.isUserVIP) {
                 openModal('pricingModal');
                 showToast("🎁 Secret Discount Coupons unlock karne ke liye User VIP Pass (₹499/yr) chunein!");
             } else {
-                showToast("✅ Coupon Code 'SAHIVIP' Copied! Dukaan par dikha kar discount lein.");
+                showToast("✅ Coupon Code 'SAHIVIP' Copied!");
             }
         }
 
-        // 8. INTERACTIVE MAP PICKER (LEAFLET + OPENSTREETMAP INDIA) — NO MANUAL LAT/LONG NEEDED!
+        // INTERACTIVE MAP PICKER
         function openAddShopModal() {
             openModal('addShopModal');
-            setTimeout(() => {
-                initInteractiveMapPicker();
-            }, 150);
+            setTimeout(() => initInteractiveMapPicker(), 150);
         }
 
         function initInteractiveMapPicker() {
@@ -1041,13 +1286,8 @@
 
                 leafletMarker = L.marker([25.3109, 83.0107], { draggable: true }).addTo(leafletMap);
 
-                // When user clicks anywhere on map, move pin & update UI Lat/Long automatically
-                leafletMap.on('click', function(e) {
-                    updatePinnedCoordinates(e.latlng.lat, e.latlng.lng);
-                });
-
-                // When user drags marker
-                leafletMarker.on('dragend', function(e) {
+                leafletMap.on('click', e => updatePinnedCoordinates(e.latlng.lat, e.latlng.lng));
+                leafletMarker.on('dragend', e => {
                     const pos = e.target.getLatLng();
                     updatePinnedCoordinates(pos.lat, pos.lng);
                 });
@@ -1067,7 +1307,6 @@
             document.getElementById('uiFormattedLatLng').innerText = `Lat: ${cleanLat}° N | Lng: ${cleanLng}° E`;
         }
 
-        // Search ANY Village / Kasba / Town in India via Live Nominatim Geocoder
         async function findVillageOnMap() {
             const q = document.getElementById('mapVillageSearchInput').value.trim();
             if (!q) return;
@@ -1082,30 +1321,27 @@
                     updatePinnedCoordinates(lat, lon);
                     const placeParts = data[0].display_name.split(',');
                     document.getElementById('newShopCity').value = placeParts[0].trim();
-                    showToast(`📍 Mil gaya: ${placeParts[0]}! Ab map par touch karke exact dukaan pin karein.`);
+                    showToast(`📍 Mil gaya: ${placeParts[0]}! Map par click karke exact dukaan pin karein.`);
                 } else {
-                    showToast("⚠️ Jagah nahi mili, kripya zila/tehsil ka naam sath me likhein.");
+                    showToast("⚠️ Jagah nahi mili, zila/tehsil ka naam sath me likhein.");
                 }
             } catch (err) {
-                showToast("📍 Map par drag karke apni jagah select karein.");
+                showToast("📍 Map ko drag karke apni jagah chunein.");
             }
         }
 
         function useMyLiveGPSOnMap() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    leafletMap.setView([lat, lng], 17);
-                    updatePinnedCoordinates(lat, lng);
-                    showToast("📍 Aapki Exact Live GPS Location Map Par Pin Ho Gayi!");
-                }, () => {
-                    showToast("⚠️ Browser GPS permission allow karein ya Map par search karein.");
-                });
+                    leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
+                    updatePinnedCoordinates(pos.coords.latitude, pos.coords.longitude);
+                    showToast("📍 Aapki Live GPS Location Map Par Pin Ho Gayi!");
+                }, () => showToast("⚠️ Browser GPS permission allow karein."));
             }
         }
 
-        function saveNewShopWithMapPin(e) {
+        // ADD NEW SHOP -> SAVES TO SUPABASE CLOUD IMMEDIATELY
+        async function saveNewShopWithMapPin(e) {
             e.preventDefault();
             const name = document.getElementById('newShopName').value.trim();
             const category = document.getElementById('newShopCategory').value;
@@ -1116,41 +1352,29 @@
             const lat = parseFloat(document.getElementById('pinnedLat').value);
             const lng = parseFloat(document.getElementById('pinnedLng').value);
 
-            const created = {
+            const newShopObj = {
                 id: "s_" + Date.now(),
-                name,
-                category,
-                city,
-                address,
-                phone,
-                lat,
-                lng,
-                rating: 4.8,
-                reviews: 6,
+                name, category, city, address, phone, lat, lng,
+                rating: 4.8, reviews: 6,
                 verified: appUser.isOwnerPro,
-                mapPin: true,
-                recent: true,
-                featured: false,
-                views: 18,
-                directions: 4,
-                calls: 2,
-                secretOffer,
+                mapPin: true, recent: true, featured: false,
+                views: 18, directions: 4, calls: 2, secretOffer,
                 image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
                 lastReview: "Map par exact GPS pin ke sath mohalle walo dwara add ki gayi dukaan!"
             };
 
-            shops.unshift(created);
-            appUser.points += 70; // 50 Add + 20 Map Pin
-            saveAllData();
+            shops.unshift(newShopObj);
+            appUser.points += 70;
+            
             closeModal('addShopModal');
             document.getElementById('addShopForm').reset();
             selectLocation(city);
             renderOwnerHub();
-            showToast(`🎉 ${name} Live ho gayi! Exact GPS (${lat}°N, ${lng}°E) saved & +70 Points mile!`);
+            await cloudUpsertShop(newShopObj);
+            showToast(`🎉 ${name} Cloud Database me Save & Live ho gayi! (+70 Points)`);
         }
 
-        // 9. ALL-INDIA LIVE LOCATION SEARCH IN HEADER (SUPPORTS EVERY VILLAGE/CITY)
-        let searchTimeout = null;
+        // ALL-INDIA LIVE LOCATION SEARCH
         function searchIndiaLocationsLive(val) {
             const box = document.getElementById('locationSuggestionsBox');
             const q = val.trim();
@@ -1158,10 +1382,7 @@
                 box.classList.add('hidden');
                 return;
             }
-
-            // Instant local match from Gazetteer
             const localMatches = INDIA_GAZETTEER.filter(loc => loc.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
-            
             let html = localMatches.map(loc => `
                 <div onclick="selectLocation('${loc.replace(/'/g, "")}')" class="px-3.5 py-2.5 hover:bg-orange-50 cursor-pointer flex items-center justify-between">
                     <span><i class="fa-solid fa-location-dot text-orange-600 mr-2"></i><b>${loc}</b></span>
@@ -1169,21 +1390,18 @@
                 </div>
             `).join('');
 
-            // Option to search any custom Village/Kasba across India live
             html += `
                 <div onclick="fetchLiveVillageFromOSM('${q.replace(/'/g, "")}')" class="px-3.5 py-2.5 bg-amber-50/70 hover:bg-amber-100 cursor-pointer text-orange-800 font-bold flex items-center justify-between">
-                    <span>🔍 Search "${q}" in All-India 6.4 Lakh Villages Database</span>
+                    <span>🔍 Search "${q}" in All-India 6.4 Lakh Villages</span>
                     <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            `;
-
+                </div>`;
             box.innerHTML = html;
             box.classList.remove('hidden');
         }
 
         async function fetchLiveVillageFromOSM(query) {
             document.getElementById('locationSuggestionsBox').classList.add('hidden');
-            showToast(`🇮🇳 Searching "${query}" in All-India Village/District Directory...`);
+            showToast(`🇮🇳 Searching "${query}" across All-India Directory...`);
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', India')}&limit=4`);
                 const data = await res.json();
@@ -1220,7 +1438,7 @@
             renderShopCards();
         }
 
-        // 10. SHOP OWNER DASHBOARD WITH BLURRED LEADS PAYWALL
+        // SHOP OWNER DASHBOARD
         function renderOwnerHub() {
             const statusBadge = document.getElementById('ownerPlanStatusBadge');
             if (appUser.isOwnerPro) {
@@ -1231,12 +1449,11 @@
                 statusBadge.innerText = "🔒 FREE MODE: Upgrade to ₹2,499/yr to Unmask Customer Mobile Numbers";
             }
 
-            // Render Customer Leads Table
             const leadsBody = document.getElementById('customerLeadsTableBody');
             leadsBody.innerHTML = customerLeads.map(lead => {
                 const phoneDisplay = appUser.isOwnerPro 
                     ? `<span class="font-mono font-bold text-emerald-700">${lead.phone}</span>` 
-                    : `<span class="font-mono font-bold text-slate-400">${lead.phone.slice(0, 8)}XXXXX</span> <button onclick="openModal('pricingModal')" class="ml-1 text-[10px] bg-orange-600 text-white font-bold px-2 py-0.5 rounded">Unlock</button>`;
+                    : `<span class="font-mono font-bold text-slate-400">${(lead.phone || '+91 98390').slice(0, 8)}XXXXX</span> <button onclick="openModal('pricingModal')" class="ml-1 text-[10px] bg-orange-600 text-white font-bold px-2 py-0.5 rounded">Unlock</button>`;
                 
                 return `
                 <tr class="hover:bg-slate-50">
@@ -1247,13 +1464,12 @@
                     <td class="py-3 px-4 text-slate-500 font-medium">${lead.dist}</td>
                     <td class="py-3 px-4 text-right">
                         <button onclick="${appUser.isOwnerPro ? `showToast('💬 Opening WhatsApp chat with ${lead.customer}...')` : `openModal('pricingModal')`}" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
-                            <i class="fa-brands fa-whatsapp mr-1"></i> Send Offer
+                            <i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp
                         </button>
                     </td>
                 </tr>`;
             }).join('');
 
-            // Render Shops Control Table
             const shopsBody = document.getElementById('ownerShopsTableBody');
             shopsBody.innerHTML = shops.map(shop => {
                 const sc = computeSahiRank(shop).total;
@@ -1271,57 +1487,211 @@
                             : `<span class="bg-red-50 text-red-600 font-bold text-xs px-2.5 py-1 rounded-md">Unverified (-20 Pts)</span>`}
                     </td>
                     <td class="py-3 px-4 text-right space-x-1">
-                        ${!shop.verified ? `<button onclick="startRazorpayCheckout('OWNER_PRO_2499', 2499, 'Shop Owner Business Pro', '${shop.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Verify ✔️ (₹2,499)</button>` : ''}
-                        ${!shop.featured ? `<button onclick="startRazorpayCheckout('SPOTLIGHT_499', 499, '7-Day #1 Spotlight', '${shop.id}')" class="gradient-gold text-white text-xs font-bold px-3 py-1.5 rounded-lg">Boost #1 (₹499)</button>` : ''}
+                        ${!shop.verified ? `<button onclick="startRealPaymentFlow('OWNER_PRO_2499', 2499, 'Shop Owner Business Pro', '${shop.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Verify ✔️ (₹2,499)</button>` : ''}
+                        ${!shop.featured ? `<button onclick="startRealPaymentFlow('SPOTLIGHT_499', 499, '7-Day #1 Spotlight', '${shop.id}')" class="gradient-gold text-white text-xs font-bold px-3 py-1.5 rounded-lg">Boost #1 (₹499)</button>` : ''}
                     </td>
                 </tr>`;
             }).join('');
         }
 
-        // 11. RAZORPAY CHECKOUT ENGINE
-        function startRazorpayCheckout(planCode, amountINR, planTitle, shopId = null) {
-            const liveKey = document.getElementById('founderRazorpayKey')?.value.trim();
+        // REAL PAYMENT FLOW
+        function startRealPaymentFlow(planCode, amountINR, planTitle, shopId = '') {
+            closeModal('pricingModal');
 
-            if (liveKey && liveKey.startsWith('rzp_')) {
+            if (founderConfig.razorpayKey && founderConfig.razorpayKey.startsWith('rzp_')) {
                 const rzp = new Razorpay({
-                    key: liveKey,
+                    key: founderConfig.razorpayKey,
                     amount: amountINR * 100,
                     currency: "INR",
-                    name: "SahiRank Enterprise SaaS",
+                    name: "SahiRank Technologies",
                     description: planTitle,
                     handler: function(res) {
-                        unlockPlanFeatures(planCode, shopId, res.razorpay_payment_id);
+                        activatePlanBenefits(planCode, shopId, res.razorpay_payment_id);
                     },
                     theme: { color: "#ea580c" }
                 });
                 rzp.open();
             } else {
-                unlockPlanFeatures(planCode, shopId, "RZP_PAID_" + Date.now());
+                document.getElementById('upiModalPlanTitle').innerText = planTitle;
+                document.getElementById('upiModalAmount').innerText = `₹${amountINR.toLocaleString()}`;
+                document.getElementById('displayFounderUpi').innerText = founderConfig.upiId;
+                document.getElementById('pendingPlanCode').value = planCode;
+                document.getElementById('pendingTargetShopId').value = shopId || '';
+                document.getElementById('upiDeepLinkBtn').href = `upi://pay?pa=${encodeURIComponent(founderConfig.upiId)}&pn=SahiRank&am=${amountINR}&cu=INR`;
+                openModal('upiPaymentModal');
             }
         }
 
-        function unlockPlanFeatures(planCode, shopId, txId) {
+        function verifyUtrAndActivate(e) {
+            e.preventDefault();
+            const utr = document.getElementById('utrNumberInput').value.trim();
+            if (utr.length !== 12) {
+                showToast("⚠️ Kripya sahi 12-Digit UPI UTR Number daalein!");
+                return;
+            }
+            const planCode = document.getElementById('pendingPlanCode').value;
+            const shopId = document.getElementById('pendingTargetShopId').value;
+            closeModal('upiPaymentModal');
+            document.getElementById('utrNumberInput').value = '';
+            activatePlanBenefits(planCode, shopId, "UTR_" + utr);
+        }
+
+        function sendPaymentOnWhatsApp() {
+            const planTitle = document.getElementById('upiModalPlanTitle').innerText;
+            const amount = document.getElementById('upiModalAmount').innerText;
+            const msg = encodeURIComponent(`Namaste SahiRank Team! Mujhe *${planTitle} (${amount})* activate karna hai. Main payment screenshot bhej raha hu.`);
+            window.open(`https://wa.me/${founderConfig.whatsapp}?text=${msg}`, '_blank');
+        }
+
+        async function activatePlanBenefits(planCode, shopId, refId) {
             if (planCode === 'USER_VIP_499') {
                 appUser.isUserVIP = true;
                 appUser.points += 50;
-                showToast(`👑 User VIP Pass Activated! Sabhi Blurred Ranks (#3+), Secret Coupons aur Unlimited Directions khul gaye!`);
+                showToast(`👑 User VIP Pass Activated (Ref: ${refId})!`);
             } else if (planCode === 'OWNER_PRO_2499') {
                 appUser.isOwnerPro = true;
                 const target = shopId ? shops.find(s => s.id === shopId) : shops.find(s => !s.verified) || shops[0];
-                if (target) target.verified = true;
-                showToast(`✔️ Business Pro (₹2,499) Active! Customer Mobile Numbers & Blue Badge Unlocked!`);
+                if (target) {
+                    target.verified = true;
+                    await cloudUpsertShop(target);
+                }
+                showToast(`✔️ Business Pro Activated (Ref: ${refId})! Verified Badge Synced to Cloud!`);
             } else if (planCode === 'SPOTLIGHT_499') {
                 const target = shopId ? shops.find(s => s.id === shopId) : shops[0];
-                if (target) target.featured = true;
-                showToast(`⚡ 7-Day City #1 Spotlight Active! Dukaan ab sabse upar Golden Card me dikhegi!`);
+                if (target) {
+                    target.featured = true;
+                    await cloudUpsertShop(target);
+                }
+                showToast(`⚡ 7-Day #1 Spotlight Activated (Ref: ${refId})!`);
             }
-            saveAllData();
-            closeModal('pricingModal');
+            saveLocalBackup();
+            renderShopCards();
+            renderOwnerHub();
+            if (isFounderLoggedIn) renderFounderAdminPanel();
+        }
+
+        // SECRET FOUNDER ADMIN ACCESS (PIN: 7788)
+        function handleSecretFooterTap() {
+            secretTapCount += 1;
+            if (secretTapCount >= 5) {
+                secretTapCount = 0;
+                openModal('founderLoginModal');
+            }
+        }
+
+        function verifyFounderPin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('founderPinInput').value.trim();
+            if (pin === founderConfig.secretPin) {
+                isFounderLoggedIn = true;
+                document.getElementById('founderPinInput').value = '';
+                closeModal('founderLoginModal');
+                document.getElementById('navTabFounderSecret').classList.remove('hidden');
+                switchView('founderAdmin');
+                renderFounderAdminPanel();
+                showToast("🔓 Welcome Founder! Secret Admin Control Room Unlocked.");
+            } else {
+                showToast("❌ Galat PIN! Default Founder PIN 7788 hai.");
+            }
+        }
+
+        function renderFounderAdminPanel() {
+            document.getElementById('adminSupabaseUrlInput').value = founderConfig.supabaseUrl || "";
+            document.getElementById('adminSupabaseKeyInput').value = founderConfig.supabaseKey || "";
+            document.getElementById('adminRazorpayKeyInput').value = founderConfig.razorpayKey || "";
+            document.getElementById('adminUpiIdInput').value = founderConfig.upiId || "sahirank@upi";
+            document.getElementById('adminWhatsappInput').value = founderConfig.whatsapp || "919876543210";
+
+            const listEl = document.getElementById('adminShopsControlList');
+            listEl.innerHTML = shops.map(shop => `
+                <tr class="hover:bg-slate-900/60">
+                    <td class="py-3 px-4 font-bold text-white">${shop.name} <span class="text-slate-400 font-normal">(${shop.city})</span></td>
+                    <td class="py-3 px-4">
+                        <button onclick="adminToggleShopVerified('${shop.id}')" class="px-2.5 py-1 rounded text-xs font-bold ${shop.verified ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'}">
+                            ${shop.verified ? '✔️ Verified (ON)' : 'Unverified (OFF)'}
+                        </button>
+                    </td>
+                    <td class="py-3 px-4">
+                        <button onclick="adminToggleShopFeatured('${shop.id}')" class="px-2.5 py-1 rounded text-xs font-bold ${shop.featured ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                            ${shop.featured ? '⭐ #1 Spotlight (ON)' : 'Standard (OFF)'}
+                        </button>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="adminDeleteShop('${shop.id}')" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveFounderConfig() {
+            founderConfig.supabaseUrl = document.getElementById('adminSupabaseUrlInput').value.trim();
+            founderConfig.supabaseKey = document.getElementById('adminSupabaseKeyInput').value.trim();
+            founderConfig.razorpayKey = document.getElementById('adminRazorpayKeyInput').value.trim();
+            founderConfig.upiId = document.getElementById('adminUpiIdInput').value.trim() || "sahirank@upi";
+            founderConfig.whatsapp = document.getElementById('adminWhatsappInput').value.trim() || "919876543210";
+            saveLocalBackup();
+            await initSupabaseCloud();
+            showToast("✅ Supabase Cloud & Payment Settings Saved!");
+        }
+
+        async function adminToggleShopVerified(shopId) {
+            const s = shops.find(x => x.id === shopId);
+            if (s) {
+                s.verified = !s.verified;
+                await cloudUpsertShop(s);
+            }
+            renderFounderAdminPanel();
             renderShopCards();
             renderOwnerHub();
         }
 
-        // 12. VOTE SUBMISSION & VIEW HELPERS
+        async function adminToggleShopFeatured(shopId) {
+            const s = shops.find(x => x.id === shopId);
+            if (s) {
+                s.featured = !s.featured;
+                await cloudUpsertShop(s);
+            }
+            renderFounderAdminPanel();
+            renderShopCards();
+            renderOwnerHub();
+        }
+
+        async function adminDeleteShop(shopId) {
+            shops = shops.filter(x => x.id !== shopId);
+            saveLocalBackup();
+            if (supabaseClient) {
+                await supabaseClient.from('shops').delete().eq('id', shopId);
+            }
+            renderFounderAdminPanel();
+            renderShopCards();
+            renderOwnerHub();
+            showToast("🗑️ Dukaan Cloud Database se delete kar di gayi.");
+        }
+
+        function adminToggleUserVIP() {
+            appUser.isUserVIP = !appUser.isUserVIP;
+            saveLocalBackup();
+            renderShopCards();
+            showToast(`👑 User VIP Preview: ${appUser.isUserVIP ? 'ON' : 'OFF'}`);
+        }
+
+        function adminToggleOwnerPro() {
+            appUser.isOwnerPro = !appUser.isOwnerPro;
+            saveLocalBackup();
+            renderOwnerHub();
+            showToast(`✔️ Owner Pro Preview: ${appUser.isOwnerPro ? 'ON' : 'OFF'}`);
+        }
+
+        function logoutFounderAdmin() {
+            isFounderLoggedIn = false;
+            document.getElementById('navTabFounderSecret').classList.add('hidden');
+            switchView('rankings');
+            showToast("🔒 Admin Panel Locked & Hidden from Public.");
+        }
+
+        // VOTE SUBMISSION -> SAVES TO SUPABASE CLOUD IMMEDIATELY
         function openVoteModal(shopId) {
             const shop = shops.find(s => s.id === shopId);
             if (!shop) return;
@@ -1330,7 +1700,7 @@
             openModal('voteModal');
         }
 
-        function submitMohallaVote(e) {
+        async function submitMohallaVote(e) {
             e.preventDefault();
             const shopId = document.getElementById('voteTargetShopId').value;
             const stars = parseFloat(document.getElementById('voteStars').value);
@@ -1348,10 +1718,10 @@
             const pts = 20 + (hasPhoto ? 30 : 0);
             appUser.points += pts;
 
-            saveAllData();
             closeModal('voteModal');
             renderShopCards();
-            showToast(`🗳️ Aapka Mohalla Vote jud gaya! +${pts} SahiRank Points mile!`);
+            await cloudUpsertShop(shop);
+            showToast(`🗳️ Vote Cloud Database me jud gaya! +${pts} SahiRank Points mile!`);
         }
 
         function filterByCategory(cat) {
@@ -1368,13 +1738,13 @@
             document.getElementById('viewRankings').classList.toggle('hidden', view !== 'rankings');
             document.getElementById('categoryChipsContainer').classList.toggle('hidden', view !== 'rankings');
             document.getElementById('viewOwner').classList.toggle('hidden', view !== 'owner');
-            document.getElementById('viewRevenue').classList.toggle('hidden', view !== 'revenue');
+            document.getElementById('viewFounderAdmin').classList.toggle('hidden', view !== 'founderAdmin');
 
             document.getElementById('navTabRankings').className = view === 'rankings' ? "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-slate-900 shadow-sm transition" : "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 hover:text-slate-900 transition";
             document.getElementById('navTabOwner').className = view === 'owner' ? "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5" : "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 hover:text-slate-900 transition flex items-center gap-1.5";
-            document.getElementById('navTabRevenue').className = view === 'revenue' ? "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-slate-900 shadow-sm transition" : "px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-700 hover:text-slate-900 transition";
 
             if (view === 'owner') renderOwnerHub();
+            if (view === 'founderAdmin') renderFounderAdminPanel();
         }
 
         function resetAllFilters() {
@@ -1396,11 +1766,10 @@
             setTimeout(() => box.classList.add('hidden'), 4200);
         }
 
-        // Live Social Proof Ticker Rotation
         const tickerMessages = [
             "🔥 <b>Ramesh Tiwary (Varanasi)</b> ne abhi Blue Lassi Shop ka Google Map Direction liya!",
             "👑 <b>Ankit Gupta (Lucknow)</b> ne ₹499 User VIP Pass unlock kiya!",
-            "✔️ <b>Purvanchal Mobile Care (Lanka)</b> ne ₹2,499 Business Pro Plan lekar 19 Customer Leads unlock kiye!",
+            "✔️ <b>Kashi Chat Bhandar</b> ne ₹2,499 Business Pro Plan se Customer Leads unlock kiye!",
             "📍 <b>Suresh Yadav (Chiraigaon Village)</b> ne Interactive Map par nayi Kirana Dukaan Pin ki (+70 Pts)!"
         ];
         let tickerIdx = 0;
@@ -1410,10 +1779,14 @@
             if (el) el.innerHTML = tickerMessages[tickerIdx];
         }, 4500);
 
-        window.onload = () => {
+        window.onload = async () => {
             refreshHeaderUI();
             renderShopCards();
             renderOwnerHub();
+            await initSupabaseCloud();
+            if (window.location.search.includes('admin=1')) {
+                openModal('founderLoginModal');
+            }
         };
     </script>
 </body>
